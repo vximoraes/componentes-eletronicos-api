@@ -120,7 +120,7 @@ class AuthController {
         const id = req.body.id;
         // remove o token do banco de dados e retorna uma resposta de sucesso
         const data = await this.service.revoke(id);
-        return CommonResponse.success(res);
+        return CommonResponse.success(res, null, 200, data.message);
     }
 
     /**

@@ -21,8 +21,41 @@ class AuthService {
     }
 
     async revoke(id) {
+        if (!id) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.BAD_REQUEST.code,
+                errorType: 'validationError',
+                field: 'id',
+                details: [],
+                customMessage: 'ID do usuário é obrigatório para revogar tokens.'
+            });
+        }
+
+        // Verificar se o usuário existe
+        const usuario = await this.repository.buscarPorId(id);
+        if (!usuario) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.NOT_FOUND.code,
+                errorType: 'notFound',
+                field: 'Usuário',
+                details: [],
+                customMessage: 'Usuário não encontrado para revogação de tokens.'
+            });
+        }
+
         const data = await this.repository.removeToken(id);
-        return { data };
+        if (!data) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR.code,
+                errorType: 'serverError',
+                field: 'Token',
+                details: [],
+                customMessage: 'Erro ao revogar tokens do usuário.'
+            });
+        }
+
+        return { message: 'Tokens revogados com sucesso.' };
+
     }
 
     async logout(id) {
