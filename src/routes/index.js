@@ -12,7 +12,7 @@ import fornecedores from './fornecedorRoutes.js';
 import movimentacoes from './movimentacaoRoutes.js';
 import notificacoes from './notificacaoRoutes.js';
 import orcamentos from './orcamentoRoutes.js'
-import grupos from './grupoRoutes.js'
+// import grupos from './grupoRoutes.js'
 
 import dotenv from "dotenv";
 
@@ -43,7 +43,7 @@ const routes = (app) => {
         movimentacoes,
         notificacoes,
         orcamentos,
-        grupos
+        // grupos
     );
 
     app.use((req, res) => {
