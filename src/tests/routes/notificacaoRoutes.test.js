@@ -1,6 +1,7 @@
 import request from 'supertest';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import faker from 'faker-br';
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
@@ -13,10 +14,12 @@ const criarUsuarioValido = async () => {
     const unique = Date.now() + '-' + Math.floor(Math.random() * 10000);
     const email = `user${unique}@test.com`;
     const senha = 'Senha1234!';
+    const nomeBruto = await faker.name.findName()
+    const nome = nomeBruto.replace(/-/g, " ")
     const res = await request(BASE_URL)
         .post('/signup')
-        .send({ nome: `Usuário Teste ${unique}`, email, senha, ativo: true });
-    return res.body.data?._id;
+        .send({ nome, email, senha, ativo: true });
+    return res.body?.data?._id;
 };
 
 const criarNotificacaoValida = async (override = {}) => {

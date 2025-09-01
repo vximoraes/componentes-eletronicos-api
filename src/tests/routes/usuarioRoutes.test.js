@@ -111,10 +111,10 @@ describe("Usuários", () => {
     it("Deve atualizar usuário (PUT)", async () => {
         const res = await request(BASE_URL)
             .put(`/usuarios/${usuarioId}`)
-            .send({ nome: "NovoNome" })
+            .send({ nome: "Novo Nome" })
             .set("Authorization", `Bearer ${token}`)
             .expect(200);
-        expect(res.body.data.nome).toBe("NovoNome");
+        expect(res.body.data.nome).toBe("Novo Nome");
     });
 
     it("Não deve atualizar email ou senha via update (PUT)", async () => {
@@ -137,7 +137,7 @@ describe("Usuários", () => {
     it("Deve retornar 404 ao atualizar usuário inexistente", async () => {
         await request(BASE_URL)
             .put(`/usuarios/000000000000000000000000`)
-            .send({ nome: "NovoNome" })
+            .send({ nome: "Novo Nome" })
             .set("Authorization", `Bearer ${token}`)
             .expect(404);
     });
@@ -161,7 +161,9 @@ describe("Usuários", () => {
     });
 
     it("Deve aplicar filtro de busca por nome", async () => {
-        const nomeFiltro = "UsuarioFiltro" + Date.now();
+        const nomeBruto = await faker.name.lastName()
+        const nome = nomeBruto.replace(/-/g, " ")
+        const nomeFiltro = "Usuario Filtro" + " " + nome;
         await request(BASE_URL)
             .post("/signup")
             .send({ nome: nomeFiltro, email: faker.internet.email(), senha: 'Senha1234!' });
@@ -173,7 +175,7 @@ describe("Usuários", () => {
     });
 
     it("Resposta não deve conter campo senha em texto plano", async () => {
-        const obj = { nome: faker.name.firstName() + Date.now(), email: faker.internet.email(), senha: 'Senha1234!' };
+        const obj = { nome: faker.name.firstName().replace(/-/g, " ") + " " + faker.name.lastName(), email: faker.internet.email(), senha: 'Senha1234!' };
         const res = await request(BASE_URL)
             .post("/signup")
             .send(obj)
@@ -186,7 +188,7 @@ describe("Usuários", () => {
     });
 
     it("Deve criar usuário com permissões do grupo 'Usuario' por padrão", async () => {
-        const obj = { nome: faker.name.firstName() + Date.now(), email: faker.internet.email(), senha: 'Senha1234!' };
+        const obj = { nome: faker.name.firstName().replace(/-/g, " ") + " " + faker.name.lastName(), email: faker.internet.email(), senha: 'Senha1234!' };
         const res = await request(BASE_URL)
             .post("/signup")
             .send(obj)
