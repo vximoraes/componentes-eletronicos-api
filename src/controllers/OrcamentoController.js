@@ -62,6 +62,11 @@ class OrcamentoController {
     async atualizar(req, res) {
         const { id } = req.params;
 
+        // Não permitir alteração do valor_unitario no update do orçamento
+        if (req.body.componente_orcamento && req.body.componente_orcamento.valor_unitario) {
+            delete req.body.componente_orcamento.valor_unitario;
+        }
+
         const parsedData = OrcamentoUpdateSchema.parse(req.body);
         const orcamentoAtualizado = await this.service.atualizar(id, parsedData);
 
@@ -75,7 +80,6 @@ class OrcamentoController {
         return CommonResponse.success(res, data, 200, 'Orçamento excluído com sucesso.');
     };
 
-    // Manipular componentes.
 
     async adicionarComponente(req, res) {
         const { orcamentoId } = req.params;
@@ -103,26 +107,25 @@ class OrcamentoController {
         };
         const parsedComponente = ComponenteOrcamentoUpdateSchema.parse(componenteData);
 
-        // Buscar valores antigos para garantir subtotal correto
+        // valores antigos para garantir subtotal correto
         const oldComponente = await this.service.getComponenteById(orcamentoId, id);
         if (!oldComponente) {
             return CommonResponse.error(res, 404, 'resourceNotFound', 'componente', [{ message: 'Componente não encontrado.' }]);
         };
 
-        // Atualiza apenas os campos enviados
         const componenteAtualizado = {
             ...oldComponente,
             ...parsedComponente,
             _id: id
         };
 
-        // Só sobrescreve se o campo veio no PATCH (req.body) e sempre converte para number
+        // Atualiza somente quantidade. Valor unitário sempre mantido
         const quantidade = Object.prototype.hasOwnProperty.call(req.body, 'quantidade')
             ? Number(req.body.quantidade)
             : Number(oldComponente.quantidade);
-        const valor_unitario = Object.prototype.hasOwnProperty.call(req.body, 'valor_unitario')
-            ? Number(req.body.valor_unitario)
-            : Number(oldComponente.valor_unitario);
+
+        const valor_unitario = Number(oldComponente.valor_unitario);
+
         componenteAtualizado.quantidade = quantidade;
         componenteAtualizado.valor_unitario = valor_unitario;
         componenteAtualizado.subtotal = quantidade * valor_unitario;

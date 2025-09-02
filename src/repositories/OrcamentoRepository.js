@@ -111,7 +111,7 @@ class OrcamentoRepository {
 
     // Manipular componentes.
 
-    async adicionarComponente(orcamentoId, novoComponente) {
+       async adicionarComponente(orcamentoId, novoComponente) {
         const orcamento = await this.model.findById(orcamentoId);
         if (!orcamento) throw new CustomError({
             statusCode: 404,
@@ -120,6 +120,11 @@ class OrcamentoRepository {
             details: [],
             customMessage: messages.error.resourceNotFound('Orçamento')
         });
+
+        // Remove valor_unitario se vier no payload da requisição
+        if (novoComponente && novoComponente.valor_unitario) {
+            delete novoComponente.valor_unitario;
+        }
 
         orcamento.componentes.push(novoComponente);
         orcamento.valor = orcamento.componentes.reduce((acc, comp) => acc + comp.subtotal, 0);
@@ -148,31 +153,22 @@ class OrcamentoRepository {
             customMessage: 'Componente não encontrado.'
         });
 
-        componentes[idx] = { ...((typeof componentes[idx].toObject === 'function') ? componentes[idx].toObject() : componentes[idx]), ...componenteAtualizado };
+        // Remove valor_unitario se o cliente tentar alterar manualmente
+        if (componenteAtualizado && componenteAtualizado.valor_unitario) {
+            delete componenteAtualizado.valor_unitario;
+        }
+
+        componentes[idx] = { 
+            ...((typeof componentes[idx].toObject === 'function') ? componentes[idx].toObject() : componentes[idx]), 
+            ...componenteAtualizado 
+        };
         orcamento.componentes = componentes;
         orcamento.valor = componentes.reduce((acc, comp) => acc + comp.subtotal, 0);
         await orcamento.save();
 
         return orcamento;
     };
-
-    async removerComponente(orcamentoId, componenteId) {
-        const orcamento = await this.model.findById(orcamentoId);
-        if (!orcamento) throw new CustomError({
-            statusCode: 404,
-            errorType: 'resourceNotFound',
-            field: 'Orçamento',
-            details: [],
-            customMessage: messages.error.resourceNotFound('Orçamento')
-        });
-
-        orcamento.componentes = orcamento.componentes.filter(c => c._id.toString() !== componenteId);
-        orcamento.valor = orcamento.componentes.reduce((acc, comp) => acc + comp.subtotal, 0);
-        await orcamento.save();
-
-        return orcamento;
-    };
-
+    
     // Métodos auxiliares.
 
     async buscarPorId(id, includeTokens = false) {
