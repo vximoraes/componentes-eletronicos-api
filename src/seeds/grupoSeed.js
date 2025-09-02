@@ -46,7 +46,6 @@ export default async function seedGrupos(rotas) {
     grupos.push(grupoVisitante);
 
     const result = await Grupo.collection.insertMany(grupos);
-    console.log(Object.keys(result.insertedIds).length + " Grupos inseridos!");
 
     // Retorna grupos atualizados
     return Grupo.find();
