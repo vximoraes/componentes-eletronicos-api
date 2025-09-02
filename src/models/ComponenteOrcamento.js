@@ -20,7 +20,8 @@ class ComponenteOrcamento {
             },
             valor_unitario: {
                 type: Number,
-                required: true
+                required: true,
+                immutable: true // não pode ser alterado
             },
             subtotal: {
                 type: Number,
