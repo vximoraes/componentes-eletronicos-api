@@ -45,5 +45,4 @@ export default async function usuarioSeed() {
     usuarios.push(admin);
 
     const result = await Usuario.collection.insertMany(usuarios);
-    console.log(Object.keys(result.insertedIds).length + " Usuários inseridos!");
 }

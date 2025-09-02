@@ -23,7 +23,7 @@ const getServersInCorrectOrder = () => {
     const devUrl = { url: process.env.SWAGGER_DEV_URL || `http://localhost:${PORT}` };
 
     if (process.env.NODE_ENV === "production") return [devUrl];
-    else return [devUrl, prodUrl1];
+    else return [devUrl];
 };
 
 // Função para obter as opções do Swagger

@@ -41,7 +41,6 @@ export default async function seedRotas() {
     }));
 
     const result = await Rota.collection.insertMany(rotas);
-    console.log(Object.keys(result.insertedIds).length + " Rotas inseridas!");
 
     return Rota.find();
 }
