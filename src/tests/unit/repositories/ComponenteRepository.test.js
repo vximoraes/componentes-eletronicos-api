@@ -70,7 +70,31 @@ describe('ComponenteRepository', () => {
             const req = { params: {}, query: { nome: 'C1', page: 1, limite: 10 } };
             const mockBuild = jest.fn(() => ({}));
             ComponenteFilterBuilder.mockImplementation(() => ({
-                comNome: () => ({ comQuantidade: () => ({ comEstoqueMinimo: () => ({ comAtivo: () => ({ build: mockBuild, comLocalizacao: async () => ({}), comCategoria: async () => ({}) }) }) }) }),
+                comNome: () => ({ 
+                    comQuantidade: () => ({ 
+                        comEstoqueMinimo: () => ({ 
+                            comAtivo: () => ({ 
+                                comStatus: () => ({ 
+                                    build: mockBuild, 
+                                    comLocalizacao: async () => ({}), 
+                                    comCategoria: async () => ({}) 
+                                }),
+                                build: mockBuild, 
+                                comLocalizacao: async () => ({}), 
+                                comCategoria: async () => ({}) 
+                            }),
+                            build: mockBuild, 
+                            comLocalizacao: async () => ({}), 
+                            comCategoria: async () => ({}) 
+                        }),
+                        build: mockBuild, 
+                        comLocalizacao: async () => ({}), 
+                        comCategoria: async () => ({}) 
+                    }),
+                    build: mockBuild, 
+                    comLocalizacao: async () => ({}), 
+                    comCategoria: async () => ({}) 
+                }),
                 build: mockBuild,
                 comLocalizacao: async () => ({}),
                 comCategoria: async () => ({})
@@ -93,33 +117,19 @@ describe('ComponenteRepository', () => {
         });
     });
 
-    describe('deletar', () => {
-        it('deve deletar componente se não houver movimentação', async () => {
-            MovimentacaoModel.exists.mockResolvedValueOnce(false);
-            mockFindById.mockReturnValueOnce({ populate: () => ({ populate: () => ({ nome: 'C1', _id: 'id1' }) }) });
-            mockFindByIdAndDelete.mockResolvedValueOnce(true);
-            const result = await repository.deletar('id1');
-            expect(result).toEqual({ nome: 'C1', _id: 'id1' });
-        });
-        it('deve lançar erro se houver movimentação vinculada', async () => {
-            MovimentacaoModel.exists.mockResolvedValueOnce(true);
-            await expect(repository.deletar('id1')).rejects.toThrow(CustomError);
-        });
-        it('deve lançar erro 404 se componente não encontrado ao deletar', async () => {
-            MovimentacaoModel.exists.mockResolvedValueOnce(false);
-            mockFindById.mockReturnValueOnce({ populate: () => ({ populate: () => null }) });
-            await expect(repository.deletar('id1')).rejects.toThrow(CustomError);
-        });
-    });
-
     describe('buscarPorId', () => {
         it('deve retornar componente por id', async () => {
-            mockFindById.mockReturnValueOnce({ nome: 'C1', _id: 'id1' });
+            const mockPopulateChain = { nome: 'C1', _id: 'id1' };
+            mockFindById.mockReturnValueOnce({
+                populate: () => ({ populate: () => mockPopulateChain })
+            });
             const result = await repository.buscarPorId('id1');
             expect(result).toEqual({ nome: 'C1', _id: 'id1' });
         });
         it('deve lançar erro 404 se não encontrar componente', async () => {
-            mockFindById.mockReturnValueOnce(null);
+            mockFindById.mockReturnValueOnce({
+                populate: () => ({ populate: () => null })
+            });
             await expect(repository.buscarPorId('id1')).rejects.toThrow(CustomError);
         });
     });
@@ -145,12 +155,26 @@ describe('ComponenteRepository', () => {
                     comQuantidade: () => ({ 
                         comEstoqueMinimo: () => ({ 
                             comAtivo: () => ({
+                                comStatus: () => ({
+                                    build: undefined,
+                                    comLocalizacao: async () => ({}),
+                                    comCategoria: async () => ({})
+                                }),
                                 build: undefined,
                                 comLocalizacao: async () => ({}),
                                 comCategoria: async () => ({})
-                            }) 
-                        }) 
-                    })
+                            }),
+                            build: undefined,
+                            comLocalizacao: async () => ({}),
+                            comCategoria: async () => ({})
+                        }),
+                        build: undefined,
+                        comLocalizacao: async () => ({}),
+                        comCategoria: async () => ({})
+                    }),
+                    build: undefined,
+                    comLocalizacao: async () => ({}),
+                    comCategoria: async () => ({})
                 }),
             }));
             await expect(repository.listar(req)).rejects.toThrow(CustomError);

@@ -114,7 +114,9 @@ class ComponenteRepository {
     // Métodos auxiliares.
 
     async buscarPorId(id, includeTokens = false) {
-        let query = this.model.findById(id);
+        let query = this.model.findById(id)
+            .populate('localizacao')
+            .populate('categoria');
 
         const componente = await query;
 

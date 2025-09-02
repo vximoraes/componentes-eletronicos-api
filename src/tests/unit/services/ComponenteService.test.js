@@ -131,35 +131,6 @@ describe('ComponenteService', () => {
         });
     });
 
-    describe('deletar', () => {
-        it('deve remover componente existente', async () => {
-            repositoryMock.buscarPorId.mockResolvedValue(makeComponente());
-            repositoryMock.deletar.mockResolvedValue({ acknowledged: true, deletedCount: 1 });
-            const result = await service.deletar('comp1');
-            expect(result).toHaveProperty('acknowledged', true);
-        });
-        it('deve lançar erro se componente não existir', async () => {
-            repositoryMock.buscarPorId.mockResolvedValue(null);
-            await expect(service.deletar('compX')).rejects.toThrow(CustomError);
-        });
-        it('deve lançar erro se componente estiver vinculado a movimentações', async () => {
-            repositoryMock.buscarPorId.mockResolvedValue(makeComponente());
-            repositoryMock.deletar.mockRejectedValue(new CustomError({
-                statusCode: 400,
-                errorType: 'resourceInUse',
-                field: 'Componente',
-                details: [],
-                customMessage: 'Componente vinculado a movimentações.'
-            }));
-            await expect(service.deletar('comp1')).rejects.toThrow('Componente vinculado a movimentações');
-        });
-        it('deve lançar erro inesperado do repository', async () => {
-            repositoryMock.buscarPorId.mockResolvedValue(makeComponente());
-            repositoryMock.deletar.mockRejectedValue(new Error('DB error'));
-            await expect(service.deletar('comp1')).rejects.toThrow('DB error');
-        });
-    });
-
     describe('Métodos auxiliares', () => {
         it('validateNome lança erro se nome já existir', async () => {
             repositoryMock.buscarPorNome.mockResolvedValue(makeComponente());

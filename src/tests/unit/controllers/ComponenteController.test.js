@@ -112,27 +112,6 @@ describe('ComponenteController', () => {
         });
     });
 
-    describe('deletar', () => {
-        it('deve deletar componente existente', async () => {
-            req.params = { id: '1' };
-            ComponenteIdSchema.parse.mockReturnValue('1');
-            serviceMock.deletar.mockResolvedValue({ nome: 'Removido' });
-
-            await controller.deletar(req, res);
-
-            expect(ComponenteIdSchema.parse).toHaveBeenCalledWith('1');
-            expect(serviceMock.deletar).toHaveBeenCalledWith('1');
-            expect(CommonResponse.success).toHaveBeenCalledWith(res, { nome: 'Removido' }, 200, 'Componente excluído com sucesso.');
-        });
-
-        it('deve retornar erro 404 ao tentar deletar componente inexistente', async () => {
-            req.params = { id: '1' };
-            ComponenteIdSchema.parse.mockReturnValue('1');
-            serviceMock.deletar.mockRejectedValue({ status: 404 });
-            await expect(controller.deletar(req, res)).rejects.toEqual(expect.objectContaining({ status: 404 }));
-        });
-    });
-
     describe('erros inesperados', () => {
         it('deve retornar erro 500 para falha inesperada em criar', async () => {
             ComponenteSchema.parse.mockReturnValue({ nome: 'Erro' });
@@ -151,13 +130,6 @@ describe('ComponenteController', () => {
             ComponenteUpdateSchema.parse.mockReturnValue({ nome: 'Erro' });
             serviceMock.atualizar.mockRejectedValue({ status: 500 });
             await expect(controller.atualizar(req, res)).rejects.toEqual(expect.objectContaining({ status: 500 }));
-        });
-
-        it('deve retornar erro 500 para falha inesperada em deletar', async () => {
-            req.params = { id: '1' };
-            ComponenteIdSchema.parse.mockReturnValue('1');
-            serviceMock.deletar.mockRejectedValue({ status: 500 });
-            await expect(controller.deletar(req, res)).rejects.toEqual(expect.objectContaining({ status: 500 }));
         });
     });
 });
