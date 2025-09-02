@@ -33,6 +33,10 @@ const ComponenteSchema = z.object({
     ativo: z
         .boolean()
         .default(true),
+    status: z
+        .enum(['Indisponível', 'Baixo Estoque', 'Em Estoque'])
+        .default('Indisponível')
+        .optional(),
 });
 
 const ComponenteUpdateSchema = ComponenteSchema.partial();

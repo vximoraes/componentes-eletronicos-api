@@ -35,10 +35,10 @@ class ComponenteService {
         return data;
     };
 
-    async deletar(id) {
+    async inativar(id) {
         await this.ensureComponentExists(id);
 
-        const data = await this.repository.deletar(id);
+        const data = await this.repository.atualizar(id, { ativo: false });
 
         return data;
     };

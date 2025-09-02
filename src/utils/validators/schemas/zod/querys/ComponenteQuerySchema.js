@@ -40,6 +40,12 @@ export const ComponenteQuerySchema = z.object({
         .refine((value) => !value || value === "true" || value === "false", {
             message: "Ativo deve ser 'true' ou 'false'",
         }),
+    status: z
+        .string()
+        .optional()
+        .refine((value) => !value || ['Indisponível', 'Baixo Estoque', 'Em Estoque'].includes(value), {
+            message: "Status deve ser 'Indisponível', 'Baixo Estoque' ou 'Em Estoque'",
+        }),
     page: z
         .string()
         .optional()

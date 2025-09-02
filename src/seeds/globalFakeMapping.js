@@ -86,6 +86,7 @@ export const fakeMappings = {
         categoria: () => new mongoose.Types.ObjectId().toString(),
         localizacao: () => new mongoose.Types.ObjectId().toString(),
         ativo: () => fakebr.random.boolean(),
+        status: () => fakebr.helpers.randomize(['Indisponível', 'Baixo Estoque', 'Em Estoque']),
     },
 
     Fornecedor: {
@@ -121,6 +122,7 @@ export const fakeMappings = {
         categoria: () => new mongoose.Types.ObjectId().toString(),
         localizacao: () => new mongoose.Types.ObjectId().toString(),
         ativo: () => fakebr.random.boolean(),
+        status: () => fakebr.helpers.randomize(['Indisponível', 'Baixo Estoque', 'Em Estoque']),
     },
 
     Orcamento: {

@@ -43,13 +43,13 @@ class ComponenteController {
         return CommonResponse.success(res, data, 200, 'Componente atualizado com sucesso. Porém, a quantidade só pode ser alterada por movimentação.');
     };
 
-    async deletar(req, res) {
+    async inativar(req, res) {
         const { id } = req.params || {};
         ComponenteIdSchema.parse(id);
 
-        const data = await this.service.deletar(id);
+        const data = await this.service.inativar(id);
 
-        return CommonResponse.success(res, data, 200, 'Componente excluído com sucesso.');
+        return CommonResponse.success(res, data, 200, 'Componente inativado com sucesso.');
     };
 };
 

@@ -13,7 +13,7 @@ router
     .get("/componentes/:id", AuthMiddleware, AuthPermission, asyncWrapper(componenteController.listar.bind(componenteController)))
     .post("/componentes", AuthMiddleware, AuthPermission, asyncWrapper(componenteController.criar.bind(componenteController)))
     .patch("/componentes/:id", AuthMiddleware, AuthPermission, asyncWrapper(componenteController.atualizar.bind(componenteController)))
+    .patch("/componentes/:id/inativar", AuthMiddleware, AuthPermission, asyncWrapper(componenteController.inativar.bind(componenteController)))
     .put("/componentes/:id", AuthMiddleware, AuthPermission, asyncWrapper(componenteController.atualizar.bind(componenteController)))
-    .delete("/componentes/:id", AuthMiddleware, AuthPermission, asyncWrapper(componenteController.deletar.bind(componenteController)))
 
 export default router;

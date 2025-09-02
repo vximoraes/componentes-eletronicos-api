@@ -19,6 +19,7 @@ const componentesSchemas = {
             localizacao: componenteJsonSchema.properties.localizacao,
             categoria: componenteJsonSchema.properties.categoria,
             ativo: componenteJsonSchema.properties.ativo,
+            status: componenteJsonSchema.properties.status,
         }
     },
     ComponenteListagem: {
@@ -87,14 +88,16 @@ componentesSchemas.ComponentePost.example = {
     imagem: "https://exemplo.com/resistor-10k.jpg",
     localizacao: "507f1f77bcf86cd799439011",
     categoria: "507f1f77bcf86cd799439012",
-    ativo: true
+    ativo: true,
+    status: "Em Estoque"
 };
 componentesSchemas.ComponentePutPatch.example = {
     nome: "Resistor 10k Ohm - Atualizado",
     estoque_minimo: "75",
     valor_unitario: "0.18",
     descricao: "Resistor de precisão 1/4W 5% - Versão atualizada",
-    ativo: true
+    ativo: true,
+    status: "Baixo Estoque"
 };
 
 export default componentesSchemas;

@@ -43,6 +43,12 @@ class Componente {
                 type: Boolean,
                 default: true
             },
+            status: {
+                type: String,
+                enum: ['Indisponível', 'Baixo Estoque', 'Em Estoque'],
+                default: 'Indisponível',
+                required: true
+            },
         });
 
         componenteSchema.plugin(mongoosePaginate);

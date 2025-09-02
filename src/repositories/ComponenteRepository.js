@@ -44,14 +44,15 @@ class ComponenteRepository {
             return dataWithStats;
         };
 
-        const { nome, quantidade, estoque_minimo, localizacao, categoria, ativo, page = 1 } = req.query;
+        const { nome, quantidade, estoque_minimo, localizacao, categoria, ativo, status, page = 1 } = req.query;
         const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
 
         const filterBuilder = new ComponenteFilterBuilder()
             .comNome(nome || '')
             .comQuantidade(quantidade || '')
             .comEstoqueMinimo(estoque_minimo || '')
-            .comAtivo(ativo || '');
+            .comAtivo(ativo || '')
+            .comStatus(status || '');
 
         await filterBuilder.comLocalizacao(localizacao || '');
         await filterBuilder.comCategoria(categoria || '');
@@ -107,36 +108,6 @@ class ComponenteRepository {
             });
         };
 
-        return componente;
-    };
-
-    async deletar(id) {
-        const existeMovimentacao = await MovimentacaoModel.exists({ componente: id });
-        if (existeMovimentacao) {
-            throw new CustomError({
-                statusCode: 400,
-                errorType: 'resourceInUse',
-                field: 'Componente',
-                details: [],
-                customMessage: 'Não é possível deletar: componente está vinculado a movimentações.'
-            });
-        };
-
-        const componente = await this.model.findById(id)
-            .populate('localizacao')
-            .populate('categoria');
-
-        if (!componente) {
-            throw new CustomError({
-                statusCode: 404,
-                errorType: 'resourceNotFound',
-                field: 'Componente',
-                details: [],
-                customMessage: messages.error.resourceNotFound('Componente')
-            });
-        }
-
-        await this.model.findByIdAndDelete(id);
         return componente;
     };
 
