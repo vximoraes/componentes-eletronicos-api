@@ -21,7 +21,8 @@ class Componente {
             },
             valor_unitario: {
                 type: Number,
-                required: true
+                required: true,
+                immutable: true // não pode ser alterado
             },
             descricao: {
                 type: String,

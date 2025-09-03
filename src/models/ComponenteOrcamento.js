@@ -21,7 +21,6 @@ class ComponenteOrcamento {
             valor_unitario: {
                 type: Number,
                 required: true,
-                immutable: true // não pode ser alterado
             },
             subtotal: {
                 type: Number,
@@ -36,3 +35,5 @@ class ComponenteOrcamento {
 };
 
 export default new ComponenteOrcamento().model;
+
+//esse arquivo terá que ser excluido após

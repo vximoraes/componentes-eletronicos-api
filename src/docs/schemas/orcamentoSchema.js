@@ -60,9 +60,9 @@ const orcamentosSchemas = {
                         nome: { type: "string", example: "Resistor 10k" },
                         fornecedor: { type: "string", example: "Fornecedor ABC" },
                         quantidade: { type: "string", example: "10" },
-                        valor_unitario: { type: "string", example: "0.50" }
+                        //valor_unitario: { type: "string", example: "0.50" }
                     },
-                    required: ["nome", "fornecedor", "quantidade", "valor_unitario"]
+                    required: ["nome", "fornecedor", "quantidade"]
                 }
             }
         },
@@ -83,9 +83,9 @@ const orcamentosSchemas = {
             nome: { type: "string", example: "Resistor 10k" },
             fornecedor: { type: "string", example: "Fornecedor ABC" },
             quantidade: { type: "string", example: "10" },
-            valor_unitario: { type: "string", example: "0.50" }
+            //valor_unitario: { type: "string", example: "0.50" }
         },
-        required: ["nome", "fornecedor", "quantidade", "valor_unitario"],
+        required: ["nome", "fornecedor", "quantidade"],
         description: "Schema para adicionar componente ao orçamento"
     },
     ComponenteOrcamentoUpdate: {
@@ -94,7 +94,7 @@ const orcamentosSchemas = {
             nome: { type: "string", example: "Resistor 10k" },
             fornecedor: { type: "string", example: "Fornecedor ABC" },
             quantidade: { type: "string", example: "15" },
-            valor_unitario: { type: "string", example: "0.45" }
+            //valor_unitario: { type: "string", example: "0.45" }
         },
         description: "Schema para atualizar componente do orçamento"
     }

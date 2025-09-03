@@ -12,7 +12,6 @@ class OrcamentoController {
 
     async criar(req, res) {
         const parsedData = OrcamentoSchema.parse(req.body);
-
         const protocolo = uuid();
 
         const componentes = parsedData.componente_orcamento.map((comp) => {
