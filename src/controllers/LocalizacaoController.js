@@ -10,6 +10,7 @@ class LocalizacaoController {
 
     async criar(req, res) {
         const parsedData = LocalizacaoSchema.parse(req.body);
+        parsedData.usuario = req.user_id;
         let data = await this.service.criar(parsedData);
 
         let localizacaoLimpa = data.toObject();

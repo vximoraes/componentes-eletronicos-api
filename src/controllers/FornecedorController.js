@@ -10,6 +10,7 @@ class FornecedorController {
 
     async criar(req, res) {
         const parsedData = FornecedorSchema.parse(req.body);
+        parsedData.usuario = req.user_id;
         let data = await this.service.criar(parsedData);
 
         let fornecedorLimpo = data.toObject();

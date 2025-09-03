@@ -12,6 +12,7 @@ class OrcamentoController {
 
     async criar(req, res) {
         const parsedData = OrcamentoSchema.parse(req.body);
+        parsedData.usuario = req.user_id;
 
         const protocolo = uuid();
 

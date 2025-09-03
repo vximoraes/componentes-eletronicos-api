@@ -48,7 +48,12 @@ class Orcamento {
                         required: true
                     },
                 }
-            ]
+            ],
+            usuario: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'usuarios',
+                required: true
+            }
         });
 
         orcamentoSchema.plugin(mongoosePaginate);

@@ -123,6 +123,7 @@ class AuthPermission {
 
             // 8. Anexa o usuário ao objeto de requisição para uso posterior
             req.user = { id: userId };
+            req.user_id = userId;
 
             // 9. Permite a continuação da requisição
             next();

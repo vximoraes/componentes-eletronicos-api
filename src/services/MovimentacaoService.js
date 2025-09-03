@@ -8,9 +8,9 @@ class MovimentacaoService {
         this.repository = new MovimentacaoRepository();
     };
 
-    async criar(parsedData) {
+    async criar(parsedData, req) {
         // Buscar o componente relacionado.
-        const componente = await Componente.findById(parsedData.componente);
+        const componente = await Componente.findOne({ _id: parsedData.componente, usuarioId: req.user_id });
         if (!componente) {
             throw new CustomError({
                 statusCode: 404,
@@ -32,7 +32,7 @@ class MovimentacaoService {
                     customMessage: 'Fornecedor é obrigatório para movimentações de entrada.'
                 });
             };
-            const fornecedor = await Fornecedor.findById(parsedData.fornecedor);
+            const fornecedor = await Fornecedor.findOne({ _id: parsedData.fornecedor, usuarioId: req.user_id });
             if (!fornecedor) {
                 throw new CustomError({
                     statusCode: 404,
@@ -68,6 +68,7 @@ class MovimentacaoService {
 
         await componente.save();
 
+        parsedData.usuarioId = req.user_id;
         const data = await this.repository.criar(parsedData);
         return data;
     };

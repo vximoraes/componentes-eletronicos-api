@@ -8,11 +8,12 @@ class ComponenteService {
         this.repository = new ComponenteRepository();
     };
 
-    async criar(parsedData) {
-        await this.validateNome(parsedData.nome);
-        await this.validateLocalizacao(parsedData.localizacao);
-        await this.validateCategoria(parsedData.categoria);
+    async criar(parsedData, req) {
+        await this.validateNome(parsedData.nome, null, req.user_id);
+        await this.validateLocalizacao(parsedData.localizacao, req.user_id);
+        await this.validateCategoria(parsedData.categoria, req.user_id);
 
+        parsedData.usuarioId = req.user_id;
         const data = await this.repository.criar(parsedData);
 
         return data;
@@ -24,29 +25,29 @@ class ComponenteService {
         return data;
     };
 
-    async atualizar(id, parsedData) {
-        await this.ensureComponentExists(id);
-        await this.validateNome(parsedData.nome)
+    async atualizar(id, parsedData, req) {
+        await this.ensureComponentExists(id, req.user_id);
+        await this.validateNome(parsedData.nome, id, req.user_id);
 
         delete parsedData.quantidade;
 
-        const data = await this.repository.atualizar(id, parsedData);
+        const data = await this.repository.atualizar(id, parsedData, req.user_id);
 
         return data;
     };
 
-    async deletar(id) {
-        await this.ensureComponentExists(id);
+    async deletar(id, req) {
+        await this.ensureComponentExists(id, req.user_id);
 
-        const data = await this.repository.deletar(id);
+        const data = await this.repository.deletar(id, req.user_id);
 
         return data;
     };
 
     // Métodos auxiliares.
 
-    async validateNome(nome, id = null) {
-        const componenteExistente = await this.repository.buscarPorNome(nome, id);
+    async validateNome(nome, id = null, usuarioId) {
+        const componenteExistente = await this.repository.buscarPorNome(nome, id, usuarioId);
         if (componenteExistente) {
             throw new CustomError({
                 statusCode: HttpStatusCodes.BAD_REQUEST.code,
@@ -58,8 +59,8 @@ class ComponenteService {
         };
     };
 
-    async ensureComponentExists(id) {
-        const componenteExistente = await this.repository.buscarPorId(id);
+    async ensureComponentExists(id, usuarioId) {
+        const componenteExistente = await this.repository.buscarPorId(id, usuarioId);
         if (!componenteExistente) {
             throw new CustomError({
                 statusCode: 404,
@@ -73,8 +74,8 @@ class ComponenteService {
         return componenteExistente;
     };
 
-    async validateLocalizacao(localizacaoId) {
-        const localizacao = await LocalizacaoModel.findById(localizacaoId);
+    async validateLocalizacao(localizacaoId, usuarioId) {
+        const localizacao = await LocalizacaoModel.findOne({ _id: localizacaoId, usuarioId });
         if (!localizacao) {
             throw new CustomError({
                 statusCode: HttpStatusCodes.BAD_REQUEST.code,
@@ -86,8 +87,8 @@ class ComponenteService {
         };
     };
 
-    async validateCategoria(categoriaId) {
-        const categoria = await CategoriaModel.findById(categoriaId);
+    async validateCategoria(categoriaId, usuarioId) {
+        const categoria = await CategoriaModel.findOne({ _id: categoriaId, usuarioId });
         if (!categoria) {
             throw new CustomError({
                 statusCode: HttpStatusCodes.BAD_REQUEST.code,

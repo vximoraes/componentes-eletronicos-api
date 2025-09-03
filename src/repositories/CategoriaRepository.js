@@ -10,8 +10,8 @@ class CategoriaRepository {
         this.model = categoriaModel;
     };
 
-    async criar(dadosCategoria) {
-        const categoria = new this.model(dadosCategoria);
+    async criar(parsedData) {
+        const categoria = new this.model(parsedData);
         return await categoria.save();
     };
 
@@ -20,7 +20,7 @@ class CategoriaRepository {
 
         // Se um ID for fornecido, retorna a categoria enriquecida com estatísticas.
         if (id) {
-            const data = await this.model.findById(id);
+            const data = await this.model.findOne({ _id: id, usuario: req.user_id });
 
             if (!data) {
                 throw new CustomError({
@@ -55,7 +55,7 @@ class CategoriaRepository {
             });
         };
 
-        const filtros = filterBuilder.build();
+        const filtros = { ...filterBuilder.build(), usuario: req.user_id };
 
         const options = {
             page: parseInt(page, 10),
@@ -77,8 +77,8 @@ class CategoriaRepository {
         return resultado;
     };
 
-    async atualizar(id, parsedData) {
-        const categoria = await this.model.findByIdAndUpdate(id, parsedData, { new: true }).lean();
+    async atualizar(id, parsedData, req) {
+        const categoria = await this.model.findOneAndUpdate({ _id: id, usuario: req.user_id }, parsedData, { new: true }).lean();
         if (!categoria) {
             throw new CustomError({
                 statusCode: 404,
@@ -92,8 +92,8 @@ class CategoriaRepository {
         return categoria;
     };
 
-    async deletar(id) {
-        const existeComponente = await ComponenteModel.exists({ categoria: id });
+    async deletar(id, req) {
+        const existeComponente = await ComponenteModel.exists({ categoria: id, usuario: req.user_id });
         if (existeComponente) {
             throw new CustomError({
                 statusCode: 400,
@@ -104,14 +104,14 @@ class CategoriaRepository {
             });
         };
 
-        const categoria = await this.model.findByIdAndDelete(id);
+        const categoria = await this.model.findOneAndDelete({ _id: id, usuario: req.user_id });
         return categoria;
     };
 
     // Métodos auxiliares.
 
-    async buscarPorNome(nome, idIgnorado) {
-        const filtro = { nome };
+    async buscarPorNome(nome, idIgnorado, req) {
+        const filtro = { nome, usuario: req.user_id };
 
         if (idIgnorado) {
             filtro._id = { $ne: idIgnorado };
@@ -122,12 +122,8 @@ class CategoriaRepository {
         return documento;
     };
 
-    async buscarPorId(id, includeTokens = false) {
-        let query = this.model.findById(id);
-
-        // if (includeTokens) {
-        //     query = query.select('+refreshtoken +accesstoken');
-        // };
+    async buscarPorId(id, includeTokens = false, req) {
+        let query = this.model.findOne({ _id: id, usuario: req.user_id });
 
         const categoria = await query;
 

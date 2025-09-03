@@ -10,6 +10,7 @@ class CategoriaController {
 
     async criar(req, res) {
         const parsedData = CategoriaSchema.parse(req.body);
+        parsedData.usuario = req.user_id;
         let data = await this.service.criar(parsedData);
 
         let categoriaLimpa = data.toObject();

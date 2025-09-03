@@ -29,6 +29,11 @@ class Movimentacao {
                 ref: "fornecedores", // corrigido para bater com o nome do modelo
                 required: false,
             },
+            usuario: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'usuarios',
+                required: true
+            }
         });
 
         movimentacaoSchema.plugin(mongoosePaginate);

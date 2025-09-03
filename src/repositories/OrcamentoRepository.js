@@ -9,8 +9,8 @@ class OrcamentoRepository {
         this.model = orcamentoModel;
     };
 
-    async criar(dadosOrcamento) {
-        const orcamento = new this.model(dadosOrcamento);
+    async criar(parsedData) {
+        const orcamento = new this.model(parsedData);
         const orcamentoSalvo = await orcamento.save();
         return await this.model.findById(orcamentoSalvo._id)
     };
@@ -20,7 +20,7 @@ class OrcamentoRepository {
 
         // Se um ID for fornecido, retorna o orçamento enriquecido com estatísticas.
         if (id) {
-            const data = await this.model.findById(id)
+            const data = await this.model.findOne({ _id: id, usuario: req.user_id })
 
             if (!data) {
                 throw new CustomError({
@@ -56,7 +56,7 @@ class OrcamentoRepository {
             });
         };
 
-        const filtros = filterBuilder.build();
+        const filtros = { ...filterBuilder.build(), usuario: req.user_id };
 
         const options = {
             page: parseInt(page),
@@ -78,8 +78,8 @@ class OrcamentoRepository {
         return resultado;
     };
 
-    async atualizar(id, parsedData) {
-        const orcamento = await this.model.findByIdAndUpdate(id, parsedData, { new: true }).lean();
+    async atualizar(id, parsedData, req) {
+        const orcamento = await this.model.findOneAndUpdate({ _id: id, usuario: req.user_id }, parsedData, { new: true }).lean();
         if (!orcamento) {
             throw new CustomError({
                 statusCode: 404,
@@ -93,8 +93,8 @@ class OrcamentoRepository {
         return orcamento;
     };
 
-    async deletar(id) {
-        const orcamento = await this.model.findById(id)
+    async deletar(id, req) {
+        const orcamento = await this.model.findOne({ _id: id, usuario: req.user_id })
         if (!orcamento) {
             throw new CustomError({
                 statusCode: 404,
@@ -105,14 +105,14 @@ class OrcamentoRepository {
             });
         }
 
-        await this.model.findByIdAndDelete(id);
+        await this.model.findOneAndDelete({ _id: id, usuario: req.user_id });
         return orcamento;
     };
 
     // Manipular componentes.
 
-    async adicionarComponente(orcamentoId, novoComponente) {
-        const orcamento = await this.model.findById(orcamentoId);
+    async adicionarComponente(orcamentoId, novoComponente, req) {
+        const orcamento = await this.model.findOne({ _id: orcamentoId, usuario: req.user_id });
         if (!orcamento) throw new CustomError({
             statusCode: 404,
             errorType: 'resourceNotFound',
@@ -128,8 +128,8 @@ class OrcamentoRepository {
         return orcamento;
     };
 
-    async atualizarComponente(orcamentoId, componenteId, componenteAtualizado) {
-        const orcamento = await this.model.findById(orcamentoId);
+    async atualizarComponente(orcamentoId, componenteId, componenteAtualizado, req) {
+        const orcamento = await this.model.findOne({ _id: orcamentoId, usuario: req.user_id });
         if (!orcamento) throw new CustomError({
             statusCode: 404,
             errorType: 'resourceNotFound',
@@ -156,8 +156,8 @@ class OrcamentoRepository {
         return orcamento;
     };
 
-    async removerComponente(orcamentoId, componenteId) {
-        const orcamento = await this.model.findById(orcamentoId);
+    async removerComponente(orcamentoId, componenteId, req) {
+        const orcamento = await this.model.findOne({ _id: orcamentoId, usuario: req.user_id });
         if (!orcamento) throw new CustomError({
             statusCode: 404,
             errorType: 'resourceNotFound',
@@ -175,8 +175,8 @@ class OrcamentoRepository {
 
     // Métodos auxiliares.
 
-    async buscarPorId(id, includeTokens = false) {
-        let query = this.model.findById(id);
+    async buscarPorId(id, includeTokens = false, req) {
+        let query = this.model.findOne({ _id: id, usuario: req.user_id });
 
         const orcamento = await query;
         if (!orcamento) {
@@ -192,8 +192,8 @@ class OrcamentoRepository {
         return orcamento;
     };
 
-    async buscarPorProtocolo(protocolo, idIgnorado) {
-        const filtro = { protocolo };
+    async buscarPorProtocolo(protocolo, idIgnorado, req) {
+        const filtro = { protocolo, usuario: req.user_id };
 
         if (idIgnorado) {
             filtro._id = { $ne: idIgnorado }

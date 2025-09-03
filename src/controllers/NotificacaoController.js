@@ -8,36 +8,36 @@ class NotificacaoController {
     };
 
     async listar(req, res) {
-        const notificacoes = await this.service.listarTodas(req.query);
+        const notificacoes = await this.service.listarTodas(req);
         return CommonResponse.success(res, notificacoes);
     };
 
     async buscarPorId(req, res) {
         const { id } = req.params;
 
-        const notificacao = await this.service.buscarPorId(id);
+        const notificacao = await this.service.buscarPorId(id, req);
         if (!notificacao) {
             return CommonResponse.error(res, { message: "Notificação não encontrada" }, HttpStatusCodes.NOT_FOUND);
-        };
+        }
 
         return CommonResponse.success(res, notificacao);
     };
 
     async criar(req, res) {
         const parsedData = NotificacaoSchema.parse(req.body);
-        const novaNotificacao = await this.service.criar(parsedData);
 
-        return CommonResponse.created(res, novaNotificacao);
+        let data = await this.service.criar(parsedData, req);
+        return CommonResponse.created(res, data);
     };
 
     async marcarComoVisualizada(req, res) {
         const { id } = req.params;
-        const notificacao = await this.service.buscarPorId(id);
+        const notificacao = await this.service.buscarPorId(id, req);
         if (!notificacao) {
             return CommonResponse.error(res, { message: "Notificação não encontrada" }, HttpStatusCodes.NOT_FOUND);
-        };
+        }
 
-        const atualizada = await this.service.marcarComoVisualizada(id);
+        const atualizada = await this.service.marcarComoVisualizada(id, req);
         return CommonResponse.success(res, atualizada);
     };
 };

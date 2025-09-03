@@ -2,10 +2,12 @@ import { fakeMappings } from "./globalFakeMapping.js";
 import Componente from "../models/Componente.js";
 import Categoria from "../models/Categoria.js";
 import Localizacao from "../models/Localizacao.js";
+import Usuario from "../models/Usuario.js";
 
 export default async function componenteSeed() {
     const categoriaList = await Categoria.find({});
     const localizacaoList = await Localizacao.find({});
+    const usuarios = await Usuario.find({});
 
     await Componente.deleteMany({});
 
@@ -13,6 +15,7 @@ export default async function componenteSeed() {
     for (let nome of nomesFixos) {
         const categoriaRandom = categoriaList[Math.floor(Math.random() * categoriaList.length)];
         const localizacaoRandom = localizacaoList[Math.floor(Math.random() * localizacaoList.length)];
+        const usuarioRandom = usuarios[Math.floor(Math.random() * usuarios.length)];
 
         const componente = {
             nome,
@@ -23,6 +26,7 @@ export default async function componenteSeed() {
             imagem: fakeMappings.Componente.imagem.apply(),
             categoria: categoriaRandom._id,
             localizacao: localizacaoRandom._id,
+            usuario: usuarioRandom._id,
             ativo: fakeMappings.Componente.ativo.apply()
         };
 

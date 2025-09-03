@@ -10,6 +10,7 @@ class ComponenteController {
 
     async criar(req, res) {
         const parsedData = ComponenteSchema.parse(req.body);
+        parsedData.usuario = req.user_id;
         let data = await this.service.criar(parsedData);
 
         let componenteLimpo = data.toObject();

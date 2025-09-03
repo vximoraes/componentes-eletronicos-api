@@ -10,8 +10,8 @@ class NotificacaoRepository {
         this.model = notificacaoModel;
     };
 
-    async buscarPorId(id) {
-        const notificacao = await this.model.findById(id).populate('usuario');
+    async buscarPorId(id, userId) {
+        const notificacao = await this.model.findOne({ _id: id, usuario: userId }).populate('usuario');
 
         if (!notificacao) {
             throw new CustomError({
@@ -26,9 +26,9 @@ class NotificacaoRepository {
         return notificacao;
     };
 
-    async criar(dadosNotificacao) {
-        if (dadosNotificacao.usuario) {
-            const usuarioExiste = await UsuarioModel.exists({ _id: dadosNotificacao.usuario });
+    async criar(parsedData) {
+        if (parsedData.usuario) {
+            const usuarioExiste = await UsuarioModel.exists({ _id: parsedData.usuario });
             if (!usuarioExiste) {
                 throw new CustomError({
                     statusCode: 400,
@@ -39,17 +39,17 @@ class NotificacaoRepository {
                 });
             }
         }
-        const notificacao = new this.model(dadosNotificacao);
+        const notificacao = new this.model(parsedData);
         const saved = await notificacao.save();
         return await this.model.findById(saved._id).populate('usuario');
     };
 
-    async listar(req = {}) {
+    async listar(user_id, req = {}) {
         const { params = {}, query = {} } = req;
         const id = params.id || null;
 
         if (id) {
-            return await this.buscarPorId(id);
+            return await this.buscarPorId(id, user_id);
         };
 
         const { usuario, visualizada, page = 1, limite = 10 } = query;
@@ -63,7 +63,7 @@ class NotificacaoRepository {
             filterBuilder.comVisualizada(visualizada);
         };
 
-        const filtros = filterBuilder.build();
+        const filtros = { ...filterBuilder.build(), usuario: user_id || req.user_id };
 
         const options = {
             page: parseInt(page, 10),
@@ -75,16 +75,16 @@ class NotificacaoRepository {
         return await this.model.paginate(filtros, options);
     };
 
-    async marcarComoVisualizada(id) {
+    async marcarComoVisualizada(id, userId) {
         return this._atualizar(id, {
             visualizada: true,
             dataLeitura: new Date()
-        });
+        }, userId);
     };
 
-    async _atualizar(id, parsedData) {
-        const notificacao = await this.model.findByIdAndUpdate(
-            id,
+    async _atualizar(id, parsedData, userId) {
+        const notificacao = await this.model.findOneAndUpdate(
+            { _id: id, usuario: userId },
             parsedData,
             { new: true }
         ).populate('usuario');
