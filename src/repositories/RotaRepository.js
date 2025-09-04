@@ -3,7 +3,7 @@
 import RotaModel from '../models/Rota.js';
 import RotaFilterBuilder from './filters/RotaFilterBuilder.js';
 import GrupoModel from '../models/Grupo.js';
-import UnidadeModel from '../models/Unidade.js';
+// import UnidadeModel from '../models/Unidade.js';
 import UsuarioModel from '../models/Usuario.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
 
@@ -11,11 +11,9 @@ class RotaRepository {
     constructor({
         rotaModel = RotaModel,
         grupoModel = GrupoModel,
-        unidadeModel = UnidadeModel,
     } = {}) {
         this.model = rotaModel;
         this.grupoModel = grupoModel;
-        this.unidadeModel = unidadeModel;
     }
 
     /**
