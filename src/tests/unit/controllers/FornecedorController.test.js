@@ -34,7 +34,7 @@ describe('FornecedorController', () => {
             await controller.criar(req, res);
 
             expect(FornecedorSchema.parse).toHaveBeenCalledWith(req.body);
-            expect(serviceMock.criar).toHaveBeenCalledWith({ nome: 'Fornecedor A' });
+            expect(serviceMock.criar).toHaveBeenCalledWith({ nome: 'Fornecedor A' }, req);
             expect(CommonResponse.created).toHaveBeenCalledWith(res, { nome: 'Fornecedor A', _id: '1' });
         });
 
@@ -104,7 +104,7 @@ describe('FornecedorController', () => {
 
             expect(FornecedorIdSchema.parse).toHaveBeenCalledWith('1');
             expect(FornecedorUpdateSchema.parse).toHaveBeenCalledWith(req.body);
-            expect(serviceMock.atualizar).toHaveBeenCalledWith('1', { nome: 'Atualizado' });
+            expect(serviceMock.atualizar).toHaveBeenCalledWith('1', { nome: 'Atualizado' }, req);
             expect(CommonResponse.success).toHaveBeenCalledWith(res, { nome: 'Atualizado' }, 200, 'Fornecedor atualizado com sucesso.');
         });
 
@@ -149,7 +149,7 @@ describe('FornecedorController', () => {
             await controller.deletar(req, res);
 
             expect(FornecedorIdSchema.parse).toHaveBeenCalledWith('1');
-            expect(serviceMock.deletar).toHaveBeenCalledWith('1');
+            expect(serviceMock.deletar).toHaveBeenCalledWith('1', req);
             expect(CommonResponse.success).toHaveBeenCalledWith(res, { nome: 'Removido' }, 200, 'Fornecedor excluído com sucesso.');
         });
 

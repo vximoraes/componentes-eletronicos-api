@@ -69,7 +69,7 @@ describe('MovimentacaoController', () => {
             await controller.criar(mockReq, mockRes);
 
             expect(MovimentacaoSchema.parse).toHaveBeenCalledWith(movimentacaoData);
-            expect(mockService.criar).toHaveBeenCalledWith(movimentacaoData);
+            expect(mockService.criar).toHaveBeenCalledWith(movimentacaoData, mockReq);
             expect(CommonResponse.created).toHaveBeenCalledWith(mockRes, expect.objectContaining({
                 _id: '64f234a0c781a7b30c2fe447'
             }));

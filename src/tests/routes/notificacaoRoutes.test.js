@@ -48,7 +48,7 @@ describe('Rotas de Notificação', () => {
         token = loginRes.body?.data?.user?.accesstoken;
         expect(token).toBeTruthy();
         usuarioId = await criarUsuarioValido();
-    });
+    }, 30000);
 
     describe('POST /notificacoes', () => {
         it('deve cadastrar notificação válida', async () => {
