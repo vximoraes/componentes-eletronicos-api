@@ -10,8 +10,7 @@ class FornecedorController {
 
     async criar(req, res) {
         const parsedData = FornecedorSchema.parse(req.body);
-        parsedData.usuario = req.user_id;
-        let data = await this.service.criar(parsedData);
+        let data = await this.service.criar(parsedData, req);
 
         let fornecedorLimpo = data.toObject();
 
@@ -39,7 +38,7 @@ class FornecedorController {
         FornecedorIdSchema.parse(id);
 
         const parsedData = FornecedorUpdateSchema.parse(req.body);
-        const data = await this.service.atualizar(id, parsedData);
+        const data = await this.service.atualizar(id, parsedData, req);
 
         return CommonResponse.success(res, data, 200, 'Fornecedor atualizado com sucesso.');
     };
@@ -48,7 +47,7 @@ class FornecedorController {
         const { id } = req.params || {};
         FornecedorIdSchema.parse(id);
 
-        const data = await this.service.deletar(id);
+        const data = await this.service.deletar(id, req);
 
         return CommonResponse.success(res, data, 200, 'Fornecedor excluído com sucesso.');
     };

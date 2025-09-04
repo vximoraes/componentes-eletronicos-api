@@ -7,9 +7,9 @@ class CategoriaService {
     };
 
     async criar(parsedData, req) {
-        await this.validateNome(parsedData.nome, null, req.user_id);
+        await this.validateNome(parsedData.nome, null, req);
 
-        parsedData.usuarioId = req.user_id;
+        parsedData.usuario = req.user_id;
         const data = await this.repository.criar(parsedData);
 
         return data;
@@ -22,26 +22,26 @@ class CategoriaService {
     };
 
     async atualizar(id, parsedData, req) {
-        await this.ensureCategoryExists(id, req.user_id);
-        await this.validateNome(parsedData.nome, id, req.user_id);
+        await this.ensureCategoryExists(id, req);
+        await this.validateNome(parsedData.nome, id, req);
 
-        const data = await this.repository.atualizar(id, parsedData, req.user_id);
+        const data = await this.repository.atualizar(id, parsedData, req);
 
         return data;
     };
 
     async deletar(id, req) {
-        await this.ensureCategoryExists(id, req.user_id);
+        await this.ensureCategoryExists(id, req);
 
-        const data = await this.repository.deletar(id, req.user_id);
+        const data = await this.repository.deletar(id, req);
 
         return data;
     };
 
     // Métodos auxiliares.
 
-    async validateNome(nome, id = null, usuarioId) {
-        const categoriaExistente = await this.repository.buscarPorNome(nome, id, usuarioId);
+    async validateNome(nome, id = null, req) {
+        const categoriaExistente = await this.repository.buscarPorNome(nome, id, req);
         if (categoriaExistente) {
             throw new CustomError({
                 statusCode: HttpStatusCodes.BAD_REQUEST.code,
@@ -53,8 +53,8 @@ class CategoriaService {
         };
     };
 
-    async ensureCategoryExists(id, usuarioId) {
-        const categoriaExistente = await this.repository.buscarPorId(id, usuarioId);
+    async ensureCategoryExists(id, req) {
+        const categoriaExistente = await this.repository.buscarPorId(id, false, req);
         if (!categoriaExistente) {
             throw new CustomError({
                 statusCode: 404,

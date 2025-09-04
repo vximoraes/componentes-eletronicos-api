@@ -11,7 +11,7 @@ class NotificacaoRepository {
     };
 
     async buscarPorId(id, userId) {
-        const notificacao = await this.model.findOne({ _id: id, usuario: userId }).populate('usuario');
+        const notificacao = await this.model.findOne({ _id: id, usuario: userId });
 
         if (!notificacao) {
             throw new CustomError({
@@ -41,7 +41,7 @@ class NotificacaoRepository {
         }
         const notificacao = new this.model(parsedData);
         const saved = await notificacao.save();
-        return await this.model.findById(saved._id).populate('usuario');
+        return await this.model.findById(saved._id);
     };
 
     async listar(user_id, req = {}) {
@@ -68,7 +68,6 @@ class NotificacaoRepository {
         const options = {
             page: parseInt(page, 10),
             limit: Math.min(parseInt(limite, 10), 100),
-            populate: 'usuario',
             sort: { createdAt: -1 }
         };
 
@@ -87,7 +86,7 @@ class NotificacaoRepository {
             { _id: id, usuario: userId },
             parsedData,
             { new: true }
-        ).populate('usuario');
+        );
 
         if (!notificacao) {
             throw new CustomError({

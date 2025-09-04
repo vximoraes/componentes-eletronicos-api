@@ -8,9 +8,9 @@ class OrcamentoService {
     };
 
     async criar(parsedData, req) {
-        await this.validateProtocolo(parsedData.protocolo, null, req.user_id);
+        await this.validateProtocolo(parsedData.protocolo, null, req);
 
-        parsedData.usuarioId = req.user_id;
+        parsedData.usuario = req.user_id;
         const data = await this.repository.criar(parsedData);
 
         return data;
@@ -23,17 +23,17 @@ class OrcamentoService {
     };
 
     async atualizar(id, parsedData, req) {
-        await this.ensureBudgetExists(id, req.user_id);
+        await this.ensureBudgetExists(id, req);
 
-        const data = await this.repository.atualizar(id, parsedData, req.user_id);
+        const data = await this.repository.atualizar(id, parsedData, req);
 
         return data;
     };
 
     async deletar(id, req) {
-        await this.ensureBudgetExists(id, req.user_id);
+        await this.ensureBudgetExists(id, req);
 
-        const data = await this.repository.deletar(id, req.user_id);
+        const data = await this.repository.deletar(id, req);
 
         return data;
     };
@@ -41,19 +41,19 @@ class OrcamentoService {
     // Manipular componentes.
 
     async adicionarComponente(orcamentoId, novoComponente, req) {
-        return await this.repository.adicionarComponente(orcamentoId, novoComponente, req.user_id);
+        return await this.repository.adicionarComponente(orcamentoId, novoComponente, req);
     };
 
     async atualizarComponente(orcamentoId, componenteId, componenteAtualizado, req) {
-        return await this.repository.atualizarComponente(orcamentoId, componenteId, componenteAtualizado, req.user_id);
+        return await this.repository.atualizarComponente(orcamentoId, componenteId, componenteAtualizado, req);
     };
 
     async removerComponente(orcamentoId, componenteId, req) {
-        return await this.repository.removerComponente(orcamentoId, componenteId, req.user_id);
+        return await this.repository.removerComponente(orcamentoId, componenteId, req);
     };
 
     async getComponenteById(orcamentoId, componenteId, req) {
-        const orcamento = await this.repository.buscarPorId(orcamentoId, req.user_id);
+        const orcamento = await this.repository.buscarPorId(orcamentoId, false, req);
         if (!orcamento) return null;
 
         const componentes = Array.isArray(orcamento.componentes) ? orcamento.componentes : [];
@@ -64,8 +64,8 @@ class OrcamentoService {
 
     // Métodos auxiliares.
 
-    async validateProtocolo(protocolo, id = null, usuarioId) {
-        const orcamentoExistente = await this.repository.buscarPorProtocolo(protocolo, id, usuarioId);
+    async validateProtocolo(protocolo, id = null, req) {
+        const orcamentoExistente = await this.repository.buscarPorProtocolo(protocolo, id, req);
         if (orcamentoExistente) {
             throw new CustomError({
                 statusCode: HttpStatusCodes.BAD_REQUEST.code,
@@ -77,8 +77,8 @@ class OrcamentoService {
         };
     };
 
-    async ensureBudgetExists(id, usuarioId) {
-        const orcamentoExistente = await this.repository.buscarPorId(id, usuarioId);
+    async ensureBudgetExists(id, req) {
+        const orcamentoExistente = await this.repository.buscarPorId(id, false, req);
         if (!orcamentoExistente) {
             throw new CustomError({
                 statusCode: 404,
