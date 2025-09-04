@@ -73,7 +73,7 @@ class GrupoController {
         const parsedData = GrupoUpdateSchema.parse(req.body);
 
         // Chama o serviço para atualizar o grupo
-        const data = await this.service.atualizar(parsedData, id);
+        const data = await this.service.atualizar(parsedData, id, req.user);
 
         // Se chegou até aqui, é porque deu tudo certo, retornar 200 OK
         return CommonResponse.success(res, data);
@@ -87,12 +87,13 @@ class GrupoController {
     
         // Validação estrutural - validação do ID passado por parâmetro
         const { id } = req.params || null;
+        GrupoIdSchema.parse(id)
         if (!id) {
             throw new CustomError('ID do grupo é obrigatório para deletar.', HttpStatusCodes.BAD_REQUEST);
         }
     
         // Chama o serviço para deletar o grupo
-        const data = await this.service.deletar(id);
+        const data = await this.service.deletar(id, req.user);
     
         // Se chegou até aqui, é porque deu tudo certo, retornar 200 OK
         return CommonResponse.success(res, data, 200, 'Grupo excluído com sucesso.');

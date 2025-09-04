@@ -41,6 +41,7 @@ export const fakeMappings = {
         email: () => fakebr.internet.email(),
         senha: () => fakebr.internet.password(),
         ativo: () => fakebr.random.boolean(),
+        grupos:() => [],
         tokenUnico: () => TokenUtil.generateAccessToken(new mongoose.Types.ObjectId().toString()),
         refreshtoken: () => TokenUtil.generateRefreshToken(new mongoose.Types.ObjectId().toString()),
         accesstoken: () => TokenUtil.generateAccessToken(new mongoose.Types.ObjectId().toString()),
