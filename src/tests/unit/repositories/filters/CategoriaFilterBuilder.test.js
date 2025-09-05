@@ -35,22 +35,13 @@ describe('CategoriaFilterBuilder', () => {
             expect(resultado).toBe(categoriaFilterBuilder);
         });
 
-        test('não deve adicionar filtro quando nome é undefined', () => {
-            const resultado = categoriaFilterBuilder.comNome(undefined);
-            expect(categoriaFilterBuilder.filtros.nome).toBeUndefined();
-            expect(resultado).toBe(categoriaFilterBuilder);
-        });
-
-        test('não deve adicionar filtro quando nome é null', () => {
-            const resultado = categoriaFilterBuilder.comNome(null);
-            expect(categoriaFilterBuilder.filtros.nome).toBeUndefined();
-            expect(resultado).toBe(categoriaFilterBuilder);
-        });
-
-        test('não deve adicionar filtro quando nome é string vazia', () => {
-            const resultado = categoriaFilterBuilder.comNome('');
-            expect(categoriaFilterBuilder.filtros.nome).toBeUndefined();
-            expect(resultado).toBe(categoriaFilterBuilder);
+        test('não deve adicionar filtro para valores inválidos (undefined, null, string vazia)', () => {
+            [undefined, null, ''].forEach(valor => {
+                categoriaFilterBuilder.filtros = {}; // Reset
+                const resultado = categoriaFilterBuilder.comNome(valor);
+                expect(categoriaFilterBuilder.filtros.nome).toBeUndefined();
+                expect(resultado).toBe(categoriaFilterBuilder);
+            });
         });
     });
 

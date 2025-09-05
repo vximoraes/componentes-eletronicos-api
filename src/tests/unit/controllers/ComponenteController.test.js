@@ -34,7 +34,7 @@ describe('ComponenteController', () => {
             await controller.criar(req, res);
 
             expect(ComponenteSchema.parse).toHaveBeenCalledWith(req.body);
-            expect(serviceMock.criar).toHaveBeenCalledWith({ nome: 'Resistor' });
+            expect(serviceMock.criar).toHaveBeenCalledWith({ nome: 'Resistor' }, req);
             expect(CommonResponse.created).toHaveBeenCalledWith(res, { nome: 'Resistor', _id: '1', ativo: false });
         });
 
@@ -87,7 +87,7 @@ describe('ComponenteController', () => {
 
             expect(ComponenteIdSchema.parse).toHaveBeenCalledWith('1');
             expect(ComponenteUpdateSchema.parse).toHaveBeenCalledWith(req.body);
-            expect(serviceMock.atualizar).toHaveBeenCalledWith('1', { nome: 'Atualizado' });
+            expect(serviceMock.atualizar).toHaveBeenCalledWith('1', { nome: 'Atualizado' }, req);
             expect(CommonResponse.success).toHaveBeenCalledWith(
                 res,
                 { nome: 'Atualizado' },
@@ -121,7 +121,7 @@ describe('ComponenteController', () => {
             await controller.deletar(req, res);
 
             expect(ComponenteIdSchema.parse).toHaveBeenCalledWith('1');
-            expect(serviceMock.deletar).toHaveBeenCalledWith('1');
+            expect(serviceMock.deletar).toHaveBeenCalledWith('1', req);
             expect(CommonResponse.success).toHaveBeenCalledWith(res, { nome: 'Removido' }, 200, 'Componente excluído com sucesso.');
         });
 

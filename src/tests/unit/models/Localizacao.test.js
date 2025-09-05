@@ -22,7 +22,10 @@ afterEach(async () => {
 
 describe('Modelo de Localizacao', () => {
     it('deve criar uma localizacao com nome válido e único', async () => {
-        const localizacaoData = { nome: 'Estoque A' };
+        const localizacaoData = { 
+            nome: 'Estoque A',
+            usuario: new mongoose.Types.ObjectId()
+        };
         const localizacao = new Localizacao(localizacaoData);
         await localizacao.save();
         const saved = await Localizacao.findById(localizacao._id);
@@ -31,12 +34,15 @@ describe('Modelo de Localizacao', () => {
     });
 
     it('não deve criar localizacao sem nome', async () => {
-        const localizacao = new Localizacao({});
+        const localizacao = new Localizacao({ usuario: new mongoose.Types.ObjectId() });
         await expect(localizacao.save()).rejects.toThrow();
     });
 
     it('não deve criar localizacao com nome duplicado', async () => {
-        const data = { nome: 'Estoque B' };
+        const data = { 
+            nome: 'Estoque B',
+            usuario: new mongoose.Types.ObjectId()
+        };
         const l1 = new Localizacao(data);
         await l1.save();
         const l2 = new Localizacao(data);
@@ -44,8 +50,8 @@ describe('Modelo de Localizacao', () => {
     });
 
     it('deve retornar todas as localizacoes cadastradas', async () => {
-        const l1 = new Localizacao({ nome: 'Estoque C' });
-        const l2 = new Localizacao({ nome: 'Estoque D' });
+        const l1 = new Localizacao({ nome: 'Estoque C', usuario: new mongoose.Types.ObjectId() });
+        const l2 = new Localizacao({ nome: 'Estoque D', usuario: new mongoose.Types.ObjectId() });
         await l1.save();
         await l2.save();
         const localizacoes = await Localizacao.find();
@@ -56,7 +62,7 @@ describe('Modelo de Localizacao', () => {
     });
 
     it('deve atualizar o nome de uma localizacao', async () => {
-        const localizacao = new Localizacao({ nome: 'Estoque E' });
+        const localizacao = new Localizacao({ nome: 'Estoque E', usuario: new mongoose.Types.ObjectId() });
         await localizacao.save();
         localizacao.nome = 'Estoque E Atualizado';
         await localizacao.save();
@@ -65,8 +71,9 @@ describe('Modelo de Localizacao', () => {
     });
 
     it('não deve atualizar para nome já existente', async () => {
-        const l1 = new Localizacao({ nome: 'Estoque F' });
-        const l2 = new Localizacao({ nome: 'Estoque G' });
+        const userId = new mongoose.Types.ObjectId();
+        const l1 = new Localizacao({ nome: 'Estoque F', usuario: userId });
+        const l2 = new Localizacao({ nome: 'Estoque G', usuario: userId });
         await l1.save();
         await l2.save();
         l2.nome = 'Estoque F';
@@ -74,7 +81,7 @@ describe('Modelo de Localizacao', () => {
     });
 
     it('deve remover uma localizacao existente', async () => {
-        const localizacao = new Localizacao({ nome: 'Estoque H' });
+        const localizacao = new Localizacao({ nome: 'Estoque H', usuario: new mongoose.Types.ObjectId() });
         await localizacao.save();
         await Localizacao.findByIdAndDelete(localizacao._id);
         const found = await Localizacao.findById(localizacao._id);

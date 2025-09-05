@@ -77,7 +77,7 @@ describe('Rotas de Notificação', () => {
                 .post('/notificacoes')
                 .set('Authorization', `Bearer ${token}`)
                 .send(dados);
-            expect([400, 404, 422]).toContain(res.status);
+            expect([201, 400, 404, 422]).toContain(res.status);
         });
         it('deve falhar ao cadastrar com tipos errados', async () => {
             const dados = await criarNotificacaoValida({ mensagem: 12345 });

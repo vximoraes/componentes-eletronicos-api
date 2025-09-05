@@ -10,8 +10,8 @@ class UsuarioService {
         this.grupoRepository = new GrupoRepository();
     };
 
-    async criar(parsedData) {
-        await this.validateEmail(parsedData.email);
+    async criar(parsedData, req) {
+        await this.validateEmail(parsedData.email, null, req.user_id);
 
         if (parsedData.senha) {
             const saltRounds = 10;
@@ -21,7 +21,7 @@ class UsuarioService {
         // Buscar grupo "Usuario" padrão se não foram fornecidas permissões
         if (!parsedData.permissoes || parsedData.permissoes.length === 0) {
             try {
-                const grupoUsuario = await this.grupoRepository.buscarPorNome("Usuario");
+                const grupoUsuario = await this.grupoRepository.buscarPorNome("Usuario", null, req.user_id);
                 if (grupoUsuario) {
                     parsedData.permissoes = grupoUsuario.permissoes || [];
                 }
@@ -31,6 +31,7 @@ class UsuarioService {
             }
         }
 
+        parsedData.usuarioId = req.user_id;
         const data = await this.repository.criar(parsedData);
 
         return data;
@@ -42,29 +43,29 @@ class UsuarioService {
         return data;
     };
 
-    async atualizar(id, parsedData) {
+    async atualizar(id, parsedData, req) {
         delete parsedData.senha;
-        delete parsedData.email; // É proibido alterar o email. No service o objeto sempre chegará sem, pois o controller impedirá.
+        delete parsedData.email; 
 
-        await this.ensureUserExists(id);
+        await this.ensureUserExists(id, req.user_id);
 
-        const data = await this.repository.atualizar(id, parsedData);
+        const data = await this.repository.atualizar(id, parsedData, req.user_id);
 
         return data;
     };
 
-    async deletar(id) {
-        await this.ensureUserExists(id);
+    async deletar(id, req) {
+        await this.ensureUserExists(id, req.user_id);
 
-        const data = await this.repository.deletar(id);
+        const data = await this.repository.deletar(id, req.user_id);
 
         return data;
     };
 
     // Métodos auxiliares.
 
-    async validateEmail(email, id = null) {
-        const usuarioExistente = await this.repository.buscarPorEmail(email, id);
+    async validateEmail(email, id = null, usuarioId) {
+        const usuarioExistente = await this.repository.buscarPorEmail(email, id, usuarioId);
         if (usuarioExistente) {
             throw new CustomError({
                 statusCode: HttpStatusCodes.BAD_REQUEST.code,
@@ -76,8 +77,8 @@ class UsuarioService {
         };
     };
 
-    async ensureUserExists(id) {
-        const usuarioExistente = await this.repository.buscarPorId(id);
+    async ensureUserExists(id, usuarioId) {
+        const usuarioExistente = await this.repository.buscarPorId(id, usuarioId);
         if (!usuarioExistente) {
             throw new CustomError({
                 statusCode: 404,

@@ -16,14 +16,14 @@ const notificacoesRoutes = {
                     - Objeto conforme schema **NotificacaoPost**, contendo dados da notificação.
 
             + Regras de Negócio:
-                - Campos obrigatórios: mensagem, usuario (id).
+                - Campos obrigatórios: mensagem.
+                - Campo \`usuario\`: obtido automaticamente do contexto de autenticação.
                 - Campo \`visualizada\`: padrão false.
                 - Não permite campos fora do schema.
-                - Usuário deve existir.
 
             + Resultado Esperado:
                 - HTTP 201 Created com corpo conforme **NotificacaoDetalhes**, contendo todos os dados da notificação criada.
-                - Retorna _id, mensagem, visualizada como false, usuario e data_hora.
+                - Retorna _id, mensagem, visualizada como false, usuario (do contexto autenticado) e data_hora.
             `,
             security: [{ bearerAuth: [] }],
             requestBody: {

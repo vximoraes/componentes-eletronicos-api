@@ -22,7 +22,7 @@ afterEach(async () => {
 
 describe('Modelo de Fornecedor', () => {
     it('deve criar um fornecedor com nome válido e único', async () => {
-        const fornecedorData = { nome: 'Fornecedor A' };
+        const fornecedorData = { nome: 'Fornecedor A', usuario: new mongoose.Types.ObjectId() };
         const fornecedor = new Fornecedor(fornecedorData);
         await fornecedor.save();
         const saved = await Fornecedor.findById(fornecedor._id);
@@ -31,12 +31,13 @@ describe('Modelo de Fornecedor', () => {
     });
 
     it('não deve criar fornecedor sem nome', async () => {
-        const fornecedor = new Fornecedor({});
+        const fornecedor = new Fornecedor({ usuario: new mongoose.Types.ObjectId() });
         await expect(fornecedor.save()).rejects.toThrow();
     });
 
     it('não deve criar fornecedor com nome duplicado', async () => {
-        const data = { nome: 'Fornecedor B' };
+        const userId = new mongoose.Types.ObjectId();
+        const data = { nome: 'Fornecedor B', usuario: userId };
         const f1 = new Fornecedor(data);
         await f1.save();
         const f2 = new Fornecedor(data);
@@ -44,8 +45,8 @@ describe('Modelo de Fornecedor', () => {
     });
 
     it('deve retornar todos os fornecedores cadastrados', async () => {
-        const f1 = new Fornecedor({ nome: 'Fornecedor C' });
-        const f2 = new Fornecedor({ nome: 'Fornecedor D' });
+        const f1 = new Fornecedor({ nome: 'Fornecedor C', usuario: new mongoose.Types.ObjectId() });
+        const f2 = new Fornecedor({ nome: 'Fornecedor D', usuario: new mongoose.Types.ObjectId() });
         await f1.save();
         await f2.save();
         const fornecedores = await Fornecedor.find();
@@ -56,7 +57,7 @@ describe('Modelo de Fornecedor', () => {
     });
 
     it('deve atualizar o nome de um fornecedor', async () => {
-        const fornecedor = new Fornecedor({ nome: 'Fornecedor E' });
+        const fornecedor = new Fornecedor({ nome: 'Fornecedor E', usuario: new mongoose.Types.ObjectId() });
         await fornecedor.save();
         fornecedor.nome = 'Fornecedor E Atualizado';
         await fornecedor.save();
@@ -65,8 +66,9 @@ describe('Modelo de Fornecedor', () => {
     });
 
     it('não deve atualizar para nome já existente', async () => {
-        const f1 = new Fornecedor({ nome: 'Fornecedor F' });
-        const f2 = new Fornecedor({ nome: 'Fornecedor G' });
+        const userId = new mongoose.Types.ObjectId();
+        const f1 = new Fornecedor({ nome: 'Fornecedor F', usuario: userId });
+        const f2 = new Fornecedor({ nome: 'Fornecedor G', usuario: userId });
         await f1.save();
         await f2.save();
         f2.nome = 'Fornecedor F';
@@ -74,7 +76,7 @@ describe('Modelo de Fornecedor', () => {
     });
 
     it('deve remover um fornecedor existente', async () => {
-        const fornecedor = new Fornecedor({ nome: 'Fornecedor H' });
+        const fornecedor = new Fornecedor({ nome: 'Fornecedor H', usuario: new mongoose.Types.ObjectId() });
         await fornecedor.save();
         await Fornecedor.findByIdAndDelete(fornecedor._id);
         const found = await Fornecedor.findById(fornecedor._id);

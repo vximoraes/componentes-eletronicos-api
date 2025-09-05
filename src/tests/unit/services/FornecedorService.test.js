@@ -25,15 +25,17 @@ describe('FornecedorService', () => {
 
     describe('criar', () => {
         it('deve cadastrar fornecedor com nome único', async () => {
+            const req = { user_id: 'user123' };
             repositoryMock.buscarPorNome.mockResolvedValue(null);
-            repositoryMock.criar.mockResolvedValue(makeFornecedor());
-            const result = await service.criar({ nome: 'Fornecedor X' });
+            repositoryMock.criar.mockResolvedValue(makeFornecedor({ usuario: 'user123' }));
+            const result = await service.criar({ nome: 'Fornecedor X' }, req);
             expect(result).toHaveProperty('_id');
-            expect(repositoryMock.criar).toHaveBeenCalledWith({ nome: 'Fornecedor X' });
+            expect(repositoryMock.criar).toHaveBeenCalledWith({ nome: 'Fornecedor X', usuario: 'user123' });
         });
         it('deve lançar erro se nome já existir', async () => {
+            const req = { user_id: 'user123' };
             repositoryMock.buscarPorNome.mockResolvedValue(makeFornecedor());
-            await expect(service.criar({ nome: 'Fornecedor X' }))
+            await expect(service.criar({ nome: 'Fornecedor X' }, req))
                 .rejects.toThrow(CustomError);
         });
     });

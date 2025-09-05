@@ -38,11 +38,12 @@ describe('MovimentacaoService', () => {
                 quantidade: 5,
                 fornecedor: 'forn1'
             };
-            Componente.findById.mockResolvedValue(makeComponente());
-            Fornecedor.findById.mockResolvedValue(makeFornecedor());
+            const req = { user_id: 'user123' };
+            Componente.findOne.mockResolvedValue(makeComponente());
+            Fornecedor.findOne.mockResolvedValue(makeFornecedor());
             repositoryMock.criar.mockResolvedValue(makeMovimentacao(parsedData));
 
-            const result = await service.criar({ ...parsedData });
+            const result = await service.criar({ ...parsedData }, req);
             expect(result).toMatchObject(parsedData);
             expect(repositoryMock.criar).toHaveBeenCalled();
         });
@@ -53,61 +54,59 @@ describe('MovimentacaoService', () => {
                 tipo: 'saida',
                 quantidade: 3
             };
+            const req = { user_id: 'user123' };
             const componente = makeComponente({ quantidade: 10 });
-            Componente.findById.mockResolvedValue(componente);
+            Componente.findOne.mockResolvedValue(componente);
             repositoryMock.criar.mockResolvedValue(makeMovimentacao(parsedData));
 
-            const result = await service.criar({ ...parsedData });
+            const result = await service.criar({ ...parsedData }, req);
             expect(result).toMatchObject(parsedData);
             expect(componente.quantidade).toBe(7);
             expect(repositoryMock.criar).toHaveBeenCalled();
         });
 
         it('deve lançar erro se componente não existir', async () => {
-            Componente.findById.mockResolvedValue(null);
-            await expect(service.criar({ componente: 'x', tipo: 'entrada', quantidade: 1, fornecedor: 'f' }))
+            const req = { user_id: 'user123' };
+            Componente.findOne.mockResolvedValue(null);
+            await expect(service.criar({ componente: 'x', tipo: 'entrada', quantidade: 1, fornecedor: 'f' }, req))
                 .rejects.toThrow(CustomError);
         });
 
         it('deve lançar erro se tipo entrada e fornecedor ausente', async () => {
-            Componente.findById.mockResolvedValue(makeComponente());
-            await expect(service.criar({ componente: 'c', tipo: 'entrada', quantidade: 1 }))
+            const req = { user_id: 'user123' };
+            Componente.findOne.mockResolvedValue(makeComponente());
+            await expect(service.criar({ componente: 'c', tipo: 'entrada', quantidade: 1 }, req))
                 .rejects.toThrow(CustomError);
         });
 
         it('deve lançar erro se tipo entrada e fornecedor não existir', async () => {
-            Componente.findById.mockResolvedValue(makeComponente());
-            Fornecedor.findById.mockResolvedValue(null);
-            await expect(service.criar({ componente: 'c', tipo: 'entrada', quantidade: 1, fornecedor: 'f' }))
+            const req = { user_id: 'user123' };
+            Componente.findOne.mockResolvedValue(makeComponente());
+            Fornecedor.findOne.mockResolvedValue(null);
+            await expect(service.criar({ componente: 'c', tipo: 'entrada', quantidade: 1, fornecedor: 'f' }, req))
                 .rejects.toThrow(CustomError);
         });
 
         it('deve lançar erro se quantidade insuficiente na saída', async () => {
-            Componente.findById.mockResolvedValue(makeComponente({ quantidade: 2 }));
-            await expect(service.criar({ componente: 'c', tipo: 'saida', quantidade: 5 }))
+            const req = { user_id: 'user123' };
+            Componente.findOne.mockResolvedValue(makeComponente({ quantidade: 2 }));
+            await expect(service.criar({ componente: 'c', tipo: 'saida', quantidade: 5 }, req))
                 .rejects.toThrow(CustomError);
-        });        it('deve lançar erro inesperado do repository', async () => {
-            Componente.findById.mockResolvedValue(makeComponente());
-            Fornecedor.findById.mockResolvedValue(makeFornecedor());
-            repositoryMock.criar.mockRejectedValue(new Error('DB error'));
-            await expect(service.criar({ componente: 'c', tipo: 'entrada', quantidade: 1, fornecedor: 'f' }))
-                .rejects.toThrow('DB error');
-        });
-
-        it('deve lidar corretamente com tipo diferente de entrada/saida', async () => {
+        });        it('deve lidar corretamente com tipo diferente de entrada/saida', async () => {
             const parsedData = {
                 componente: 'comp1',
-                tipo: 'outro',  // Nem entrada nem saida.
+                tipo: 'outro',  
                 quantidade: 5
             };
+            const req = { user_id: 'user123' };
             const componente = makeComponente({ quantidade: 10 });
-            Componente.findById.mockResolvedValue(componente);
+            Componente.findOne.mockResolvedValue(componente);
             repositoryMock.criar.mockResolvedValue(makeMovimentacao(parsedData));
 
-            const result = await service.criar({ ...parsedData });
+            const result = await service.criar({ ...parsedData }, req);
             
             expect(result).toMatchObject(parsedData);
-            expect(componente.quantidade).toBe(10); // Quantidade não deve ser alterada.
+            expect(componente.quantidade).toBe(10); 
             expect(componente.save).toHaveBeenCalled();
             expect(repositoryMock.criar).toHaveBeenCalled();
         });

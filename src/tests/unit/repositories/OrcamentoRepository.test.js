@@ -6,8 +6,7 @@ function MockModel(data) {
     this.toObject = jest.fn().mockReturnValue(this);
 }
 MockModel.findById = jest.fn();
-MockModel.findByIdAndUpdate = jest.fn();
-MockModel.findByIdAndDelete = jest.fn();
+MockModel.findOneAndUpdate = jest.fn();
 MockModel.findOne = jest.fn();
 MockModel.paginate = jest.fn();
 
@@ -20,8 +19,7 @@ describe('OrcamentoRepository', () => {
 
     beforeEach(() => {
         MockModel.findById.mockReset();
-        MockModel.findByIdAndUpdate.mockReset();
-        MockModel.findByIdAndDelete.mockReset();
+        MockModel.findOneAndUpdate.mockReset();
         MockModel.findOne.mockReset();
         MockModel.paginate.mockReset();
         repository = new OrcamentoRepository({ orcamentoModel: MockModel });
@@ -37,15 +35,15 @@ describe('OrcamentoRepository', () => {
 
     it('deve listar orçamento por id', async () => {
         const fake = { _id: 'id', toObject: () => ({ _id: 'id' }) };
-        MockModel.findById.mockResolvedValue(fake);
-        const req = { params: { id: 'id' } };
+        MockModel.findOne = jest.fn().mockResolvedValue(fake);
+        const req = { params: { id: 'id' }, user_id: 'user1' };
         const result = await repository.listar(req);
         expect(result._id).toBe('id');
     });
 
     it('deve lançar erro 404 ao listar por id inexistente', async () => {
-        MockModel.findById.mockResolvedValue(null);
-        const req = { params: { id: 'id' } };
+        MockModel.findOne = jest.fn().mockResolvedValue(null);
+        const req = { params: { id: 'id' }, user_id: 'user1' };
         await expect(repository.listar(req)).rejects.toThrow('não encontrado');
     });
 
@@ -57,92 +55,107 @@ describe('OrcamentoRepository', () => {
     });
 
     it('deve atualizar orçamento existente', async () => {
-        MockModel.findByIdAndUpdate.mockReturnValue(withLean({ _id: 'id' }));
-        const result = await repository.atualizar('id', { nome: 'Novo' });
+        MockModel.findOneAndUpdate.mockReturnValue(withLean({ _id: 'id' }));
+        const req = { user_id: 'user123' };
+        const result = await repository.atualizar('id', { nome: 'Novo' }, req);
         expect(result._id).toBe('id');
     });
 
     it('deve lançar erro ao atualizar orçamento inexistente', async () => {
-        MockModel.findByIdAndUpdate.mockReturnValue({});
-        await expect(repository.atualizar('id', { nome: 'Novo' })).rejects.toThrow();
+        MockModel.findOneAndUpdate.mockReturnValue(withLean(null));
+        const req = { user_id: 'user123' };
+        await expect(repository.atualizar('id', { nome: 'Novo' }, req)).rejects.toThrow();
     });
 
     it('deve deletar orçamento existente', async () => {
-        MockModel.findById.mockResolvedValue({ _id: 'id' });
-        MockModel.findByIdAndDelete.mockResolvedValue({ _id: 'id' });
-        const result = await repository.deletar('id');
+        const fake = { _id: 'id' };
+        MockModel.findOne.mockResolvedValue(fake);
+        MockModel.findOneAndDelete = jest.fn().mockResolvedValue(fake);
+        const req = { user_id: 'user123' };
+        const result = await repository.deletar('id', req);
         expect(result._id).toBe('id');
     });
 
     it('deve lançar erro ao deletar orçamento inexistente', async () => {
-        MockModel.findById.mockResolvedValue(null);
-        await expect(repository.deletar('id')).rejects.toThrow('não encontrado');
+        MockModel.findOne.mockResolvedValue(null);
+        const req = { user_id: 'user123' };
+        await expect(repository.deletar('id', req)).rejects.toThrow('não encontrado');
     });
 
     it('deve adicionar componente', async () => {
         const fake = { _id: 'id', componentes: [], save: jest.fn(), toObject: () => ({ _id: 'id', componentes: [] }) };
-        MockModel.findById.mockResolvedValue(fake);
+        MockModel.findOne.mockResolvedValue(fake);
         fake.save.mockResolvedValue(fake);
-        const result = await repository.adicionarComponente('id', { nome: 'C' });
+        const req = { user_id: 'user123' };
+        const result = await repository.adicionarComponente('id', { nome: 'C' }, req);
         expect(result._id).toBe('id');
     });
 
     it('deve lançar erro ao adicionar componente em orçamento inexistente', async () => {
-        MockModel.findById.mockResolvedValue(null);
-        await expect(repository.adicionarComponente('id', { nome: 'C' })).rejects.toThrow('não encontrado');
+        MockModel.findOne.mockResolvedValue(null);
+        const req = { user_id: 'user123' };
+        await expect(repository.adicionarComponente('id', { nome: 'C' }, req)).rejects.toThrow('não encontrado');
     });
 
     it('deve atualizar componente', async () => {
         const comp = { _id: 'cid', toObject: () => ({ _id: 'cid' }) };
         const fake = { _id: 'id', componentes: [comp], save: jest.fn() };
-        MockModel.findById.mockResolvedValue(fake);
+        MockModel.findOne.mockResolvedValue(fake);
         fake.save.mockResolvedValue(fake);
-        const result = await repository.atualizarComponente('id', 'cid', { nome: 'Novo' });
+        const req = { user_id: 'user123' };
+        const result = await repository.atualizarComponente('id', 'cid', { nome: 'Novo' }, req);
         expect(result._id).toBe('id');
     });
 
     it('deve lançar erro ao atualizar componente inexistente', async () => {
         const fake = { _id: 'id', componentes: [{ _id: 'other' }] };
-        MockModel.findById.mockResolvedValue(fake);
-        await expect(repository.atualizarComponente('id', 'cid', { nome: 'Novo' })).rejects.toThrow('Componente não encontrado');
+        MockModel.findOne.mockResolvedValue(fake);
+        const req = { user_id: 'user123' };
+        await expect(repository.atualizarComponente('id', 'cid', { nome: 'Novo' }, req)).rejects.toThrow('Componente não encontrado');
     });
 
     it('deve remover componente', async () => {
         const comp = { _id: 'cid', subtotal: 1 };
         const fake = { _id: 'id', componentes: [comp], save: jest.fn() };
-        MockModel.findById.mockResolvedValue(fake);
+        MockModel.findOne.mockResolvedValue(fake);
         fake.save.mockResolvedValue(fake);
-        const result = await repository.removerComponente('id', 'cid');
+        const req = { user_id: 'user123' };
+        const result = await repository.removerComponente('id', 'cid', req);
         expect(result._id).toBe('id');
     });
 
     it('deve lançar erro ao remover componente de orçamento inexistente', async () => {
-        MockModel.findById.mockResolvedValue(null);
-        await expect(repository.removerComponente('id', 'cid')).rejects.toThrow('não encontrado');
+        MockModel.findOne.mockResolvedValue(null);
+        const req = { user_id: 'user123' };
+        await expect(repository.removerComponente('id', 'cid', req)).rejects.toThrow('não encontrado');
     });
 
     it('deve buscar por id', async () => {
         const fake = { _id: 'id' };
-        MockModel.findById.mockResolvedValue(fake);
-        const result = await repository.buscarPorId('id');
+        MockModel.findOne.mockResolvedValue(fake);
+        const req = { user_id: 'user123' };
+        const result = await repository.buscarPorId('id', false, req);
         expect(result._id).toBe('id');
     });
 
     it('deve lançar erro ao buscar por id inexistente', async () => {
-        MockModel.findById.mockResolvedValue(null);
-        await expect(repository.buscarPorId('id')).rejects.toThrow('não encontrado');
+        MockModel.findOne.mockResolvedValue(null);
+        const req = { user_id: 'user123' };
+        await expect(repository.buscarPorId('id', false, req)).rejects.toThrow('não encontrado');
     });
 
     it('deve buscar por protocolo', async () => {
         const fake = { _id: 'id' };
         MockModel.findOne.mockResolvedValue(fake);
-        const result = await repository.buscarPorProtocolo('P123');
+        const req = { user_id: 'user123' };
+        const result = await repository.buscarPorProtocolo('P123', null, req);
         expect(result._id).toBe('id');
     });
 
     it('deve retornar null se protocolo não existe', async () => {
         MockModel.findOne.mockResolvedValue(null);
-        const result = await repository.buscarPorProtocolo('P123');
+        const req = { user_id: 'user123' };
+        const result = await repository.buscarPorProtocolo('P123', null, req);
         expect(result).toBeNull();
     });
 });

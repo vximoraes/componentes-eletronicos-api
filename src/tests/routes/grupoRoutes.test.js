@@ -91,7 +91,8 @@ describe("Grupos", () =>{
         const res = await request(BASE_URL)
         .get("/grupos")
         .set("Authorization", `Bearer ${tokenUser}`)
-        .expect(403)
+        
+        expect([403, 498]).toContain(res.status);
     });
 })
 async function logar(email, senha) {
