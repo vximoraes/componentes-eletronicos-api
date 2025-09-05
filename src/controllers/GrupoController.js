@@ -2,6 +2,7 @@ import GrupoService from '../services/GrupoService.js';
 import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
 import { GrupoQuerySchema, GrupoIdSchema } from '../utils/validators/schemas/zod/querys/GrupoQuerySchema.js';
 import { GrupoSchema, GrupoUpdateSchema } from '../utils/validators/schemas/zod/GrupoSchema.js';
+import  ObjectIdSchema  from '../utils/validators/schemas/zod/ObjectIdSchema.js'
 
 class GrupoController {
     constructor() {
@@ -97,6 +98,19 @@ class GrupoController {
     
         // Se chegou até aqui, é porque deu tudo certo, retornar 200 OK
         return CommonResponse.success(res, data, 200, 'Grupo excluído com sucesso.');
+    }
+
+    async adicionarRota(req, res) {
+        console.log('Estou no adicionarRota em GrupoController')
+
+        const {id} = req.params
+        const {idRota} = req.body
+        GrupoIdSchema.parse(id)
+        ObjectIdSchema.parse(idRota)
+
+        const data = await this.service.adicionarRota(id, idRota)
+        return CommonResponse.success(res, data, 200, 'Rota Adicionada com sucesso.')
+        
     }
 }
 

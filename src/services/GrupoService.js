@@ -1,11 +1,13 @@
 import GrupoRepository from "../repositories/GrupoRepository.js";
 import UsuarioRepository from "../repositories/UsuarioRepository.js";
+import RotaRepository from "../repositories/RotaRepository.js"
 import { CustomError, HttpStatusCodes, messages } from "../utils/helpers/index.js";
 
 class GrupoService {
     constructor(){
         this.repository = new GrupoRepository();
         this.usuarioRepository = new UsuarioRepository();
+        this.rotaRepository = new RotaRepository()
     }
 
     async listar(req) {
@@ -69,6 +71,45 @@ class GrupoService {
 
             }
         }
+    }
+    async adicionarRota(idGrupo, idRota){
+
+        const grupo = await this.repository.buscarPorId(idGrupo)
+        if(!grupo) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.NOT_FOUND.code,
+                errorType: "resourceNotFuond",
+                filed: "Grupos",
+                details:[],
+                customMessage: messages.error.resourceNotFound("Grupos")
+            })
+        }
+
+        const rota = await this.rotaRepository.buscarPorId(idRota)
+
+        if(!rota) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.NOT_FOUND.code,
+                errorType: "resourceNotFuond",
+                filed: "Rotas",
+                details:[],
+                customMessage: messages.error.resourceNotFound("Rotas")
+            })
+        }
+        const existRota = grupo.permissoes.find(item => item.rota === rota.rota)
+        if(existRota){
+            throw new CustomError({
+                statusCode: HttpStatusCodes.CONFLICT.code,
+                errorType: "resourceConflict",
+                filed: "Rotas",
+                details:[],
+                customMessage: messages.error.resourceConflict("Grupos", "rotas duplicadas")
+            })  
+        }
+        const data = await this.repository.adiciotarRota(idGrupo, rota)
+
+        return data
+        
     }
 }
 

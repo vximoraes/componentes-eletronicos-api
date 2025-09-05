@@ -150,12 +150,11 @@ class RotaRepository {
     }
     async buscarRotaPorNome(rota, idIgnorado = null){
         console.log('Estou no buscar rota por nome em RotaRepository')
-        const filtro = {rota}
+        const filtro = {rota: rota}
         if(idIgnorado){
-            filtro._id = {$ne: idIgnorado}
+            filtro._id = { $ne: idIgnorado }
         }
-        const data = await this.model.findOne({filtro})
-        console.log(data)
+        const data = await this.model.findOne(filtro)
         return data
     }
 }
