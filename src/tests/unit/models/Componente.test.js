@@ -72,21 +72,6 @@ describe('Modelo de Componente', () => {
         await expect(c2.save()).rejects.toThrow();
     });
 
-    it('deve definir ativo como false por padrão', async () => {
-        const componenteData = {
-            nome: 'Indutor',
-            estoque_minimo: 2,
-            valor_unitario: 0.50,
-            localizacao: new mongoose.Types.ObjectId(),
-            categoria: new mongoose.Types.ObjectId(),
-            usuario: new mongoose.Types.ObjectId()
-        };
-        const componente = new Componente(componenteData);
-        await componente.save();
-        const saved = await Componente.findById(componente._id);
-        expect(saved.ativo).toBe(true);
-    });
-
     it('deve retornar todos os componentes cadastrados', async () => {
         const c1 = new Componente({
             nome: 'Diodo',

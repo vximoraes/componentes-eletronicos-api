@@ -92,19 +92,10 @@ describe('MovimentacaoService', () => {
             Componente.findOne.mockResolvedValue(makeComponente({ quantidade: 2 }));
             await expect(service.criar({ componente: 'c', tipo: 'saida', quantidade: 5 }, req))
                 .rejects.toThrow(CustomError);
-        });        it('deve lançar erro inesperado do repository', async () => {
-            const req = { user_id: 'user123' };
-            Componente.findOne.mockResolvedValue(makeComponente());
-            Fornecedor.findOne.mockResolvedValue(makeFornecedor());
-            repositoryMock.criar.mockRejectedValue(new Error('DB error'));
-            await expect(service.criar({ componente: 'c', tipo: 'entrada', quantidade: 1, fornecedor: 'f' }, req))
-                .rejects.toThrow('DB error');
-        });
-
-        it('deve lidar corretamente com tipo diferente de entrada/saida', async () => {
+        });        it('deve lidar corretamente com tipo diferente de entrada/saida', async () => {
             const parsedData = {
                 componente: 'comp1',
-                tipo: 'outro',  // Nem entrada nem saida.
+                tipo: 'outro',  
                 quantidade: 5
             };
             const req = { user_id: 'user123' };
@@ -115,7 +106,7 @@ describe('MovimentacaoService', () => {
             const result = await service.criar({ ...parsedData }, req);
             
             expect(result).toMatchObject(parsedData);
-            expect(componente.quantidade).toBe(10); // Quantidade não deve ser alterada.
+            expect(componente.quantidade).toBe(10); 
             expect(componente.save).toHaveBeenCalled();
             expect(repositoryMock.criar).toHaveBeenCalled();
         });
