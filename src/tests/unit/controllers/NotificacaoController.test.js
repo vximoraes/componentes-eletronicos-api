@@ -52,7 +52,7 @@ describe('NotificacaoController', () => {
 
             await controller.listar(mockReq, mockRes);
 
-            expect(mockService.listarTodas).toHaveBeenCalledWith(mockReq.query, mockReq);
+            expect(mockService.listarTodas).toHaveBeenCalledWith(mockReq);
             expect(CommonResponse.success).toHaveBeenCalledWith(mockRes, mockNotificacoes);
         });
     });
@@ -114,7 +114,7 @@ describe('NotificacaoController', () => {
             await controller.marcarComoVisualizada(mockReq, mockRes);
 
             expect(mockService.buscarPorId).toHaveBeenCalledWith('123', mockReq);
-            expect(mockService.marcarComoVisualizada).toHaveBeenCalledWith('123');
+            expect(mockService.marcarComoVisualizada).toHaveBeenCalledWith('123', mockReq);
             expect(CommonResponse.success).toHaveBeenCalledWith(mockRes, mockUpdated);
         });
     });

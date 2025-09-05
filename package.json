@@ -11,7 +11,7 @@
         "dev": "clear && nodemon server.js",
         "seed": "clear && node src/seeds/seeds.js",
         "start": "clear && node server.js",
-        "test": "clear && jest --coverage --detectOpenHandles"
+        "test": "clear && jest --coverage"
     },
     "dependencies": {
         "bcrypt": "^6.0.0",

@@ -35,15 +35,15 @@ describe('OrcamentoRepository', () => {
 
     it('deve listar orçamento por id', async () => {
         const fake = { _id: 'id', toObject: () => ({ _id: 'id' }) };
-        MockModel.findById.mockResolvedValue(fake);
-        const req = { params: { id: 'id' } };
+        MockModel.findOne = jest.fn().mockResolvedValue(fake);
+        const req = { params: { id: 'id' }, user_id: 'user1' };
         const result = await repository.listar(req);
         expect(result._id).toBe('id');
     });
 
     it('deve lançar erro 404 ao listar por id inexistente', async () => {
-        MockModel.findById.mockResolvedValue(null);
-        const req = { params: { id: 'id' } };
+        MockModel.findOne = jest.fn().mockResolvedValue(null);
+        const req = { params: { id: 'id' }, user_id: 'user1' };
         await expect(repository.listar(req)).rejects.toThrow('não encontrado');
     });
 
@@ -68,8 +68,9 @@ describe('OrcamentoRepository', () => {
     });
 
     it('deve deletar orçamento existente', async () => {
-        const fake = { _id: 'id', deleteOne: jest.fn().mockResolvedValue({ _id: 'id' }) };
+        const fake = { _id: 'id' };
         MockModel.findOne.mockResolvedValue(fake);
+        MockModel.findOneAndDelete = jest.fn().mockResolvedValue(fake);
         const req = { user_id: 'user123' };
         const result = await repository.deletar('id', req);
         expect(result._id).toBe('id');

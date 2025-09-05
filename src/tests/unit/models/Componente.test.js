@@ -29,7 +29,8 @@ describe('Modelo de Componente', () => {
             descricao: 'Resistor de 10k Ohms',
             imagem: 'http://exemplo.com/resistor.jpg',
             localizacao: new mongoose.Types.ObjectId(),
-            categoria: new mongoose.Types.ObjectId()
+            categoria: new mongoose.Types.ObjectId(),
+            usuario: new mongoose.Types.ObjectId()
         };
         const componente = new Componente(componenteData);
         await componente.save();
@@ -62,7 +63,8 @@ describe('Modelo de Componente', () => {
             estoque_minimo: 5,
             valor_unitario: 0.10,
             localizacao: new mongoose.Types.ObjectId(),
-            categoria: new mongoose.Types.ObjectId()
+            categoria: new mongoose.Types.ObjectId(),
+            usuario: new mongoose.Types.ObjectId()
         };
         const c1 = new Componente(baseData);
         await c1.save();
@@ -76,7 +78,8 @@ describe('Modelo de Componente', () => {
             estoque_minimo: 2,
             valor_unitario: 0.50,
             localizacao: new mongoose.Types.ObjectId(),
-            categoria: new mongoose.Types.ObjectId()
+            categoria: new mongoose.Types.ObjectId(),
+            usuario: new mongoose.Types.ObjectId()
         };
         const componente = new Componente(componenteData);
         await componente.save();
@@ -90,14 +93,16 @@ describe('Modelo de Componente', () => {
             estoque_minimo: 3,
             valor_unitario: 0.20,
             localizacao: new mongoose.Types.ObjectId(),
-            categoria: new mongoose.Types.ObjectId()
+            categoria: new mongoose.Types.ObjectId(),
+            usuario: new mongoose.Types.ObjectId()
         });
         const c2 = new Componente({
             nome: 'Transistor',
             estoque_minimo: 4,
             valor_unitario: 0.30,
             localizacao: new mongoose.Types.ObjectId(),
-            categoria: new mongoose.Types.ObjectId()
+            categoria: new mongoose.Types.ObjectId(),
+            usuario: new mongoose.Types.ObjectId()
         });
         await c1.save();
         await c2.save();

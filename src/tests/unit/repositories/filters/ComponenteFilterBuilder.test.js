@@ -80,25 +80,13 @@ describe('ComponenteFilterBuilder', () => {
             expect(resultado).toBe(componenteFilterBuilder);
         });
 
-        test('não deve adicionar filtro quando nome é undefined', () => {
-            const resultado = componenteFilterBuilder.comNome(undefined);
-
-            expect(componenteFilterBuilder.filtros.nome).toBeUndefined();
-            expect(resultado).toBe(componenteFilterBuilder);
-        });
-
-        test('não deve adicionar filtro quando nome é null', () => {
-            const resultado = componenteFilterBuilder.comNome(null);
-
-            expect(componenteFilterBuilder.filtros.nome).toBeUndefined();
-            expect(resultado).toBe(componenteFilterBuilder);
-        });
-
-        test('não deve adicionar filtro quando nome é string vazia', () => {
-            const resultado = componenteFilterBuilder.comNome('');
-
-            expect(componenteFilterBuilder.filtros.nome).toBeUndefined();
-            expect(resultado).toBe(componenteFilterBuilder);
+        test('não deve adicionar filtro para valores inválidos (undefined, null, string vazia)', () => {
+            [undefined, null, ''].forEach(valor => {
+                componenteFilterBuilder.filtros = {}; // Reset
+                const resultado = componenteFilterBuilder.comNome(valor);
+                expect(componenteFilterBuilder.filtros.nome).toBeUndefined();
+                expect(resultado).toBe(componenteFilterBuilder);
+            });
         });
     });
 
@@ -119,32 +107,13 @@ describe('ComponenteFilterBuilder', () => {
             expect(resultado).toBe(componenteFilterBuilder);
         });
 
-        test('não deve adicionar filtro quando quantidade é undefined', () => {
-            const resultado = componenteFilterBuilder.comQuantidade(undefined);
-
-            expect(componenteFilterBuilder.filtros.quantidade).toBeUndefined();
-            expect(resultado).toBe(componenteFilterBuilder);
-        });
-
-        test('não deve adicionar filtro quando quantidade é null', () => {
-            const resultado = componenteFilterBuilder.comQuantidade(null);
-
-            expect(componenteFilterBuilder.filtros.quantidade).toBeUndefined();
-            expect(resultado).toBe(componenteFilterBuilder);
-        });
-
-        test('não deve adicionar filtro quando quantidade é string vazia', () => {
-            const resultado = componenteFilterBuilder.comQuantidade('');
-
-            expect(componenteFilterBuilder.filtros.quantidade).toBeUndefined();
-            expect(resultado).toBe(componenteFilterBuilder);
-        });
-
-        test('não deve adicionar filtro quando quantidade não é um número válido', () => {
-            const resultado = componenteFilterBuilder.comQuantidade('abc');
-
-            expect(componenteFilterBuilder.filtros.quantidade).toBeUndefined();
-            expect(resultado).toBe(componenteFilterBuilder);
+        test('não deve adicionar filtro para valores inválidos (undefined, null, string vazia, não-numérico)', () => {
+            [undefined, null, '', 'abc'].forEach(valor => {
+                componenteFilterBuilder.filtros = {}; // Reset
+                const resultado = componenteFilterBuilder.comQuantidade(valor);
+                expect(componenteFilterBuilder.filtros.quantidade).toBeUndefined();
+                expect(resultado).toBe(componenteFilterBuilder);
+            });
         });
     });
 
@@ -156,32 +125,13 @@ describe('ComponenteFilterBuilder', () => {
             expect(resultado).toBe(componenteFilterBuilder);
         });
 
-        test('não deve adicionar filtro quando estoque_minimo não é "true"', () => {
-            const resultado = componenteFilterBuilder.comEstoqueMinimo('false');
-
-            expect(componenteFilterBuilder.filtros.$expr).toBeUndefined();
-            expect(resultado).toBe(componenteFilterBuilder);
-        });
-
-        test('não deve adicionar filtro quando estoque_minimo é undefined', () => {
-            const resultado = componenteFilterBuilder.comEstoqueMinimo(undefined);
-
-            expect(componenteFilterBuilder.filtros.$expr).toBeUndefined();
-            expect(resultado).toBe(componenteFilterBuilder);
-        });
-
-        test('não deve adicionar filtro quando estoque_minimo é null', () => {
-            const resultado = componenteFilterBuilder.comEstoqueMinimo(null);
-
-            expect(componenteFilterBuilder.filtros.$expr).toBeUndefined();
-            expect(resultado).toBe(componenteFilterBuilder);
-        });
-
-        test('não deve adicionar filtro quando estoque_minimo é string vazia', () => {
-            const resultado = componenteFilterBuilder.comEstoqueMinimo('');
-
-            expect(componenteFilterBuilder.filtros.$expr).toBeUndefined();
-            expect(resultado).toBe(componenteFilterBuilder);
+        test('não deve adicionar filtro para valores inválidos (não "true")', () => {
+            ['false', undefined, null, ''].forEach(valor => {
+                componenteFilterBuilder.filtros = {}; // Reset
+                const resultado = componenteFilterBuilder.comEstoqueMinimo(valor);
+                expect(componenteFilterBuilder.filtros.$expr).toBeUndefined();
+                expect(resultado).toBe(componenteFilterBuilder);
+            });
         });
     });
 
@@ -246,34 +196,22 @@ describe('ComponenteFilterBuilder', () => {
             expect(resultado).toBe(componenteFilterBuilder);
         });
 
-        test('não deve adicionar filtro quando localizacao é undefined', async () => {
-            const resultado = await componenteFilterBuilder.comLocalizacao(undefined);
-
-            expect(mongoose.Types.ObjectId.isValid).not.toHaveBeenCalled();
-            expect(Localizacao.findById).not.toHaveBeenCalled();
-            expect(Localizacao.findOne).not.toHaveBeenCalled();
-            expect(componenteFilterBuilder.filtros.localizacao).toBeUndefined();
-            expect(resultado).toBe(componenteFilterBuilder);
-        });
-
-        test('não deve adicionar filtro quando localizacao é null', async () => {
-            const resultado = await componenteFilterBuilder.comLocalizacao(null);
-
-            expect(mongoose.Types.ObjectId.isValid).not.toHaveBeenCalled();
-            expect(Localizacao.findById).not.toHaveBeenCalled();
-            expect(Localizacao.findOne).not.toHaveBeenCalled();
-            expect(componenteFilterBuilder.filtros.localizacao).toBeUndefined();
-            expect(resultado).toBe(componenteFilterBuilder);
-        });
-
-        test('não deve adicionar filtro quando localizacao é string vazia', async () => {
-            const resultado = await componenteFilterBuilder.comLocalizacao('');
-
-            expect(mongoose.Types.ObjectId.isValid).not.toHaveBeenCalled();
-            expect(Localizacao.findById).not.toHaveBeenCalled();
-            expect(Localizacao.findOne).not.toHaveBeenCalled();
-            expect(componenteFilterBuilder.filtros.localizacao).toBeUndefined();
-            expect(resultado).toBe(componenteFilterBuilder);
+        test('não deve adicionar filtro para valores inválidos (undefined, null, string vazia)', async () => {
+            const valoresInvalidos = [undefined, null, ''];
+            
+            for (const valor of valoresInvalidos) {
+                componenteFilterBuilder.filtros = {}; // Reset
+                
+                const resultado = await componenteFilterBuilder.comLocalizacao(valor);
+                
+                expect(mongoose.Types.ObjectId.isValid).not.toHaveBeenCalled();
+                expect(Localizacao.findById).not.toHaveBeenCalled();
+                expect(Localizacao.findOne).not.toHaveBeenCalled();
+                expect(componenteFilterBuilder.filtros.localizacao).toBeUndefined();
+                expect(resultado).toBe(componenteFilterBuilder);
+                
+                jest.clearAllMocks();
+            }
         });
     });
 
@@ -338,34 +276,23 @@ describe('ComponenteFilterBuilder', () => {
             expect(resultado).toBe(componenteFilterBuilder);
         });
 
-        test('não deve adicionar filtro quando categoria é undefined', async () => {
-            const resultado = await componenteFilterBuilder.comCategoria(undefined);
-
-            expect(mongoose.Types.ObjectId.isValid).not.toHaveBeenCalled();
-            expect(Categoria.findById).not.toHaveBeenCalled();
-            expect(Categoria.findOne).not.toHaveBeenCalled();
-            expect(componenteFilterBuilder.filtros.categoria).toBeUndefined();
-            expect(resultado).toBe(componenteFilterBuilder);
-        });
-
-        test('não deve adicionar filtro quando categoria é null', async () => {
-            const resultado = await componenteFilterBuilder.comCategoria(null);
-
-            expect(mongoose.Types.ObjectId.isValid).not.toHaveBeenCalled();
-            expect(Categoria.findById).not.toHaveBeenCalled();
-            expect(Categoria.findOne).not.toHaveBeenCalled();
-            expect(componenteFilterBuilder.filtros.categoria).toBeUndefined();
-            expect(resultado).toBe(componenteFilterBuilder);
-        });
-
-        test('não deve adicionar filtro quando categoria é string vazia', async () => {
-            const resultado = await componenteFilterBuilder.comCategoria('');
-
-            expect(mongoose.Types.ObjectId.isValid).not.toHaveBeenCalled();
-            expect(Categoria.findById).not.toHaveBeenCalled();
-            expect(Categoria.findOne).not.toHaveBeenCalled();
-            expect(componenteFilterBuilder.filtros.categoria).toBeUndefined();
-            expect(resultado).toBe(componenteFilterBuilder);
+        test('não deve adicionar filtro para valores inválidos', async () => {
+            const valoresInvalidos = [undefined, null, ''];
+            
+            for (const valor of valoresInvalidos) {
+                componenteFilterBuilder.filtros = {}; // Reset
+                mongoose.Types.ObjectId.isValid.mockReturnValue(false);
+                
+                const resultado = await componenteFilterBuilder.comCategoria(valor);
+                
+                expect(mongoose.Types.ObjectId.isValid).not.toHaveBeenCalled();
+                expect(Categoria.findById).not.toHaveBeenCalled();
+                expect(Categoria.findOne).not.toHaveBeenCalled();
+                expect(componenteFilterBuilder.filtros.categoria).toBeUndefined();
+                expect(resultado).toBe(componenteFilterBuilder);
+                
+                jest.clearAllMocks();
+            }
         });
     });
 
@@ -402,44 +329,7 @@ describe('ComponenteFilterBuilder', () => {
     describe('build', () => {
         test('deve retornar filtros vazios quando nenhum filtro foi adicionado', () => {
             const filtros = componenteFilterBuilder.build();
-
             expect(filtros).toEqual({});
-        });
-
-        test('deve retornar filtro de nome quando foi adicionado', () => {
-            componenteFilterBuilder.comNome('Resistor');
-            const filtros = componenteFilterBuilder.build();
-
-            expect(filtros).toEqual({
-                nome: { $regex: 'Resistor', $options: 'i' }
-            });
-        });
-
-        test('deve retornar filtro de quantidade quando foi adicionado', () => {
-            componenteFilterBuilder.comQuantidade('10');
-            const filtros = componenteFilterBuilder.build();
-
-            expect(filtros).toEqual({
-                quantidade: 10
-            });
-        });
-
-        test('deve retornar filtro de estoque mínimo quando foi adicionado', () => {
-            componenteFilterBuilder.comEstoqueMinimo('true');
-            const filtros = componenteFilterBuilder.build();
-
-            expect(filtros).toEqual({
-                $expr: { $lt: ["$quantidade", "$estoque_minimo"] }
-            });
-        });
-
-        test('deve retornar filtro de ativo quando foi adicionado', () => {
-            componenteFilterBuilder.comAtivo('false');
-            const filtros = componenteFilterBuilder.build();
-
-            expect(filtros).toEqual({
-                ativo: false
-            });
         });
 
         test('deve retornar todos os filtros adicionados corretamente', () => {

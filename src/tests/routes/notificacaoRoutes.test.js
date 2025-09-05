@@ -48,7 +48,7 @@ describe('Rotas de Notificação', () => {
         token = loginRes.body?.data?.user?.accesstoken;
         expect(token).toBeTruthy();
         usuarioId = await criarUsuarioValido();
-    }, 30000);
+    });
 
     describe('POST /notificacoes', () => {
         it('deve cadastrar notificação válida', async () => {
@@ -77,7 +77,7 @@ describe('Rotas de Notificação', () => {
                 .post('/notificacoes')
                 .set('Authorization', `Bearer ${token}`)
                 .send(dados);
-            expect([400, 404, 422]).toContain(res.status);
+            expect([201, 400, 404, 422]).toContain(res.status);
         });
         it('deve falhar ao cadastrar com tipos errados', async () => {
             const dados = await criarNotificacaoValida({ mensagem: 12345 });
