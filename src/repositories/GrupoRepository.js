@@ -304,7 +304,6 @@ class GrupoRepository {
         }
     }
 
-
 }
 
 export default GrupoRepository;
