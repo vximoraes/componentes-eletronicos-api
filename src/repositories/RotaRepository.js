@@ -148,6 +148,16 @@ class RotaRepository {
         }
         return data;
     }
+    async buscarRotaPorNome(rota, idIgnorado = null){
+        console.log('Estou no buscar rota por nome em RotaRepository')
+        const filtro = {rota}
+        if(idIgnorado){
+            filtro._id = {$ne: idIgnorado}
+        }
+        const data = await this.model.findOne({filtro})
+        console.log(data)
+        return data
+    }
 }
 
 export default RotaRepository;
