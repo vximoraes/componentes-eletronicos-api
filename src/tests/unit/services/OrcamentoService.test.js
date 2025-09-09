@@ -16,16 +16,18 @@ describe('OrcamentoService', () => {
     describe('criar', () => {
         it('deve cadastrar orçamento válido', async () => {
             const parsedData = { nome: 'Orçamento', protocolo: 'P123', valor: 10 };
+            const req = { user_id: 'user123' };
             repository.buscarPorProtocolo.mockResolvedValue(null);
-            repository.criar.mockResolvedValue({ _id: 'id', ...parsedData });
-            const result = await service.criar(parsedData);
-            expect(repository.criar).toHaveBeenCalledWith(parsedData);
+            repository.criar.mockResolvedValue({ _id: 'id', ...parsedData, usuario: 'user123' });
+            const result = await service.criar(parsedData, req);
+            expect(repository.criar).toHaveBeenCalledWith({ ...parsedData, usuario: 'user123' });
             expect(result).toEqual(expect.objectContaining({ _id: 'id', nome: 'Orçamento' }));
         });
         it('deve lançar erro se protocolo já existe', async () => {
             const parsedData = { nome: 'Orçamento', protocolo: 'P123', valor: 10 };
+            const req = { user_id: 'user123' };
             repository.buscarPorProtocolo.mockResolvedValue({ _id: 'id' });
-            await expect(service.criar(parsedData)).rejects.toThrow('Nome já está em uso.');
+            await expect(service.criar(parsedData, req)).rejects.toThrow('Nome já está em uso.');
         });
     });
 
@@ -43,50 +45,57 @@ describe('OrcamentoService', () => {
         it('deve atualizar orçamento existente', async () => {
             const id = 'id';
             const parsedData = { nome: 'Novo Nome' };
+            const req = { user_id: 'user123' };
             repository.buscarPorId.mockResolvedValue({ _id: id });
             repository.atualizar.mockResolvedValue({ _id: id, ...parsedData });
-            const result = await service.atualizar(id, parsedData);
-            expect(repository.atualizar).toHaveBeenCalledWith(id, parsedData);
+            const result = await service.atualizar(id, parsedData, req);
+            expect(repository.atualizar).toHaveBeenCalledWith(id, parsedData, req);
             expect(result).toEqual(expect.objectContaining({ nome: 'Novo Nome' }));
         });
         it('deve lançar erro se orçamento não existe', async () => {
+            const req = { user_id: 'user123' };
             repository.buscarPorId.mockResolvedValue(null);
-            await expect(service.atualizar('id', { nome: 'Novo' })).rejects.toThrow('não encontrado');
+            await expect(service.atualizar('id', { nome: 'Novo' }, req)).rejects.toThrow('não encontrado');
         });
     });
 
     describe('deletar', () => {
         it('deve deletar orçamento existente', async () => {
             const id = 'id';
+            const req = { user_id: 'user123' };
             repository.buscarPorId.mockResolvedValue({ _id: id });
             repository.deletar.mockResolvedValue({ _id: id });
-            const result = await service.deletar(id);
-            expect(repository.deletar).toHaveBeenCalledWith(id);
+            const result = await service.deletar(id, req);
+            expect(repository.deletar).toHaveBeenCalledWith(id, req);
             expect(result).toEqual(expect.objectContaining({ _id: id }));
         });
         it('deve lançar erro se orçamento não existe', async () => {
+            const req = { user_id: 'user123' };
             repository.buscarPorId.mockResolvedValue(null);
-            await expect(service.deletar('id')).rejects.toThrow('não encontrado');
+            await expect(service.deletar('id', req)).rejects.toThrow('não encontrado');
         });
     });
 
     describe('manipulação de componentes', () => {
         it('deve adicionar componente', async () => {
+            const req = { user_id: 'user123' };
             repository.adicionarComponente.mockResolvedValue({ _id: 'id', componentes: [{ nome: 'C1' }] });
-            const result = await service.adicionarComponente('id', { nome: 'C1' });
-            expect(repository.adicionarComponente).toHaveBeenCalledWith('id', { nome: 'C1' });
+            const result = await service.adicionarComponente('id', { nome: 'C1' }, req);
+            expect(repository.adicionarComponente).toHaveBeenCalledWith('id', { nome: 'C1' }, req);
             expect(result).toEqual(expect.objectContaining({ componentes: expect.any(Array) }));
         });
         it('deve atualizar componente', async () => {
+            const req = { user_id: 'user123' };
             repository.atualizarComponente.mockResolvedValue({ _id: 'id', componentes: [{ nome: 'C1', quantidade: 2 }] });
-            const result = await service.atualizarComponente('id', 'cid', { quantidade: 2 });
-            expect(repository.atualizarComponente).toHaveBeenCalledWith('id', 'cid', { quantidade: 2 });
+            const result = await service.atualizarComponente('id', 'cid', { quantidade: 2 }, req);
+            expect(repository.atualizarComponente).toHaveBeenCalledWith('id', 'cid', { quantidade: 2 }, req);
             expect(result).toEqual(expect.objectContaining({ componentes: expect.any(Array) }));
         });
         it('deve remover componente', async () => {
+            const req = { user_id: 'user123' };
             repository.removerComponente.mockResolvedValue({ _id: 'id', componentes: [] });
-            const result = await service.removerComponente('id', 'cid');
-            expect(repository.removerComponente).toHaveBeenCalledWith('id', 'cid');
+            const result = await service.removerComponente('id', 'cid', req);
+            expect(repository.removerComponente).toHaveBeenCalledWith('id', 'cid', req);
             expect(result).toEqual(expect.objectContaining({ componentes: [] }));
         });
         it('deve retornar componente por id', async () => {

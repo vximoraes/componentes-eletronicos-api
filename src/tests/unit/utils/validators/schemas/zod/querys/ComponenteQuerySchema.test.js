@@ -96,21 +96,21 @@ describe('ComponenteQuerySchema', () => {
         expect(() => ComponenteQuerySchema.parse(consulta)).not.toThrow();
     });
 
-    it('deve invalidar valor não numérico para page', () => {
-        const consulta = { ...consultaValida, page: 'abc' };
-        expect(() => ComponenteQuerySchema.parse(consulta)).toThrow('Page deve ser um número inteiro maior que 0');
+    it('deve validar paginação válida e usar defaults', () => {
+        const resultado1 = ComponenteQuerySchema.parse({ page: '2', limite: '5' });
+        expect(resultado1.page).toBe(2);
+        expect(resultado1.limite).toBe(5);
+
+        const resultado2 = ComponenteQuerySchema.parse({});
+        expect(resultado2.page).toBe(1);
+        expect(resultado2.limite).toBe(10);
     });
 
-    it('deve invalidar page menor que 1', () => {
-        const consulta = { ...consultaValida, page: '0' };
-        expect(() => ComponenteQuerySchema.parse(consulta)).toThrow('Page deve ser um número inteiro maior que 0');
-    });
-
-    it('deve definir page como 1 se não fornecido', () => {
-        const consulta = { ...consultaValida };
-        delete consulta.page;
-        const resultado = ComponenteQuerySchema.parse(consulta);
-        expect(resultado.page).toBe(1);
+    it('deve invalidar paginação inválida', () => {
+        expect(() => ComponenteQuerySchema.parse({ page: 'abc' })).toThrow();
+        expect(() => ComponenteQuerySchema.parse({ page: '0' })).toThrow('Page deve ser um número inteiro maior que 0');
+        expect(() => ComponenteQuerySchema.parse({ limite: '101' })).toThrow('Limite deve ser um número inteiro entre 1 e 100');
+        expect(() => ComponenteQuerySchema.parse({ limite: '0' })).toThrow('Limite deve ser um número inteiro entre 1 e 100');
     });
 
     it('deve invalidar limite maior que 100', () => {

@@ -49,7 +49,7 @@ const notificacoesSchemas = {
     },
     NotificacaoPost: {
         ...deepCopy(notificacaoJsonSchema),
-        required: ["mensagem", "usuario"],
+        required: ["mensagem"],
         description: "Schema para criação de notificação"
     },
     NotificacaoVisualizacao: {
@@ -74,7 +74,7 @@ const notificacoesSchemas = {
 const removalMapping = {
     NotificacaoItem: ['__v'],
     NotificacaoDetalhes: ['__v'],
-    NotificacaoPost: ['createdAt', 'updatedAt', '__v', '_id', 'data_hora', 'visualizada']
+    NotificacaoPost: ['createdAt', 'updatedAt', '__v', '_id', 'data_hora', 'visualizada', 'usuario']
 }
 
 Object.entries(removalMapping).forEach(([schemaKey, fields]) => {
@@ -88,8 +88,7 @@ const notificacaoMongooseSchema = Notificacao.schema;
 notificacoesSchemas.NotificacaoItem.example = await generateExample(notificacoesSchemas.NotificacaoItem, null, notificacaoMongooseSchema);
 notificacoesSchemas.NotificacaoDetalhes.example = await generateExample(notificacoesSchemas.NotificacaoDetalhes, null, notificacaoMongooseSchema);
 notificacoesSchemas.NotificacaoPost.example = {
-    mensagem: "Estoque baixo do componente Resistor 10k",
-    usuario: "507f1f77bcf86cd799439011"
+    mensagem: "Estoque baixo do componente Resistor 10k"
 };
 
 export default notificacoesSchemas;

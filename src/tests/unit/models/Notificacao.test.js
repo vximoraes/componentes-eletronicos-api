@@ -38,7 +38,7 @@ describe('Modelo de Notificacao', () => {
     });
 
     it('não deve criar notificacao sem campos obrigatórios', async () => {
-        const notificacao = new Notificacao({});
+        const notificacao = new Notificacao({ usuario: new mongoose.Types.ObjectId() });
         await expect(notificacao.save()).rejects.toThrow();
     });
 

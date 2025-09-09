@@ -16,13 +16,13 @@ await DbConnect.conectar();
 try {
     console.log(`[${new Date().toLocaleString()}] - Iniciando criação das seeds...`);
 
+    await rotasSeed();
+    await usuarioSeed(); 
     await categoriaSeed();
     await localizacaoSeed();
     await componenteSeed();
     await fornecedorSeed();
     await movimentacaoSeed();
-    await rotasSeed();
-    await usuarioSeed(); 
     await notificacaoSeed();
     await componenteOrcamentoSeed();
     await orcamentoSeed();

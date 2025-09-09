@@ -25,11 +25,12 @@ describe('CategoriaService', () => {
 
     describe('criar', () => {
         it('deve cadastrar categoria com nome único', async () => {
+            const req = { user_id: 'user123' };
             repositoryMock.buscarPorNome.mockResolvedValue(null);
             repositoryMock.criar.mockResolvedValue(makeCategoria());
-            const result = await service.criar({ nome: 'Passivo' });
+            const result = await service.criar({ nome: 'Passivo' }, req);
             expect(result).toHaveProperty('_id');
-            expect(repositoryMock.criar).toHaveBeenCalledWith({ nome: 'Passivo' });
+            expect(repositoryMock.criar).toHaveBeenCalledWith({ nome: 'Passivo', usuario: 'user123' });
         });
         it('deve lançar erro se nome já existir', async () => {
             repositoryMock.buscarPorNome.mockResolvedValue(makeCategoria());

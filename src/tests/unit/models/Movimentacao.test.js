@@ -29,15 +29,20 @@ describe('Modelo de Movimentacao', () => {
     let fornecedor;
 
     beforeEach(async () => {
+        const userId = new mongoose.Types.ObjectId();
         componente = await Componente.create({
             nome: 'Resistor 1k',
             quantidade: 100,
             estoque_minimo: 10,
             valor_unitario: 0.05,
             localizacao: new mongoose.Types.ObjectId(),
-            categoria: new mongoose.Types.ObjectId()
+            categoria: new mongoose.Types.ObjectId(),
+            usuario: userId
         });
-        fornecedor = await Fornecedor.create({ nome: 'Fornecedor Teste' });
+        fornecedor = await Fornecedor.create({ 
+            nome: 'Fornecedor Teste', 
+            usuario: userId 
+        });
     });
 
     it('deve criar uma movimentacao de entrada válida (fornecedor obrigatório)', async () => {
@@ -45,7 +50,8 @@ describe('Modelo de Movimentacao', () => {
             tipo: 'entrada',
             quantidade: 10,
             componente: componente._id,
-            fornecedor: fornecedor._id
+            fornecedor: fornecedor._id,
+            usuario: new mongoose.Types.ObjectId()
         };
         const mov = new Movimentacao(movData);
         await mov.save();
@@ -59,7 +65,8 @@ describe('Modelo de Movimentacao', () => {
         const movData = {
             tipo: 'entrada',
             quantidade: 10,
-            componente: componente._id
+            componente: componente._id,
+            usuario: new mongoose.Types.ObjectId()
         };
         const mov = new Movimentacao(movData);
         await mov.save(); 
@@ -69,7 +76,8 @@ describe('Modelo de Movimentacao', () => {
         const movData = {
             tipo: 'saida',
             quantidade: 5,
-            componente: componente._id
+            componente: componente._id,
+            usuario: new mongoose.Types.ObjectId()
         };
         const mov = new Movimentacao(movData);
         await mov.save();
@@ -79,8 +87,9 @@ describe('Modelo de Movimentacao', () => {
     });
 
     it('deve retornar todas as movimentacoes cadastradas', async () => {
-        await Movimentacao.create({ tipo: 'entrada', quantidade: 10, componente: componente._id, fornecedor: fornecedor._id });
-        await Movimentacao.create({ tipo: 'saida', quantidade: 5, componente: componente._id });
+        const userId = new mongoose.Types.ObjectId();
+        await Movimentacao.create({ tipo: 'entrada', quantidade: 10, componente: componente._id, fornecedor: fornecedor._id, usuario: userId });
+        await Movimentacao.create({ tipo: 'saida', quantidade: 5, componente: componente._id, usuario: userId });
         const movs = await Movimentacao.find();
         expect(movs.length).toBe(2);
         const tipos = movs.map(m => m.tipo);
@@ -89,7 +98,7 @@ describe('Modelo de Movimentacao', () => {
     });
 
     it('deve remover uma movimentacao existente', async () => {
-        const mov = await Movimentacao.create({ tipo: 'entrada', quantidade: 10, componente: componente._id, fornecedor: fornecedor._id });
+        const mov = await Movimentacao.create({ tipo: 'entrada', quantidade: 10, componente: componente._id, fornecedor: fornecedor._id, usuario: new mongoose.Types.ObjectId() });
         await Movimentacao.findByIdAndDelete(mov._id);
         const found = await Movimentacao.findById(mov._id);
         expect(found).toBeNull();
@@ -99,7 +108,8 @@ describe('Modelo de Movimentacao', () => {
         const movData = {
             quantidade: 10,
             componente: componente._id,
-            fornecedor: fornecedor._id
+            fornecedor: fornecedor._id,
+            usuario: new mongoose.Types.ObjectId()
         };
         const mov = new Movimentacao(movData);
         await expect(mov.save()).rejects.toThrow();
@@ -109,7 +119,8 @@ describe('Modelo de Movimentacao', () => {
         const movData = {
             tipo: 'entrada',
             quantidade: 10,
-            fornecedor: fornecedor._id
+            fornecedor: fornecedor._id,
+            usuario: new mongoose.Types.ObjectId()
         };
         const mov = new Movimentacao(movData);
         await expect(mov.save()).rejects.toThrow();
@@ -119,7 +130,8 @@ describe('Modelo de Movimentacao', () => {
         const movData = {
             tipo: 'entrada',
             componente: componente._id,
-            fornecedor: fornecedor._id
+            fornecedor: fornecedor._id,
+            usuario: new mongoose.Types.ObjectId()
         };
         const mov = new Movimentacao(movData);
         await expect(mov.save()).rejects.toThrow();
@@ -130,7 +142,8 @@ describe('Modelo de Movimentacao', () => {
             tipo: 'ajuste',
             quantidade: 10,
             componente: componente._id,
-            fornecedor: fornecedor._id
+            fornecedor: fornecedor._id,
+            usuario: new mongoose.Types.ObjectId()
         };
         const mov = new Movimentacao(movData);
         await expect(mov.save()).rejects.toThrow();

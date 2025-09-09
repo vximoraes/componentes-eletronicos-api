@@ -58,37 +58,20 @@ describe('UsuarioQuerySchema', () => {
         expect(() => UsuarioQuerySchema.parse(consulta)).not.toThrow();
     });
 
-    it('deve invalidar valor não numérico para page', () => {
-        const consulta = { ...consultaValida, page: 'abc' };
-        expect(() => UsuarioQuerySchema.parse(consulta)).toThrow('Page deve ser um número inteiro maior que 0');
+    it('deve validar paginação válida e usar defaults', () => {
+        const resultado1 = UsuarioQuerySchema.parse({ page: '2', limite: '5' });
+        expect(resultado1.page).toBe(2);
+        expect(resultado1.limite).toBe(5);
+
+        const resultado2 = UsuarioQuerySchema.parse({});
+        expect(resultado2.page).toBe(1);
+        expect(resultado2.limite).toBe(10);
     });
 
-    it('deve invalidar page menor que 1', () => {
-        const consulta = { ...consultaValida, page: '0' };
-        expect(() => UsuarioQuerySchema.parse(consulta)).toThrow('Page deve ser um número inteiro maior que 0');
-    });
-
-    it('deve definir page como 1 se não fornecido', () => {
-        const consulta = { ...consultaValida };
-        delete consulta.page;
-        const resultado = UsuarioQuerySchema.parse(consulta);
-        expect(resultado.page).toBe(1);
-    });
-
-    it('deve invalidar limite maior que 100', () => {
-        const consulta = { ...consultaValida, limite: '101' };
-        expect(() => UsuarioQuerySchema.parse(consulta)).toThrow('Limite deve ser um número inteiro entre 1 e 100');
-    });
-
-    it('deve invalidar limite menor que 1', () => {
-        const consulta = { ...consultaValida, limite: '0' };
-        expect(() => UsuarioQuerySchema.parse(consulta)).toThrow('Limite deve ser um número inteiro entre 1 e 100');
-    });
-
-    it('deve definir limite como 10 se não fornecido', () => {
-        const consulta = { ...consultaValida };
-        delete consulta.limite;
-        const resultado = UsuarioQuerySchema.parse(consulta);
-        expect(resultado.limite).toBe(10);
+    it('deve invalidar paginação inválida', () => {
+        expect(() => UsuarioQuerySchema.parse({ page: 'abc' })).toThrow();
+        expect(() => UsuarioQuerySchema.parse({ page: '0' })).toThrow('Page deve ser um número inteiro maior que 0');
+        expect(() => UsuarioQuerySchema.parse({ limite: '101' })).toThrow('Limite deve ser um número inteiro entre 1 e 100');
+        expect(() => UsuarioQuerySchema.parse({ limite: '0' })).toThrow('Limite deve ser um número inteiro entre 1 e 100');
     });
 });

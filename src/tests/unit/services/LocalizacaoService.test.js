@@ -25,16 +25,18 @@ describe('LocalizacaoService', () => {
 
     describe('criar', () => {
         it('deve cadastrar localização com nome único', async () => {
+            const req = { user_id: 'user123' };
             repositoryMock.buscarPorNome.mockResolvedValue(null);
-            repositoryMock.criar.mockResolvedValue(makeLocalizacao());
-            const result = await service.criar({ nome: 'Estoque' });
+            repositoryMock.criar.mockResolvedValue(makeLocalizacao({ usuario: 'user123' }));
+            const result = await service.criar({ nome: 'Estoque' }, req);
             expect(result).toHaveProperty('_id');
-            expect(repositoryMock.criar).toHaveBeenCalledWith({ nome: 'Estoque' });
+            expect(repositoryMock.criar).toHaveBeenCalledWith({ nome: 'Estoque', usuario: 'user123' });
         });
 
         it('deve lançar erro se nome já existir', async () => {
+            const req = { user_id: 'user123' };
             repositoryMock.buscarPorNome.mockResolvedValue(makeLocalizacao());
-            await expect(service.criar({ nome: 'Estoque' }))
+            await expect(service.criar({ nome: 'Estoque' }, req))
                 .rejects.toThrow(CustomError);
         });
     });

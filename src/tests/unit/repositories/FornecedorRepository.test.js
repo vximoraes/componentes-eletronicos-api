@@ -46,21 +46,21 @@ describe('FornecedorRepository', () => {
 
     describe('listar', () => {
         it('deve retornar fornecedor por id', async () => {
-            const req = { params: { id: '123' } };
+            const req = { params: { id: '123' }, user_id: 'user1' };
             const data = { toObject: () => ({ nome: 'Fornecedor Y' }) };
-            FornecedorModel.findById.mockResolvedValue(data);
+            FornecedorModel.findOne = jest.fn().mockResolvedValue(data);
             const result = await repository.listar(req);
             expect(result).toEqual({ nome: 'Fornecedor Y' });
         });
 
         it('deve lançar erro se fornecedor não encontrado por id', async () => {
-            const req = { params: { id: 'notfound' } };
-            FornecedorModel.findById.mockResolvedValue(null);
+            const req = { params: { id: 'notfound' }, user_id: 'user1' };
+            FornecedorModel.findOne = jest.fn().mockResolvedValue(null);
             await expect(repository.listar(req)).rejects.toThrow(CustomError);
         });
 
         it('deve listar fornecedores paginados', async () => {
-            const req = { params: {}, query: { page: 1, limite: 10, nome: 'abc' } };
+            const req = { params: {}, query: { page: 1, limite: 10, nome: 'abc' }, user_id: 'user1' };
             FornecedorModel.paginate.mockResolvedValue({ docs: [{ toObject: () => ({ nome: 'Fornecedor Z' }) }] });
             const result = await repository.listar(req);
             expect(result.docs[0].nome).toBe('Fornecedor Z');
@@ -75,7 +75,7 @@ describe('FornecedorRepository', () => {
             });
             const FornecedorRepositoryWithBrokenBuilder = (await import('../../../repositories/FornecedorRepository.js')).default;
             const repositoryWithBrokenBuilder = new FornecedorRepositoryWithBrokenBuilder({ fornecedorModel: FornecedorModel });
-            const req = { params: {}, query: { page: 1, limite: 10, nome: 'abc' } };
+            const req = { params: {}, query: { page: 1, limite: 10, nome: 'abc' }, user_id: 'user1' };
             
             try {
                 await repositoryWithBrokenBuilder.listar(req);
@@ -91,55 +91,63 @@ describe('FornecedorRepository', () => {
 
     describe('atualizar', () => {
         it('deve atualizar fornecedor existente', async () => {
-            FornecedorModel.findByIdAndUpdate.mockReturnValue({
+            const req = { user_id: 'user1' };
+            FornecedorModel.findOneAndUpdate = jest.fn().mockReturnValue({
                 lean: jest.fn().mockResolvedValue({ nome: 'Atualizado' })
             });
-            const result = await repository.atualizar('id', { nome: 'Atualizado' });
+            const result = await repository.atualizar('id', { nome: 'Atualizado' }, req);
             expect(result.nome).toBe('Atualizado');
         });
         it('deve lançar erro se fornecedor não encontrado', async () => {
-            FornecedorModel.findByIdAndUpdate.mockReturnValue({
+            const req = { user_id: 'user1' };
+            FornecedorModel.findOneAndUpdate = jest.fn().mockReturnValue({
                 lean: jest.fn().mockResolvedValue(null)
             });
-            await expect(repository.atualizar('id', {})).rejects.toThrow(CustomError);
+            await expect(repository.atualizar('id', {}, req)).rejects.toThrow(CustomError);
         });
     });
 
     describe('deletar', () => {
         it('deve deletar fornecedor se não houver movimentação', async () => {
+            const req = { user_id: 'user1' };
             MovimentacaoModel.exists.mockResolvedValue(false);
-            FornecedorModel.findByIdAndDelete.mockResolvedValue({ nome: 'Deletado' });
-            const result = await repository.deletar('id');
+            FornecedorModel.findOneAndDelete = jest.fn().mockResolvedValue({ nome: 'Deletado' });
+            const result = await repository.deletar('id', req);
             expect(result.nome).toBe('Deletado');
         });
         it('deve lançar erro se houver movimentação vinculada', async () => {
+            const req = { user_id: 'user1' };
             MovimentacaoModel.exists.mockResolvedValue(true);
-            await expect(repository.deletar('id')).rejects.toThrow(CustomError);
+            await expect(repository.deletar('id', req)).rejects.toThrow(CustomError);
         });
     });
 
     describe('buscarPorNome', () => {
         it('deve buscar fornecedor por nome', async () => {
+            const req = { user_id: 'user1' };
             FornecedorModel.findOne.mockResolvedValue({ nome: 'Fornecedor A' });
-            const result = await repository.buscarPorNome('Fornecedor A');
+            const result = await repository.buscarPorNome('Fornecedor A', null, req);
             expect(result.nome).toBe('Fornecedor A');
         });
         it('deve buscar fornecedor por nome ignorando id', async () => {
+            const req = { user_id: 'user1' };
             FornecedorModel.findOne.mockResolvedValue({ nome: 'Fornecedor B' });
-            const result = await repository.buscarPorNome('Fornecedor B', 'idIgnorado');
+            const result = await repository.buscarPorNome('Fornecedor B', 'idIgnorado', req);
             expect(result.nome).toBe('Fornecedor B');
         });
     });
 
     describe('buscarPorId', () => {
         it('deve retornar fornecedor por id', async () => {
-            FornecedorModel.findById.mockResolvedValue({ nome: 'Fornecedor C' });
-            const result = await repository.buscarPorId('id');
+            const req = { user_id: 'user1' };
+            FornecedorModel.findOne = jest.fn().mockResolvedValue({ nome: 'Fornecedor C' });
+            const result = await repository.buscarPorId('id', false, req);
             expect(result.nome).toBe('Fornecedor C');
         });
         it('deve lançar erro se fornecedor não encontrado', async () => {
-            FornecedorModel.findById.mockResolvedValue(null);
-            await expect(repository.buscarPorId('id')).rejects.toThrow(CustomError);
+            const req = { user_id: 'user1' };
+            FornecedorModel.findOne = jest.fn().mockResolvedValue(null);
+            await expect(repository.buscarPorId('id', false, req)).rejects.toThrow(CustomError);
         });
     });
 });

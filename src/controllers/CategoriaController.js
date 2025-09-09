@@ -10,7 +10,7 @@ class CategoriaController {
 
     async criar(req, res) {
         const parsedData = CategoriaSchema.parse(req.body);
-        let data = await this.service.criar(parsedData);
+        let data = await this.service.criar(parsedData, req);
 
         let categoriaLimpa = data.toObject();
 
@@ -38,7 +38,7 @@ class CategoriaController {
         CategoriaIdSchema.parse(id);
 
         const parsedData = CategoriaUpdateSchema.parse(req.body);
-        const data = await this.service.atualizar(id, parsedData);
+        const data = await this.service.atualizar(id, parsedData, req);
 
         return CommonResponse.success(res, data, 200, 'Categoria atualizada com sucesso.');
     };
@@ -47,7 +47,7 @@ class CategoriaController {
         const { id } = req.params || {};
         CategoriaIdSchema.parse(id);
 
-        const data = await this.service.deletar(id);
+        const data = await this.service.deletar(id, req);
 
         return CommonResponse.success(res, data, 200, 'Categoria excluída com sucesso.');
     };

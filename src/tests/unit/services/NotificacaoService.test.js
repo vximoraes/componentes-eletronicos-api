@@ -28,43 +28,49 @@ describe('NotificacaoService', () => {
     it('deve buscar notificação por id', async () => {
         const mockData = { mensagem: 'Teste' };
         repository.buscarPorId.mockResolvedValue(mockData);
-        const result = await service.buscarPorId('id123');
+        const req = { user_id: 'user123' };
+        const result = await service.buscarPorId('id123', req);
         expect(result).toBe(mockData);
-        expect(repository.buscarPorId).toHaveBeenCalledWith('id123');
+        expect(repository.buscarPorId).toHaveBeenCalledWith('id123', 'user123');
     });
 
     it('deve criar notificação com dados válidos', async () => {
-        const mockData = { mensagem: 'Nova', usuario: 'u1' };
+        const mockData = { mensagem: 'Nova', usuario: 'user123' };
         repository.criar.mockResolvedValue(mockData);
-        const result = await service.criar(mockData);
+        const req = { user_id: 'user123' };
+        const result = await service.criar({ mensagem: 'Nova' }, req);
         expect(result).toBe(mockData);
-        expect(repository.criar).toHaveBeenCalledWith(mockData);
+        expect(repository.criar).toHaveBeenCalledWith({ mensagem: 'Nova', usuario: 'user123' });
     });
 
     it('deve marcar notificação como visualizada', async () => {
         const mockData = { visualizada: true };
         repository.marcarComoVisualizada.mockResolvedValue(mockData);
-        const result = await service.marcarComoVisualizada('id123');
+        const req = { user_id: 'user123' };
+        const result = await service.marcarComoVisualizada('id123', req);
         expect(result).toBe(mockData);
-        expect(repository.marcarComoVisualizada).toHaveBeenCalledWith('id123');
+        expect(repository.marcarComoVisualizada).toHaveBeenCalledWith('id123', 'user123');
     });
 
     it('deve lançar erro ao tentar cadastrar notificação com usuário inexistente', async () => {
         const customError = new CustomError({ statusCode: 400, customMessage: 'Usuário informado não existe.' });
         repository.criar.mockRejectedValue(customError);
-        await expect(service.criar({ mensagem: 'Teste', usuario: 'invalido' })).rejects.toThrow('Usuário informado não existe.');
+        const req = { user_id: 'user123' };
+        await expect(service.criar({ mensagem: 'Teste', usuario: 'invalido' }, req)).rejects.toThrow('Usuário informado não existe.');
     });
 
     it('deve lançar erro ao tentar buscar notificação inexistente', async () => {
         const customError = new CustomError({ statusCode: 404, customMessage: 'Notificação não encontrada' });
         repository.buscarPorId.mockRejectedValue(customError);
-        await expect(service.buscarPorId('id_inexistente')).rejects.toThrow('Notificação não encontrada');
+        const req = { user_id: 'user123' };
+        await expect(service.buscarPorId('id_inexistente', req)).rejects.toThrow('Notificação não encontrada');
     });
 
     it('deve lançar erro ao tentar atualizar notificação inexistente', async () => {
         const customError = new CustomError({ statusCode: 404, customMessage: 'Notificação não encontrada' });
         repository.marcarComoVisualizada.mockRejectedValue(customError);
-        await expect(service.marcarComoVisualizada('id_inexistente')).rejects.toThrow('Notificação não encontrada');
+        const req = { user_id: 'user123' };
+        await expect(service.marcarComoVisualizada('id_inexistente', req)).rejects.toThrow('Notificação não encontrada');
     });
 
     it('deve lançar erro do repository em qualquer operação', async () => {

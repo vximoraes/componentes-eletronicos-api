@@ -6,9 +6,10 @@ class LocalizacaoService {
         this.repository = new LocalizacaoRepository();
     };
 
-    async criar(parsedData) {
-        await this.validateNome(parsedData.nome)
+    async criar(parsedData, req) {
+        await this.validateNome(parsedData.nome, null, req);
 
+        parsedData.usuario = req.user_id;
         const data = await this.repository.criar(parsedData);
 
         return data;
@@ -20,27 +21,27 @@ class LocalizacaoService {
         return data;
     };
 
-    async atualizar(id, parsedData) {
-        await this.ensureLocationExists(id);
-        await this.validateNome(parsedData.nome)
+    async atualizar(id, parsedData, req) {
+        await this.ensureLocationExists(id, req);
+        await this.validateNome(parsedData.nome, id, req);
 
-        const data = await this.repository.atualizar(id, parsedData);
+        const data = await this.repository.atualizar(id, parsedData, req);
 
         return data;
     };
 
-    async deletar(id) {
-        await this.ensureLocationExists(id);
+    async deletar(id, req) {
+        await this.ensureLocationExists(id, req);
 
-        const data = await this.repository.deletar(id);
+        const data = await this.repository.deletar(id, req);
 
         return data;
     };
 
     // Métodos auxiliares.
 
-    async validateNome(nome, id = null) {
-        const localizacaoExistente = await this.repository.buscarPorNome(nome, id);
+    async validateNome(nome, id = null, req) {
+        const localizacaoExistente = await this.repository.buscarPorNome(nome, id, req);
         if (localizacaoExistente) {
             throw new CustomError({
                 statusCode: HttpStatusCodes.BAD_REQUEST.code,
@@ -52,8 +53,8 @@ class LocalizacaoService {
         };
     };
 
-    async ensureLocationExists(id) {
-        const localizacaoExistente = await this.repository.buscarPorId(id);
+    async ensureLocationExists(id, req) {
+        const localizacaoExistente = await this.repository.buscarPorId(id, false, req);
         if (!localizacaoExistente) {
             throw new CustomError({
                 statusCode: 404,
