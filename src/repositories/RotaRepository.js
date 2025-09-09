@@ -2,16 +2,13 @@
 
 import RotaModel from '../models/Rota.js';
 import RotaFilterBuilder from './filters/RotaFilterBuilder.js';
-import GrupoModel from '../models/Grupo.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
 
 class RotaRepository {
     constructor({
         rotaModel = RotaModel,
-        grupoModel = GrupoModel,
     } = {}) {
         this.model = rotaModel;
-        this.grupoModel = grupoModel;
     }
 
     /**
@@ -20,17 +17,17 @@ class RotaRepository {
  * cujo listar não atende por exigir req.
  */
     async buscarPorId(id) {
-        const group = await this.model.findById(id);
-        if (!group) {
+        const rota = await this.model.findById(id);
+        if (!rota) {
             throw new CustomError({
                 statusCode: 404,
                 errorType: 'resourceNotFound',
-                field: 'Grupo',
+                field: 'Rota',
                 details: [],
-                customMessage: messages.error.resourceNotFound('Grupo')
+                customMessage: messages.error.resourceNotFound('Rota')
             });
         }
-        return group;
+        return rota;
     }
 
     /**

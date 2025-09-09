@@ -52,7 +52,7 @@ class RotaService {
                errorTypes: "resourceNotFound",
                field: "Rotas",
                details: [],
-               customMessage: messages.error.resourceNotFound("rota")
+               customMessage: messages.error.resourceNotFound("Rota")
            })
            
        }
