@@ -8,9 +8,8 @@ class RotaService {
     }
 
     async listar(req){
-        console.log('Estou no listar em RotaService');
+
         const data = await this.repository.listar(req)
-        console.log('Estou retornando os dados em RotaService')
         return data
     }
 
@@ -31,7 +30,6 @@ class RotaService {
     }
 
     async atualizar(req, id) {
-        console.log('Estou no atualizar em RotaService')
         const rota = await this.repository.buscarRotaPorNome(req.rota, id)
         if (rota) {
             throw new CustomError({

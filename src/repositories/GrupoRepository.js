@@ -116,7 +116,6 @@ class GrupoRepository {
      */
     async listar(req) {
         try {
-            console.log('Estou no listar em GrupoRepository');
             const id = req.params.id || null;
 
             if (id) {
