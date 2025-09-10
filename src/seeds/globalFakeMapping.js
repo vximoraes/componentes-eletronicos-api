@@ -85,7 +85,7 @@ export const fakeMappings = {
         imagem: () => fakebr.image.imageUrl(),
         categoria: () => new mongoose.Types.ObjectId().toString(),
         localizacao: () => new mongoose.Types.ObjectId().toString(),
-        ativo: () => fakebr.random.boolean(),
+        ativo: () => true,
         status: () => fakebr.helpers.randomize(['Indisponível', 'Baixo Estoque', 'Em Estoque']),
     },
 
@@ -121,7 +121,7 @@ export const fakeMappings = {
         imagem: () => fakebr.image.imageUrl(),
         categoria: () => new mongoose.Types.ObjectId().toString(),
         localizacao: () => new mongoose.Types.ObjectId().toString(),
-        ativo: () => fakebr.random.boolean(),
+        ativo: () => true,
         status: () => fakebr.helpers.randomize(['Indisponível', 'Baixo Estoque', 'Em Estoque']),
     },
 
