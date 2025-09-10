@@ -47,7 +47,7 @@ class ComponenteController {
         const { id } = req.params || {};
         ComponenteIdSchema.parse(id);
 
-        const data = await this.service.deletar(id, req);
+        const data = await this.service.inativar(id, req);
 
         return CommonResponse.success(res, data, 200, 'Componente inativado com sucesso.');
     };
