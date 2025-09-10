@@ -28,7 +28,10 @@ class ComponenteService {
         await this.ensureComponentExists(id);
         await this.validateNome(parsedData.nome)
 
+        // Proteger campos que não podem ser alterados diretamente
+        // Quantidade é controlada por movimentações; valor_unitario não pode ser alterado pelo cliente aqui.
         delete parsedData.quantidade;
+        delete parsedData.valor_unitario;
 
         const data = await this.repository.atualizar(id, parsedData);
 

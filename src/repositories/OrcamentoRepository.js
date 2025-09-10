@@ -121,13 +121,14 @@ class OrcamentoRepository {
             customMessage: messages.error.resourceNotFound('Orçamento')
         });
 
-        // Remove valor_unitario se vier no payload da requisição
-        if (novoComponente && novoComponente.valor_unitario) {
-            delete novoComponente.valor_unitario;
-        }
+        // Normalize numeric fields and ensure subtotal is correct.
+        novoComponente.valor_unitario = Number(novoComponente.valor_unitario || 0);
+        novoComponente.quantidade = Number(novoComponente.quantidade || 0);
+        // If subtotal wasn't provided, compute it from quantidade * valor_unitario
+        novoComponente.subtotal = Number(novoComponente.subtotal ?? (novoComponente.quantidade * novoComponente.valor_unitario));
 
         orcamento.componentes.push(novoComponente);
-        orcamento.valor = orcamento.componentes.reduce((acc, comp) => acc + comp.subtotal, 0);
+        orcamento.valor = orcamento.componentes.reduce((acc, comp) => acc + Number(comp.subtotal || 0), 0);
         await orcamento.save();
 
         return orcamento;
@@ -153,17 +154,22 @@ class OrcamentoRepository {
             customMessage: 'Componente não encontrado.'
         });
 
-        // Remove valor_unitario se o cliente tentar alterar manualmente
-        if (componenteAtualizado && componenteAtualizado.valor_unitario) {
-            delete componenteAtualizado.valor_unitario;
-        }
+        // Preserve valor_unitario do componente existente 
+        const old = (typeof componentes[idx].toObject === 'function') ? componentes[idx].toObject() : componentes[idx];
+        componenteAtualizado.valor_unitario = Number(old.valor_unitario || 0);
 
-        componentes[idx] = { 
-            ...((typeof componentes[idx].toObject === 'function') ? componentes[idx].toObject() : componentes[idx]), 
-            ...componenteAtualizado 
+        // normalize quantidade and recompute subtotal
+        componenteAtualizado.quantidade = Number(componenteAtualizado.quantidade ?? old.quantidade);
+        componenteAtualizado.subtotal = Number((componenteAtualizado.quantidade || 0) * componenteAtualizado.valor_unitario);
+
+        componentes[idx] = {
+            ...old,
+            ...componenteAtualizado,
+            _id: old._id
         };
+
         orcamento.componentes = componentes;
-        orcamento.valor = componentes.reduce((acc, comp) => acc + comp.subtotal, 0);
+        orcamento.valor = componentes.reduce((acc, comp) => acc + Number(comp.subtotal || 0), 0);
         await orcamento.save();
 
         return orcamento;
