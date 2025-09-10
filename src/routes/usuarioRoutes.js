@@ -12,6 +12,7 @@ router
     .get("/usuarios", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.listar.bind(usuarioController)))
     .get("/usuarios/:id", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.listar.bind(usuarioController)))
     .post("/usuarios", asyncWrapper(usuarioController.criar.bind(usuarioController)))
+    .post("/usuarios/:id/foto", AuthMiddleware, asyncWrapper(usuarioController))
     .patch("/usuarios/:id", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.atualizar.bind(usuarioController)))
     .put("/usuarios/:id", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.atualizar.bind(usuarioController)))
     .delete("/usuarios/:id", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.deletar.bind(usuarioController)))
