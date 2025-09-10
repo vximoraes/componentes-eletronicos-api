@@ -52,8 +52,8 @@ describe('ComponenteRepository', () => {
 
     describe('listar', () => {
         it('deve retornar componente por id', async () => {
-            const req = { params: { id: 'id1' }, query: {} };
-            mockFindById.mockReturnValueOnce({
+            const req = { params: { id: 'id1' }, query: {}, user_id: 'user1' };
+            ComponenteModel.findOne = jest.fn().mockReturnValueOnce({
                 populate: () => ({ populate: () => ({ toObject: () => ({ nome: 'C1', _id: 'id1' }) }) })
             });
             const result = await repository.listar(req);
@@ -61,13 +61,15 @@ describe('ComponenteRepository', () => {
         });
 
         it('deve lançar erro 404 se componente não encontrado por id', async () => {
-            const req = { params: { id: 'id1' }, query: {} };
-            mockFindById.mockReturnValueOnce({ populate: () => ({ populate: () => null }) });
+            const req = { params: { id: 'id1' }, query: {}, user_id: 'user1' };
+            ComponenteModel.findOne = jest.fn().mockReturnValueOnce({
+                populate: () => ({ populate: () => null })
+            });
             await expect(repository.listar(req)).rejects.toThrow(CustomError);
         });
 
         it('deve listar componentes com filtros', async () => {
-            const req = { params: {}, query: { nome: 'C1', page: 1, limite: 10 } };
+            const req = { params: {}, query: { nome: 'C1', page: 1, limite: 10 }, user_id: 'user1' };
             const mockBuild = jest.fn(() => ({}));
             ComponenteFilterBuilder.mockImplementation(() => ({
                 comNome: () => ({ 
@@ -107,49 +109,77 @@ describe('ComponenteRepository', () => {
 
     describe('atualizar', () => {
         it('deve atualizar e retornar componente', async () => {
-            mockFindByIdAndUpdate.mockReturnValueOnce({ populate: () => ({ populate: () => ({ lean: () => ({ nome: 'C1', _id: 'id1' }) }) }) });
-            const result = await repository.atualizar('id1', { nome: 'Novo' });
+            const req = { user_id: 'user1' };
+            ComponenteModel.findOneAndUpdate = jest.fn().mockReturnValueOnce({ populate: () => ({ populate: () => ({ lean: () => ({ nome: 'C1', _id: 'id1' }) }) }) });
+            const result = await repository.atualizar('id1', { nome: 'Novo' }, req);
             expect(result).toEqual({ nome: 'C1', _id: 'id1' });
         });
         it('deve lançar erro 404 se componente não encontrado', async () => {
-            mockFindByIdAndUpdate.mockReturnValueOnce({ populate: () => ({ populate: () => ({ lean: () => null }) }) });
-            await expect(repository.atualizar('id1', { nome: 'Novo' })).rejects.toThrow(CustomError);
+            const req = { user_id: 'user1' };
+            ComponenteModel.findOneAndUpdate = jest.fn().mockReturnValueOnce({ populate: () => ({ populate: () => ({ lean: () => null }) }) });
+            await expect(repository.atualizar('id1', { nome: 'Novo' }, req)).rejects.toThrow(CustomError);
+        });
+    });
+
+    describe('deletar', () => {
+        it('deve deletar componente se não houver movimentação', async () => {
+            const req = { user_id: 'user1' };
+            MovimentacaoModel.exists.mockResolvedValueOnce(false);
+            ComponenteModel.findOne = jest.fn().mockReturnValueOnce({ populate: () => ({ populate: () => ({ nome: 'C1', _id: 'id1' }) }) });
+            ComponenteModel.findOneAndDelete = jest.fn().mockResolvedValueOnce(true);
+            const result = await repository.deletar('id1', req);
+            expect(result).toEqual({ nome: 'C1', _id: 'id1' });
+        });
+        it('deve lançar erro se houver movimentação vinculada', async () => {
+            const req = { user_id: 'user1' };
+            MovimentacaoModel.exists.mockResolvedValueOnce(true);
+            await expect(repository.deletar('id1', req)).rejects.toThrow(CustomError);
+        });
+        it('deve lançar erro 404 se componente não encontrado ao deletar', async () => {
+            const req = { user_id: 'user1' };
+            MovimentacaoModel.exists.mockResolvedValueOnce(false);
+            ComponenteModel.findOne = jest.fn().mockReturnValueOnce({ populate: () => ({ populate: () => null }) });
+            await expect(repository.deletar('id1', req)).rejects.toThrow(CustomError);
         });
     });
 
     describe('buscarPorId', () => {
         it('deve retornar componente por id', async () => {
             const mockPopulateChain = { nome: 'C1', _id: 'id1' };
-            mockFindById.mockReturnValueOnce({
+            const req = { user_id: 'user1' };
+            ComponenteModel.findOne = jest.fn().mockReturnValueOnce({
                 populate: () => ({ populate: () => mockPopulateChain })
             });
-            const result = await repository.buscarPorId('id1');
+            const result = await repository.buscarPorId('id1', false, req);
             expect(result).toEqual({ nome: 'C1', _id: 'id1' });
         });
         it('deve lançar erro 404 se não encontrar componente', async () => {
-            mockFindById.mockReturnValueOnce({
+            const req = { user_id: 'user1' };
+            ComponenteModel.findOne = jest.fn().mockReturnValueOnce({
                 populate: () => ({ populate: () => null })
             });
-            await expect(repository.buscarPorId('id1')).rejects.toThrow(CustomError);
+            await expect(repository.buscarPorId('id1', false, req)).rejects.toThrow(CustomError);
         });
     });
 
     describe('buscarPorNome', () => {
         it('deve retornar componente por nome', async () => {
+            const req = { user_id: 'user1' };
             mockFindOne.mockReturnValueOnce({ populate: () => ({ populate: () => ({ nome: 'C1', _id: 'id1' }) }) });
-            const result = await repository.buscarPorNome('C1');
+            const result = await repository.buscarPorNome('C1', null, req);
             expect(result).toEqual({ nome: 'C1', _id: 'id1' });
         });
         it('deve retornar null se não encontrar componente', async () => {
+            const req = { user_id: 'user1' };
             mockFindOne.mockReturnValueOnce({ populate: () => ({ populate: () => null }) });
-            const result = await repository.buscarPorNome('C1');
+            const result = await repository.buscarPorNome('C1', null, req);
             expect(result).toBeNull();
         });
     });
 
     describe('erros inesperados', () => {
         it('deve lançar erro 500 se build não for função', async () => {
-            const req = { params: {}, query: {} };
+            const req = { params: {}, query: {}, user_id: 'user1' };
             ComponenteFilterBuilder.mockImplementation(() => ({
                 comNome: () => ({ 
                     comQuantidade: () => ({ 

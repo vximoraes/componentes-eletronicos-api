@@ -148,7 +148,7 @@ describe('Rotas de Componente', () => {
                 
             expect([200, 201]).toContain(res.status);
             expect(res.body.data).toHaveProperty('status', 'Baixo Estoque');
-        }, 30000);
+        });
         it('deve falhar ao cadastrar sem campos obrigatórios', async () => {
             const res = await request(BASE_URL).post('/componentes').set('Authorization', `Bearer ${token}`).send({});
             expect([400, 422]).toContain(res.status);
@@ -158,17 +158,17 @@ describe('Rotas de Componente', () => {
             await request(BASE_URL).post('/componentes').set('Authorization', `Bearer ${token}`).send(dados);
             const res = await request(BASE_URL).post('/componentes').set('Authorization', `Bearer ${token}`).send(dados);
             expect([400, 409, 422]).toContain(res.status);
-        }, 30000);
+        });
         it('deve falhar ao cadastrar com categoria inexistente', async () => {
             const dados = await criarComponenteValido({ categoria: new mongoose.Types.ObjectId().toString() });
             const res = await request(BASE_URL).post('/componentes').set('Authorization', `Bearer ${token}`).send(dados);
             expect([400, 404, 422]).toContain(res.status);
-        }, 30000);
+        });
         it('deve falhar ao cadastrar com localizacao inexistente', async () => {
             const dados = await criarComponenteValido({ localizacao: new mongoose.Types.ObjectId().toString() });
             const res = await request(BASE_URL).post('/componentes').set('Authorization', `Bearer ${token}`).send(dados);
             expect([400, 404, 422]).toContain(res.status);
-        }, 30000);
+        });
     });
 
     describe('GET /componentes', () => {
@@ -195,7 +195,7 @@ describe('Rotas de Componente', () => {
             const res = await request(BASE_URL).get(`/componentes/${id}`).set('Authorization', `Bearer ${token}`);
             expect([200, 201]).toContain(res.status);
             expect(res.body.data).toHaveProperty('_id', id);
-        }, 30000);
+        });
         it('deve retornar 404 para componente inexistente', async () => {
             const id = new mongoose.Types.ObjectId();
             const res = await request(BASE_URL).get(`/componentes/${id}`).set('Authorization', `Bearer ${token}`);
@@ -214,7 +214,7 @@ describe('Rotas de Componente', () => {
             const res = await request(BASE_URL).patch(`/componentes/${id}`).set('Authorization', `Bearer ${token}`).send({ nome: novoNome });
             expect([200, 201]).toContain(res.status);
             expect(res.body.data.nome).toBe(novoNome);
-        }, 30000);
+        });
         
         it('deve atualizar status do componente', async () => {
             const dados = await criarComponenteValido();
@@ -226,7 +226,7 @@ describe('Rotas de Componente', () => {
             const res = await request(BASE_URL).patch(`/componentes/${id}`).set('Authorization', `Bearer ${token}`).send({ status: novoStatus });
             expect([200, 201]).toContain(res.status);
             expect(res.body.data.status).toBe(novoStatus);
-        }, 30000);
+        });
         it('não deve permitir atualizar quantidade diretamente', async () => {
             // Cria um componente válido para testar a atualização
             const dados = await criarComponenteValido();
@@ -243,7 +243,7 @@ describe('Rotas de Componente', () => {
             expect([200, 201]).toContain(res.status);
             // Garante que o valor de 'quantidade' não foi alterado para 999
             expect(res.body.data.quantidade).not.toBe(999);
-        }, 30000);
+        });
         it('deve falhar ao atualizar para nome já existente', async () => {
             const dados1 = await criarComponenteValido();
             const dados2 = await criarComponenteValido();
@@ -253,7 +253,7 @@ describe('Rotas de Componente', () => {
             expect(comp2.body.data).toBeTruthy();
             const res = await request(BASE_URL).patch(`/componentes/${comp2.body.data._id}`).set('Authorization', `Bearer ${token}`).send({ nome: dados1.nome });
             expect([400, 409, 422]).toContain(res.status);
-        }, 30000);
+        });
         it('deve retornar 404 ao atualizar componente inexistente', async () => {
             const id = new mongoose.Types.ObjectId();
             const res = await request(BASE_URL).patch(`/componentes/${id}`).set('Authorization', `Bearer ${token}`).send({ nome: 'Qualquer' });
@@ -271,7 +271,7 @@ describe('Rotas de Componente', () => {
             const res = await request(BASE_URL).patch(`/componentes/${id}/inativar`).set('Authorization', `Bearer ${token}`);
             expect([200, 201]).toContain(res.status);
             expect(res.body.data.ativo).toBe(false);
-        }, 30000);
+        });
         it('deve retornar 404 ao inativar componente inexistente', async () => {
             const id = new mongoose.Types.ObjectId();
             const res = await request(BASE_URL).patch(`/componentes/${id}/inativar`).set('Authorization', `Bearer ${token}`);

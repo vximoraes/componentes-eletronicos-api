@@ -89,7 +89,7 @@ class RotaController {
         }
 
         // Chama o serviço para deletar a rota
-        const data = await this.service.deletar(req);
+        const data = await this.service.deletar(req, id);
         return CommonResponse.success(res, data);
     }
 }

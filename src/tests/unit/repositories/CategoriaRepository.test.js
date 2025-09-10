@@ -46,15 +46,15 @@ describe('CategoriaRepository', () => {
 
     describe('listar', () => {
         it('deve retornar categoria por id', async () => {
-            const req = { params: { id: 'id1' }, query: {} };
-            mockFindById.mockResolvedValueOnce({ toObject: () => ({ nome: 'Cat1', _id: 'id1' }) });
+            const req = { params: { id: 'id1' }, query: {}, user_id: 'user1' };
+            CategoriaModel.findOne = jest.fn().mockResolvedValueOnce({ toObject: () => ({ nome: 'Cat1', _id: 'id1' }) });
             const result = await repository.listar(req);
             expect(result).toEqual({ nome: 'Cat1', _id: 'id1' });
         });
 
         it('deve lançar erro 404 se categoria não encontrada por id', async () => {
-            const req = { params: { id: 'id1' }, query: {} };
-            mockFindById.mockResolvedValueOnce(null);
+            const req = { params: { id: 'id1' }, query: {}, user_id: 'user1' };
+            CategoriaModel.findOne = jest.fn().mockResolvedValueOnce(null);
             await expect(repository.listar(req)).rejects.toThrow(CustomError);
         });
 
@@ -79,55 +79,63 @@ describe('CategoriaRepository', () => {
 
     describe('atualizar', () => {
         it('deve atualizar e retornar categoria', async () => {
-            mockFindByIdAndUpdate.mockReturnValueOnce({
+            const req = { user_id: 'user1' };
+            CategoriaModel.findOneAndUpdate = jest.fn().mockReturnValueOnce({
                 lean: () => ({ nome: 'Cat1', _id: 'id1' })
             });
-            const result = await repository.atualizar('id1', { nome: 'Novo' });
+            const result = await repository.atualizar('id1', { nome: 'Novo' }, req);
             expect(result).toEqual({ nome: 'Cat1', _id: 'id1' });
         });
         it('deve lançar erro 404 se categoria não encontrada', async () => {
-            mockFindByIdAndUpdate.mockReturnValueOnce({
+            const req = { user_id: 'user1' };
+            CategoriaModel.findOneAndUpdate = jest.fn().mockReturnValueOnce({
                 lean: () => null
             });
-            await expect(repository.atualizar('id1', { nome: 'Novo' })).rejects.toThrow(CustomError);
+            await expect(repository.atualizar('id1', { nome: 'Novo' }, req)).rejects.toThrow(CustomError);
         });
     });
 
     describe('deletar', () => {
         it('deve deletar categoria se não houver componente vinculado', async () => {
+            const req = { user_id: 'user1' };
             ComponenteModel.exists.mockResolvedValueOnce(false);
-            mockFindByIdAndDelete.mockResolvedValueOnce({ nome: 'Cat1', _id: 'id1' });
-            const result = await repository.deletar('id1');
+            CategoriaModel.findOneAndDelete = jest.fn().mockResolvedValueOnce({ nome: 'Cat1', _id: 'id1' });
+            const result = await repository.deletar('id1', req);
             expect(result).toEqual({ nome: 'Cat1', _id: 'id1' });
         });
         it('deve lançar erro se houver componente vinculado', async () => {
+            const req = { user_id: 'user1' };
             ComponenteModel.exists.mockResolvedValueOnce(true);
-            await expect(repository.deletar('id1')).rejects.toThrow(CustomError);
+            await expect(repository.deletar('id1', req)).rejects.toThrow(CustomError);
         });
     });
 
     describe('buscarPorNome', () => {
         it('deve retornar categoria por nome', async () => {
+            const req = { user_id: 'user1' };
             mockFindOne.mockResolvedValueOnce({ nome: 'Cat1', _id: 'id1' });
-            const result = await repository.buscarPorNome('Cat1');
+            const result = await repository.buscarPorNome('Cat1', null, req);
             expect(result).toEqual({ nome: 'Cat1', _id: 'id1' });
         });
         it('deve retornar null se não encontrar categoria', async () => {
+            const req = { user_id: 'user1' };
             mockFindOne.mockResolvedValueOnce(null);
-            const result = await repository.buscarPorNome('Cat1');
+            const result = await repository.buscarPorNome('Cat1', null, req);
             expect(result).toBeNull();
         });
     });
 
     describe('buscarPorId', () => {
         it('deve retornar categoria por id', async () => {
-            mockFindById.mockResolvedValueOnce({ nome: 'Cat1', _id: 'id1' });
-            const result = await repository.buscarPorId('id1');
+            const req = { user_id: 'user1' };
+            CategoriaModel.findOne = jest.fn().mockResolvedValueOnce({ nome: 'Cat1', _id: 'id1' });
+            const result = await repository.buscarPorId('id1', false, req);
             expect(result).toEqual({ nome: 'Cat1', _id: 'id1' });
         });
         it('deve lançar erro 404 se não encontrar categoria', async () => {
-            mockFindById.mockResolvedValueOnce(null);
-            await expect(repository.buscarPorId('id1')).rejects.toThrow(CustomError);
+            const req = { user_id: 'user1' };
+            CategoriaModel.findOne = jest.fn().mockResolvedValueOnce(null);
+            await expect(repository.buscarPorId('id1', false, req)).rejects.toThrow(CustomError);
         });
     });
 });

@@ -43,6 +43,11 @@ class Componente {
                 type: Boolean,
                 default: true
             },
+            usuario: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'usuarios',
+                required: true
+            },
             status: {
                 type: String,
                 enum: ['Indisponível', 'Baixo Estoque', 'Em Estoque'],

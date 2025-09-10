@@ -41,6 +41,7 @@ export const fakeMappings = {
         email: () => fakebr.internet.email(),
         senha: () => fakebr.internet.password(),
         ativo: () => fakebr.random.boolean(),
+        grupos:() => [],
         tokenUnico: () => TokenUtil.generateAccessToken(new mongoose.Types.ObjectId().toString()),
         refreshtoken: () => TokenUtil.generateRefreshToken(new mongoose.Types.ObjectId().toString()),
         accesstoken: () => TokenUtil.generateAccessToken(new mongoose.Types.ObjectId().toString()),
@@ -61,11 +62,13 @@ export const fakeMappings = {
         categorias: ["Sensores", "Cabos", "Microcontroladores"],
         nome(index) {
             return this.categorias[index];
-        }
+        },
+        usuario: () => new mongoose.Types.ObjectId().toString(),
     },
 
     Localizacao: {
         nome: () => `${String.fromCharCode(65 + fakebr.random.number({ min: 0, max: 25 }))}${fakebr.random.number({ min: 1, max: 100 })}`,
+        usuario: () => new mongoose.Types.ObjectId().toString(),
     },
 
     Componente: {
@@ -87,10 +90,12 @@ export const fakeMappings = {
         localizacao: () => new mongoose.Types.ObjectId().toString(),
         ativo: () => true,
         status: () => fakebr.helpers.randomize(['Indisponível', 'Baixo Estoque', 'Em Estoque']),
+        usuario: () => new mongoose.Types.ObjectId().toString(),
     },
 
     Fornecedor: {
         nome: () => fakebr.company.companyName(),
+        usuario: () => new mongoose.Types.ObjectId().toString(),
     },
 
     Movimentacao: {
@@ -100,6 +105,7 @@ export const fakeMappings = {
         quantidade: () => fakebr.random.number({ min: 1, max: 10 }),
         componente: () => new mongoose.Types.ObjectId().toString(),
         fornecedor: () => new mongoose.Types.ObjectId().toString(),
+        usuario: () => new mongoose.Types.ObjectId().toString(),
     },
 
     ComponenteOrcamento: {
@@ -150,6 +156,7 @@ export const fakeMappings = {
             });
         },
         valor: () => 0,
+        usuario: () => new mongoose.Types.ObjectId().toString(),
     },
 };
 

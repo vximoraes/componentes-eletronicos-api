@@ -41,9 +41,10 @@ describe('ComponenteService', () => {
 
     describe('criar', () => {
         it('deve cadastrar componente com dados válidos', async () => {
+            const req = { user_id: 'user1' };
             repositoryMock.buscarPorNome.mockResolvedValue(null);
-            LocalizacaoModel.findById.mockResolvedValue(makeLocalizacao());
-            CategoriaModel.findById.mockResolvedValue(makeCategoria());
+            LocalizacaoModel.findOne.mockResolvedValue(makeLocalizacao());
+            CategoriaModel.findOne.mockResolvedValue(makeCategoria());
             repositoryMock.criar.mockResolvedValue(makeComponente());
             const result = await service.criar({
                 nome: 'Resistor',
@@ -52,34 +53,38 @@ describe('ComponenteService', () => {
                 valor_unitario: 0.5,
                 categoria: 'cat1',
                 localizacao: 'loc1'
-            });
+            }, req);
             expect(result).toHaveProperty('_id');
             expect(repositoryMock.criar).toHaveBeenCalled();
         });
         it('deve lançar erro se nome já existir', async () => {
+            const req = { user_id: 'user1' };
             repositoryMock.buscarPorNome.mockResolvedValue(makeComponente());
-            await expect(service.criar({ nome: 'Resistor', localizacao: 'loc1', categoria: 'cat1' }))
+            await expect(service.criar({ nome: 'Resistor', localizacao: 'loc1', categoria: 'cat1' }, req))
                 .rejects.toThrow(CustomError);
         });
         it('deve lançar erro se localizacao não existir', async () => {
+            const req = { user_id: 'user1' };
             repositoryMock.buscarPorNome.mockResolvedValue(null);
-            LocalizacaoModel.findById.mockResolvedValue(null);
-            await expect(service.criar({ nome: 'Resistor', localizacao: 'locX', categoria: 'cat1' }))
+            LocalizacaoModel.findOne.mockResolvedValue(null);
+            await expect(service.criar({ nome: 'Resistor', localizacao: 'locX', categoria: 'cat1' }, req))
                 .rejects.toThrow(CustomError);
         });
         it('deve lançar erro se categoria não existir', async () => {
+            const req = { user_id: 'user1' };
             repositoryMock.buscarPorNome.mockResolvedValue(null);
-            LocalizacaoModel.findById.mockResolvedValue(makeLocalizacao());
-            CategoriaModel.findById.mockResolvedValue(null);
-            await expect(service.criar({ nome: 'Resistor', localizacao: 'loc1', categoria: 'catX' }))
+            LocalizacaoModel.findOne.mockResolvedValue(makeLocalizacao());
+            CategoriaModel.findOne.mockResolvedValue(null);
+            await expect(service.criar({ nome: 'Resistor', localizacao: 'loc1', categoria: 'catX' }, req))
                 .rejects.toThrow(CustomError);
         });
         it('deve lançar erro inesperado do repository', async () => {
+            const req = { user_id: 'user1' };
             repositoryMock.buscarPorNome.mockResolvedValue(null);
-            LocalizacaoModel.findById.mockResolvedValue(makeLocalizacao());
-            CategoriaModel.findById.mockResolvedValue(makeCategoria());
+            LocalizacaoModel.findOne.mockResolvedValue(makeLocalizacao());
+            CategoriaModel.findOne.mockResolvedValue(makeCategoria());
             repositoryMock.criar.mockRejectedValue(new Error('DB error'));
-            await expect(service.criar({ nome: 'Resistor', localizacao: 'loc1', categoria: 'cat1' }))
+            await expect(service.criar({ nome: 'Resistor', localizacao: 'loc1', categoria: 'cat1' }, req))
                 .rejects.toThrow('DB error');
         });
     });
@@ -99,6 +104,7 @@ describe('ComponenteService', () => {
 
     describe('atualizar', () => {
         it('deve atualizar dados do componente, exceto quantidade', async () => {
+            const req = { user_id: 'user1' };
             // Simula que o componente existe no banco
             repositoryMock.buscarPorId.mockResolvedValue(makeComponente());
             // Simula que não existe outro componente com o mesmo nome
@@ -106,28 +112,64 @@ describe('ComponenteService', () => {
             // Simula atualização no banco, mas mantém quantidade original
             repositoryMock.atualizar.mockResolvedValue(makeComponente({ nome: 'Novo Nome', quantidade: 10 }));
             // Tenta atualizar o nome e a quantidade do componente
-            const result = await service.atualizar('comp1', { nome: 'Novo Nome', quantidade: 999 });
+            const result = await service.atualizar('comp1', { nome: 'Novo Nome', quantidade: 999 }, req);
             // Verifica se o nome foi atualizado corretamente
             expect(result.nome).toBe('Novo Nome');
             // Garante que o método atualizar foi chamado sem o campo quantidade
-            expect(repositoryMock.atualizar).toHaveBeenCalledWith('comp1', { nome: 'Novo Nome' });
+            expect(repositoryMock.atualizar).toHaveBeenCalledWith('comp1', { nome: 'Novo Nome' }, req);
         });
         it('deve lançar erro se componente não existir', async () => {
+            const req = { user_id: 'user1' };
             repositoryMock.buscarPorId.mockResolvedValue(null);
-            await expect(service.atualizar('compX', { nome: 'Qualquer' }))
+            await expect(service.atualizar('compX', { nome: 'Qualquer' }, req))
                 .rejects.toThrow(CustomError);
         });
         it('deve lançar erro se tentar atualizar para nome já existente', async () => {
+            const req = { user_id: 'user1' };
             repositoryMock.buscarPorId.mockResolvedValue(makeComponente());
             repositoryMock.buscarPorNome.mockResolvedValue(makeComponente({ _id: 'comp2', nome: 'Duplicado' }));
-            await expect(service.atualizar('comp1', { nome: 'Duplicado' }))
+            await expect(service.atualizar('comp1', { nome: 'Duplicado' }, req))
                 .rejects.toThrow(CustomError);
         });
         it('deve lançar erro inesperado do repository', async () => {
+            const req = { user_id: 'user1' };
             repositoryMock.buscarPorId.mockResolvedValue(makeComponente());
             repositoryMock.buscarPorNome.mockResolvedValue(null);
             repositoryMock.atualizar.mockRejectedValue(new Error('DB error'));
-            await expect(service.atualizar('comp1', { nome: 'Novo' })).rejects.toThrow('DB error');
+            await expect(service.atualizar('comp1', { nome: 'Novo' }, req)).rejects.toThrow('DB error');
+        });
+    });
+
+    describe('deletar', () => {
+        it('deve remover componente existente', async () => {
+            const req = { user_id: 'user1' };
+            repositoryMock.buscarPorId.mockResolvedValue(makeComponente());
+            repositoryMock.deletar.mockResolvedValue({ acknowledged: true, deletedCount: 1 });
+            const result = await service.deletar('comp1', req);
+            expect(result).toHaveProperty('acknowledged', true);
+        });
+        it('deve lançar erro se componente não existir', async () => {
+            const req = { user_id: 'user1' };
+            repositoryMock.buscarPorId.mockResolvedValue(null);
+            await expect(service.deletar('compX', req)).rejects.toThrow(CustomError);
+        });
+        it('deve lançar erro se componente estiver vinculado a movimentações', async () => {
+            const req = { user_id: 'user1' };
+            repositoryMock.buscarPorId.mockResolvedValue(makeComponente());
+            repositoryMock.deletar.mockRejectedValue(new CustomError({
+                statusCode: 400,
+                errorType: 'resourceInUse',
+                field: 'Componente',
+                details: [],
+                customMessage: 'Componente vinculado a movimentações.'
+            }));
+            await expect(service.deletar('comp1', req)).rejects.toThrow('Componente vinculado a movimentações');
+        });
+        it('deve lançar erro inesperado do repository', async () => {
+            const req = { user_id: 'user1' };
+            repositoryMock.buscarPorId.mockResolvedValue(makeComponente());
+            repositoryMock.deletar.mockRejectedValue(new Error('DB error'));
+            await expect(service.deletar('comp1', req)).rejects.toThrow('DB error');
         });
     });
 
@@ -149,20 +191,20 @@ describe('ComponenteService', () => {
             await expect(service.ensureComponentExists('comp1')).resolves.toHaveProperty('_id', 'comp1');
         });
         it('validateLocalizacao lança erro se não existir', async () => {
-            LocalizacaoModel.findById.mockResolvedValue(null);
-            await expect(service.validateLocalizacao('locX')).rejects.toThrow(CustomError);
+            LocalizacaoModel.findOne.mockResolvedValue(null);
+            await expect(service.validateLocalizacao('locX', { user_id: 'user1' })).rejects.toThrow(CustomError);
         });
         it('validateLocalizacao não lança erro se existir', async () => {
-            LocalizacaoModel.findById.mockResolvedValue(makeLocalizacao());
-            await expect(service.validateLocalizacao('loc1')).resolves.toBeUndefined();
+            LocalizacaoModel.findOne.mockResolvedValue(makeLocalizacao());
+            await expect(service.validateLocalizacao('loc1', { user_id: 'user1' })).resolves.toBeUndefined();
         });
         it('validateCategoria lança erro se não existir', async () => {
-            CategoriaModel.findById.mockResolvedValue(null);
-            await expect(service.validateCategoria('catX')).rejects.toThrow(CustomError);
+            CategoriaModel.findOne.mockResolvedValue(null);
+            await expect(service.validateCategoria('catX', { user_id: 'user1' })).rejects.toThrow(CustomError);
         });
         it('validateCategoria não lança erro se existir', async () => {
-            CategoriaModel.findById.mockResolvedValue(makeCategoria());
-            await expect(service.validateCategoria('cat1')).resolves.toBeUndefined();
+            CategoriaModel.findOne.mockResolvedValue(makeCategoria());
+            await expect(service.validateCategoria('cat1', { user_id: 'user1' })).resolves.toBeUndefined();
         });
     });
 });

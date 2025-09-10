@@ -97,4 +97,14 @@ describe('NotificacaoSchema', () => {
         };
         expect(() => NotificacaoSchema.parse(data)).toThrow();
     });
+
+    it('deve criar notificação apenas com mensagem', () => {
+        const data = {
+            mensagem: 'Mensagem sem usuário',
+        };
+        const parsed = NotificacaoSchema.parse(data);
+        expect(parsed.mensagem).toBe(data.mensagem);
+        expect(parsed.visualizada).toBe(false);
+        expect(parsed.usuario).toBeUndefined();
+    });
 });

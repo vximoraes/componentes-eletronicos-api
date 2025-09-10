@@ -86,7 +86,7 @@ describe('OrcamentoController', () => {
             const req = { params: { id: '507f1f77bcf86cd799439011' }, body: { nome: 'Novo Nome' } };
             service.atualizar.mockResolvedValue({ _id: '507f1f77bcf86cd799439011', nome: 'Novo Nome' });
             await controller.atualizar(req, res);
-            expect(service.atualizar).toHaveBeenCalledWith('507f1f77bcf86cd799439011', { nome: 'Novo Nome' });
+            expect(service.atualizar).toHaveBeenCalledWith('507f1f77bcf86cd799439011', { nome: 'Novo Nome' }, req);
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringContaining('sucesso') }));
         });
@@ -102,7 +102,7 @@ describe('OrcamentoController', () => {
             const req = { params: { id: '507f1f77bcf86cd799439011' } };
             service.deletar.mockResolvedValue({ _id: '507f1f77bcf86cd799439011' });
             await controller.deletar(req, res);
-            expect(service.deletar).toHaveBeenCalledWith('507f1f77bcf86cd799439011');
+            expect(service.deletar).toHaveBeenCalledWith('507f1f77bcf86cd799439011', req);
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringContaining('excluído') }));
         });
@@ -160,7 +160,7 @@ describe('OrcamentoController', () => {
             const req = { params: { orcamentoId: '507f1f77bcf86cd799439011', id: 'cid' } };
             service.removerComponente.mockResolvedValue({ _id: '507f1f77bcf86cd799439011', componente_orcamento: [] });
             await controller.removerComponente(req, res);
-            expect(service.removerComponente).toHaveBeenCalledWith('507f1f77bcf86cd799439011', 'cid');
+            expect(service.removerComponente).toHaveBeenCalledWith('507f1f77bcf86cd799439011', 'cid', req);
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringContaining('removido') }));
         });

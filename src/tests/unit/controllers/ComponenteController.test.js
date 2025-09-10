@@ -34,7 +34,7 @@ describe('ComponenteController', () => {
             await controller.criar(req, res);
 
             expect(ComponenteSchema.parse).toHaveBeenCalledWith(req.body);
-            expect(serviceMock.criar).toHaveBeenCalledWith({ nome: 'Resistor' });
+            expect(serviceMock.criar).toHaveBeenCalledWith({ nome: 'Resistor' }, req);
             expect(CommonResponse.created).toHaveBeenCalledWith(res, { nome: 'Resistor', _id: '1', ativo: false });
         });
 
@@ -87,7 +87,7 @@ describe('ComponenteController', () => {
 
             expect(ComponenteIdSchema.parse).toHaveBeenCalledWith('1');
             expect(ComponenteUpdateSchema.parse).toHaveBeenCalledWith(req.body);
-            expect(serviceMock.atualizar).toHaveBeenCalledWith('1', { nome: 'Atualizado' });
+            expect(serviceMock.atualizar).toHaveBeenCalledWith('1', { nome: 'Atualizado' }, req);
             expect(CommonResponse.success).toHaveBeenCalledWith(
                 res,
                 { nome: 'Atualizado' },
@@ -109,6 +109,27 @@ describe('ComponenteController', () => {
             ComponenteUpdateSchema.parse.mockReturnValue({ nome: 'Atualizado' });
             serviceMock.atualizar.mockRejectedValue({ status: 404 });
             await expect(controller.atualizar(req, res)).rejects.toEqual(expect.objectContaining({ status: 404 }));
+        });
+    });
+
+    describe('deletar', () => {
+        it('deve deletar componente existente', async () => {
+            req.params = { id: '1' };
+            ComponenteIdSchema.parse.mockReturnValue('1');
+            serviceMock.deletar.mockResolvedValue({ nome: 'Removido' });
+
+            await controller.deletar(req, res);
+
+            expect(ComponenteIdSchema.parse).toHaveBeenCalledWith('1');
+            expect(serviceMock.deletar).toHaveBeenCalledWith('1', req);
+            expect(CommonResponse.success).toHaveBeenCalledWith(res, { nome: 'Removido' }, 200, 'Componente excluído com sucesso.');
+        });
+
+        it('deve retornar erro 404 ao tentar deletar componente inexistente', async () => {
+            req.params = { id: '1' };
+            ComponenteIdSchema.parse.mockReturnValue('1');
+            serviceMock.deletar.mockRejectedValue({ status: 404 });
+            await expect(controller.deletar(req, res)).rejects.toEqual(expect.objectContaining({ status: 404 }));
         });
     });
 

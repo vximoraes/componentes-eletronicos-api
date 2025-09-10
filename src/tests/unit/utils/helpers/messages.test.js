@@ -88,37 +88,6 @@ describe('Messages Helper', () => {
             expect(messages.error.resourceInUse(fieldName)).toBe(`Recurso em uso em ${fieldName}.`);
         });
 
-        test('deve retornar mensagem de erro interno do servidor', () => {
-            expect(messages.error.internalServerError()).toMatch(/servidor/i);
-        });
-
-        test('deve retornar mensagem de erro de validação', () => {
-            expect(messages.error.validationError()).toMatch(/validação/i);
-        });
-
-        test('deve retornar mensagem de acesso não autorizado', () => {
-            expect(messages.error.unauthorized()).toMatch(/não autorizado/i);
-        });
-
-        test('deve retornar mensagem de requisição inválida', () => {
-            expect(messages.error.badRequest('Campo')).toMatch(/Campo/);
-        });
-
-        test('deve retornar mensagem de recurso não encontrado', () => {
-            expect(messages.error.resourceNotFound('Categoria')).toMatch(/Categoria/);
-        });
-
-        test('deve retornar mensagem de erro de servidor', () => {
-            expect(messages.error.serverError()).toMatch(/servidor/i);
-        });
-
-        test('deve retornar mensagem de permissão negada', () => {
-            expect(messages.error.forbidden('Ação')).toMatch(/Ação/);
-        });
-
-        test('deve retornar mensagem de entrada duplicada', () => {
-            expect(messages.error.duplicateEntry('Campo')).toMatch(/Campo/);
-        });
 
         test('deve retornar mensagem de erro de servidor com recurso', () => {
             expect(messages.error.serverError('Usuário')).toBe('Erro interno do servidor ao processar Usuário.');

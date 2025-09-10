@@ -10,8 +10,8 @@ class ComponenteRepository {
         this.model = componenteModel;
     };
 
-    async criar(dadosComponente) {
-        const componente = new this.model(dadosComponente);
+    async criar(parsedData) {
+        const componente = new this.model(parsedData);
         const componenteSalvo = await componente.save();
         return await this.model.findById(componenteSalvo._id)
             .populate('localizacao')
@@ -23,7 +23,7 @@ class ComponenteRepository {
 
         // Se um ID for fornecido, retorna o componente enriquecido com estatísticas.
         if (id) {
-            const data = await this.model.findById(id)
+            const data = await this.model.findOne({ _id: id, usuario: req.user_id })
                 .populate('localizacao')
                 .populate('categoria');
 
@@ -67,7 +67,7 @@ class ComponenteRepository {
             });
         };
 
-        const filtros = filterBuilder.build();
+        const filtros = { ...filterBuilder.build(), usuario: req.user_id };
 
         const options = {
             page: parseInt(page),
@@ -93,8 +93,8 @@ class ComponenteRepository {
         return resultado;
     };
 
-    async atualizar(id, parsedData) {
-        const componente = await this.model.findByIdAndUpdate(id, parsedData, { new: true })
+    async atualizar(id, parsedData, req) {
+        const componente = await this.model.findOneAndUpdate({ _id: id, usuario: req.user_id }, parsedData, { new: true })
             .populate('localizacao')
             .populate('categoria')
             .lean();
@@ -111,10 +111,40 @@ class ComponenteRepository {
         return componente;
     };
 
+    async deletar(id, req) {
+        const existeMovimentacao = await MovimentacaoModel.exists({ componente: id, usuario: req.user_id });
+        if (existeMovimentacao) {
+            throw new CustomError({
+                statusCode: 400,
+                errorType: 'resourceInUse',
+                field: 'Componente',
+                details: [],
+                customMessage: 'Não é possível deletar: componente está vinculado a movimentações.'
+            });
+        };
+
+        const componente = await this.model.findOne({ _id: id, usuario: req.user_id })
+            .populate('localizacao')
+            .populate('categoria');
+
+        if (!componente) {
+            throw new CustomError({
+                statusCode: 404,
+                errorType: 'resourceNotFound',
+                field: 'Componente',
+                details: [],
+                customMessage: messages.error.resourceNotFound('Componente')
+            });
+        }
+
+        await this.model.findOneAndDelete({ _id: id, usuario: req.user_id });
+        return componente;
+    };
+
     // Métodos auxiliares.
 
-    async buscarPorId(id, includeTokens = false) {
-        let query = this.model.findById(id)
+    async buscarPorId(id, includeTokens = false, req) {
+        let query = this.model.findOne({ _id: id, usuario: req.user_id })
             .populate('localizacao')
             .populate('categoria');
 
@@ -133,8 +163,8 @@ class ComponenteRepository {
         return componente;
     };
 
-    async buscarPorNome(nome, idIgnorado) {
-        const filtro = { nome };
+    async buscarPorNome(nome, idIgnorado, req) {
+        const filtro = { nome, usuario: req.user_id };
 
         if (idIgnorado) {
             filtro._id = { $ne: idIgnorado }

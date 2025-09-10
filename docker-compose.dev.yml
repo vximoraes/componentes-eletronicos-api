@@ -17,6 +17,10 @@ services:
             - DB_URL=mongodb://mongodb:27017/componentes-eletronicos
         env_file:
             - .env
+        volumes:
+            - .:/usr/src/app
+            - /usr/src/app/node_modules
+        command: npx nodemon --legacy-watch server.js
         depends_on:
             - mongodb
 
