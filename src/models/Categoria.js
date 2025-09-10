@@ -10,6 +10,11 @@ class Categoria {
                 unique: true,
                 required: true
             },
+            usuario: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'usuarios',
+                required: true
+            }
         });
 
         categoriaSchema.plugin(mongoosePaginate);

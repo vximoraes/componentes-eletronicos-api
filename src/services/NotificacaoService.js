@@ -9,25 +9,31 @@ class NotificacaoService {
     };
 
     async listarTodas(req) {
-        const data = await this.repository.listar(req);
+        const userId = req.user_id || req.user?.id;
+        
+        const data = await this.repository.listar(userId, req);
 
         return data;
     };
 
-    async buscarPorId(id) {
-        const data = await this.repository.buscarPorId(id);
+    async buscarPorId(id, req) {
+        const userId = req.user_id || req.user?.id;
+        const data = await this.repository.buscarPorId(id, userId);
 
         return data;
     };
 
-    async criar(parsedData) {
+    async criar(parsedData, req) {
+        const userId = req.user_id || req.user?.id;
+        parsedData.usuario = userId;
         const data2 = await this.repository.criar(parsedData);
 
         return data2;
     };
 
-    async marcarComoVisualizada(id) {
-        const data = await this.repository.marcarComoVisualizada(id);
+    async marcarComoVisualizada(id, req) {
+        const userId = req.user_id || req.user?.id;
+        const data = await this.repository.marcarComoVisualizada(id, userId);
         return data;
     };
 };

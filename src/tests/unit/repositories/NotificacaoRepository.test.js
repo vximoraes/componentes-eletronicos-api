@@ -23,8 +23,8 @@ describe('NotificacaoRepository', () => {
     });
 
     it('deve buscar notificação por id', async () => {
-        NotificacaoModel.findById = jest.fn().mockReturnValue({ populate: jest.fn().mockResolvedValue({ _id: 'id1' }) });
-        const result = await repository.buscarPorId('id1');
+        NotificacaoModel.findOne = jest.fn().mockResolvedValue({ _id: 'id1' });
+        const result = await repository.buscarPorId('id1', 'user1');
         expect(result._id).toBe('id1');
     });
 
@@ -49,15 +49,17 @@ describe('NotificacaoRepository', () => {
 
     it('deve cadastrar notificação com tipos errados (mensagem numérica)', async () => {
         UsuarioModel.exists = jest.fn().mockResolvedValue(true);
-        NotificacaoModel.prototype.save = jest.fn().mockResolvedValue({ _id: 'id1', mensagem: '12345', usuario: usuarioId });
-        NotificacaoModel.findById = jest.fn().mockReturnValue({ populate: jest.fn().mockResolvedValue({ _id: 'id1', mensagem: '12345', usuario: usuarioId }) });
+        const mockNotificacao = { _id: 'id1', mensagem: 12345, usuario: usuarioId, save: jest.fn().mockResolvedValue({ _id: 'id1' }) };
+        NotificacaoModel.mockImplementation(() => mockNotificacao);
+        const mockResult = { _id: 'id1', mensagem: '12345', usuario: usuarioId };
+        NotificacaoModel.findById = jest.fn().mockResolvedValue(mockResult);
         const result = await repository.criar({ mensagem: 12345, usuario: usuarioId });
         expect(result.mensagem).toBe('12345');
     });
 
     it('deve lançar erro ao buscar notificação inexistente', async () => {
-        NotificacaoModel.findById = jest.fn().mockReturnValue({ populate: jest.fn().mockResolvedValue(null) });
-        await expect(repository.buscarPorId('id_inexistente')).rejects.toThrow('Notificação não encontrado(a).');
+        NotificacaoModel.findOne = jest.fn().mockResolvedValue(null);
+        await expect(repository.buscarPorId('id_inexistente', 'user1')).rejects.toThrow('Notificação não encontrado(a).');
     });
 
     it('deve lançar erro ao atualizar notificação inexistente', async () => {

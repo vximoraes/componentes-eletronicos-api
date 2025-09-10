@@ -10,8 +10,8 @@ class FornecedorRepository {
         this.model = fornecedorModel;
     };
 
-    async criar(dadosFornecedor) {
-        const fornecedor = new this.model(dadosFornecedor);
+    async criar(parsedData) {
+        const fornecedor = new this.model(parsedData);
         return await fornecedor.save();
     };
 
@@ -20,7 +20,7 @@ class FornecedorRepository {
 
         // Se um ID for fornecido, retorna o fornecedor enriquecido com estatísticas.
         if (id) {
-            const data = await this.model.findById(id);
+            const data = await this.model.findOne({ _id: id, usuario: req.user_id });
 
             if (!data) {
                 throw new CustomError({
@@ -55,7 +55,7 @@ class FornecedorRepository {
             });
         };
 
-        const filtros = filterBuilder.build();
+        const filtros = { ...filterBuilder.build(), usuario: req.user_id };
 
         const options = {
             page: parseInt(page, 10),
@@ -77,8 +77,8 @@ class FornecedorRepository {
         return resultado;
     };
 
-    async atualizar(id, parsedData) {
-        const fornecedor = await this.model.findByIdAndUpdate(id, parsedData, { new: true }).lean();
+    async atualizar(id, parsedData, req) {
+        const fornecedor = await this.model.findOneAndUpdate({ _id: id, usuario: req.user_id }, parsedData, { new: true }).lean();
         if (!fornecedor) {
             throw new CustomError({
                 statusCode: 404,
@@ -92,8 +92,8 @@ class FornecedorRepository {
         return fornecedor;
     };
 
-    async deletar(id) {
-        const existeMovimentacao = await MovimentacaoModel.exists({ fornecedor: id });
+    async deletar(id, req) {
+        const existeMovimentacao = await MovimentacaoModel.exists({ fornecedor: id, usuario: req.user_id });
         if (existeMovimentacao) {
             throw new CustomError({
                 statusCode: 400,
@@ -104,14 +104,14 @@ class FornecedorRepository {
             });
         };
 
-        const fornecedor = await this.model.findByIdAndDelete(id);
+        const fornecedor = await this.model.findOneAndDelete({ _id: id, usuario: req.user_id });
         return fornecedor;
     };
 
     // Métodos auxiliares.
 
-    async buscarPorNome(nome, idIgnorado) {
-        const filtro = { nome };
+    async buscarPorNome(nome, idIgnorado, req) {
+        const filtro = { nome, usuario: req.user_id };
 
         if (idIgnorado) {
             filtro._id = { $ne: idIgnorado };
@@ -122,12 +122,8 @@ class FornecedorRepository {
         return documento;
     };
 
-    async buscarPorId(id, includeTokens = false) {
-        let query = this.model.findById(id);
-
-        // if (includeTokens) {
-        //     query = query.select('+refreshtoken +accesstoken');
-        // };
+    async buscarPorId(id, includeTokens = false, req) {
+        let query = this.model.findOne({ _id: id, usuario: req.user_id });
 
         const fornecedor = await query;
 

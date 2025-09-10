@@ -36,12 +36,13 @@ describe('UsuarioService', () => {
 
     describe('criar', () => {
         it('deve criar usuário com senha criptografada', async () => {
+            const req = { user_id: 'user123' };
             repositoryMock.buscarPorEmail.mockResolvedValue(null);
             grupoRepositoryMock.buscarPorNome.mockResolvedValue(null);
             bcrypt.hash.mockResolvedValue('senha_criptografada');
             repositoryMock.criar.mockResolvedValue({ _id: '1', nome: 'Teste', email: 'a@a.com', senha: 'senha_criptografada', ativo: false });
             
-            const data = await service.criar({ nome: 'Teste', email: 'a@a.com', senha: '123' });
+            const data = await service.criar({ nome: 'Teste', email: 'a@a.com', senha: '123' }, req);
             
             expect(bcrypt.hash).toHaveBeenCalledWith('123', 10);
             expect(data.senha).toBe('senha_criptografada');
@@ -49,18 +50,22 @@ describe('UsuarioService', () => {
         });
 
         it('deve criar usuário sem senha quando não fornecida', async () => {
+            const req = { user_id: 'user123' };
             repositoryMock.buscarPorEmail.mockResolvedValue(null);
             grupoRepositoryMock.buscarPorNome.mockResolvedValue(null);
             repositoryMock.criar.mockResolvedValue({ _id: '1', nome: 'Teste', email: 'a@a.com', ativo: false });
-
+            
+            // Limpa mocks do bcrypt para não interferir de outros testes
             bcrypt.hash.mockClear();
             
-            const data = await service.criar({ nome: 'Teste', email: 'a@a.com', senha: null });
+            const data = await service.criar({ nome: 'Teste', email: 'a@a.com' }, req);
+            
             expect(bcrypt.hash).not.toHaveBeenCalled();
-            expect(data).toHaveProperty('_id');
+            expect(data).not.toHaveProperty('senha');
         });
 
         it('deve criar usuário quando senha é undefined', async () => {
+            const req = { user_id: 'user123' };
             repositoryMock.buscarPorEmail.mockResolvedValue(null);
             grupoRepositoryMock.buscarPorNome.mockResolvedValue(null);
             repositoryMock.criar.mockResolvedValue({ _id: '1', nome: 'Teste', email: 'a@a.com', ativo: false });
@@ -68,23 +73,25 @@ describe('UsuarioService', () => {
             bcrypt.hash.mockClear();
 
             const userData = { nome: 'Teste', email: 'a@a.com' };
-            const data = await service.criar(userData);
+            const data = await service.criar(userData, req);
             expect(bcrypt.hash).not.toHaveBeenCalled();
             expect(data).toHaveProperty('_id');
         });
 
         it('deve lançar erro se e-mail já existir', async () => {
+            const req = { user_id: 'user123' };
             repositoryMock.buscarPorEmail.mockResolvedValue({ _id: '1', email: 'a@a.com' });
             grupoRepositoryMock.buscarPorNome.mockResolvedValue(null);
-            await expect(service.criar({ nome: 'Teste', email: 'a@a.com', senha: '123' }))
+            await expect(service.criar({ nome: 'Teste', email: 'a@a.com', senha: '123' }, req))
                 .rejects.toThrow('Email já está em uso.');
         });
 
         it('deve lançar erro se bcrypt falhar', async () => {
+            const req = { user_id: 'user123' };
             repositoryMock.buscarPorEmail.mockResolvedValue(null);
             grupoRepositoryMock.buscarPorNome.mockResolvedValue(null);
             bcrypt.hash.mockRejectedValue(new Error('bcrypt error'));
-            await expect(service.criar({ nome: 'Teste', email: 'a@a.com', senha: '123' }))
+            await expect(service.criar({ nome: 'Teste', email: 'a@a.com', senha: '123' }, req))
                 .rejects.toThrow('bcrypt error');
         });
     });
@@ -99,33 +106,37 @@ describe('UsuarioService', () => {
 
     describe('atualizar', () => {
         it('deve atualizar usuário existente, exceto email e senha', async () => {
+            const req = { user_id: 'user123' };
             repositoryMock.buscarPorId.mockResolvedValue({ _id: '1', nome: 'Teste', email: 'a@a.com', senha: '123' });
             repositoryMock.atualizar.mockResolvedValue({ _id: '1', nome: 'Novo Nome', email: 'a@a.com', senha: '123' });
-            const data = await service.atualizar('1', { nome: 'Novo Nome', email: 'novo@a.com', senha: 'nova' });
-            expect(repositoryMock.atualizar).toHaveBeenCalledWith('1', { nome: 'Novo Nome' });
+            const data = await service.atualizar('1', { nome: 'Novo Nome', email: 'novo@a.com', senha: 'nova' }, req);
+            expect(repositoryMock.atualizar).toHaveBeenCalledWith('1', { nome: 'Novo Nome' }, 'user123');
             expect(data.nome).toBe('Novo Nome');
             expect(data.email).toBe('a@a.com');
         });
 
         it('deve lançar erro se usuário não existir', async () => {
+            const req = { user_id: 'user123' };
             repositoryMock.buscarPorId.mockResolvedValue(null);
-            await expect(service.atualizar('1', { nome: 'Novo' }))
+            await expect(service.atualizar('1', { nome: 'Novo' }, req))
                 .rejects.toThrow('Usuário não encontrado(a).');
         });
     });
 
     describe('deletar', () => {
         it('deve deletar usuário existente', async () => {
+            const req = { user_id: 'user123' };
             repositoryMock.buscarPorId.mockResolvedValue({ _id: '1' });
             repositoryMock.deletar.mockResolvedValue({ acknowledged: true, deletedCount: 1 });
-            const data = await service.deletar('1');
-            expect(repositoryMock.deletar).toHaveBeenCalledWith('1');
+            const data = await service.deletar('1', req);
+            expect(repositoryMock.deletar).toHaveBeenCalledWith('1', 'user123');
             expect(data).toEqual({ acknowledged: true, deletedCount: 1 });
         });
 
         it('deve lançar erro se usuário não existir', async () => {
+            const req = { user_id: 'user123' };
             repositoryMock.buscarPorId.mockResolvedValue(null);
-            await expect(service.deletar('1')).rejects.toThrow('Usuário não encontrado(a).');
+            await expect(service.deletar('1', req)).rejects.toThrow('Usuário não encontrado(a).');
         });
     });
 
@@ -154,22 +165,24 @@ describe('UsuarioService', () => {
 
     describe('unicidade de e-mail', () => {
         it('deve impedir cadastro de dois usuários com o mesmo e-mail', async () => {
+            const req = { user_id: 'user123' };
             repositoryMock.buscarPorEmail.mockResolvedValueOnce(null).mockResolvedValueOnce({ _id: '1', email: 'a@a.com' });
             grupoRepositoryMock.buscarPorNome.mockResolvedValue(null);
             bcrypt.hash.mockResolvedValue('senha_criptografada');
             repositoryMock.criar.mockResolvedValue({ _id: '1', nome: 'Teste', email: 'a@a.com', senha: 'senha_criptografada', ativo: false });
-            await service.criar({ nome: 'Teste', email: 'a@a.com', senha: '123' });
-            await expect(service.criar({ nome: 'Outro', email: 'a@a.com', senha: '456' }))
+            await service.criar({ nome: 'Teste', email: 'a@a.com', senha: '123' }, req);
+            await expect(service.criar({ nome: 'Outro', email: 'a@a.com', senha: '456' }, req))
                 .rejects.toThrow('Email já está em uso.');
         });
     });
 
     describe('proibição de update de email e senha', () => {
         it('deve ignorar alterações em email e senha no update', async () => {
+            const req = { user_id: 'user123' };
             repositoryMock.buscarPorId.mockResolvedValue({ _id: '1', nome: 'Teste', email: 'a@a.com', senha: '123' });
             repositoryMock.atualizar.mockResolvedValue({ _id: '1', nome: 'Novo Nome', email: 'a@a.com', senha: '123' });
-            const data = await service.atualizar('1', { nome: 'Novo Nome', email: 'novo@a.com', senha: 'nova' });
-            expect(repositoryMock.atualizar).toHaveBeenCalledWith('1', { nome: 'Novo Nome' });
+            const data = await service.atualizar('1', { nome: 'Novo Nome', email: 'novo@a.com', senha: 'nova' }, req);
+            expect(repositoryMock.atualizar).toHaveBeenCalledWith('1', { nome: 'Novo Nome' }, 'user123');
             expect(data.email).toBe('a@a.com');
             expect(data.senha).toBe('123');
         });
@@ -177,8 +190,9 @@ describe('UsuarioService', () => {
 
     describe('erro inesperado do repository', () => {
         it('deve lançar erro se o repository lançar exceção', async () => {
+            const req = { user_id: 'user123' };
             repositoryMock.buscarPorEmail.mockRejectedValue(new Error('erro repo'));
-            await expect(service.criar({ nome: 'Teste', email: 'a@a.com', senha: '123' }))
+            await expect(service.criar({ nome: 'Teste', email: 'a@a.com', senha: '123' }, req))
                 .rejects.toThrow('erro repo');
         });
     });

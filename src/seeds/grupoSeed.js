@@ -32,6 +32,18 @@ export default async function seedGrupos(rotas) {
                     excluir: false,
                 };
             }
+            else if(r.rota ==="grupos" || r.rota ==="grupos:id" || r.rota === "rotas" || r.rota ==="rotas:id"){
+                return {
+                    ...r.toObject(),
+                    _id: r._id,
+                    ativo: false,
+                    buscar: false,
+                    enviar: false,
+                    modificar: false,
+                    substituir: false,
+                    excluir: false
+                }
+            }
             return {
                 ...r.toObject(),
                 _id: r._id,

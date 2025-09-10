@@ -10,8 +10,8 @@ class LocalizacaoRepository {
         this.model = localizacaoModel;
     };
 
-    async criar(dadosLocalizacao) {
-        const localizacao = new this.model(dadosLocalizacao);
+    async criar(parsedData) {
+        const localizacao = new this.model(parsedData);
         return await localizacao.save();
     };
 
@@ -20,7 +20,7 @@ class LocalizacaoRepository {
 
         // Se um ID for fornecido, retorna a localização enriquecida com estatísticas.
         if (id) {
-            const data = await this.model.findById(id);
+            const data = await this.model.findOne({ _id: id, usuario: req.user_id });
 
             if (!data) {
                 throw new CustomError({
@@ -55,7 +55,7 @@ class LocalizacaoRepository {
             });
         };
 
-        const filtros = filterBuilder.build();
+        const filtros = { ...filterBuilder.build(), usuario: req.user_id };
 
         const options = {
             page: parseInt(page, 10),
@@ -77,8 +77,8 @@ class LocalizacaoRepository {
         return resultado;
     };
 
-    async atualizar(id, parsedData) {
-        const localizacao = await this.model.findByIdAndUpdate(id, parsedData, { new: true }).lean();
+    async atualizar(id, parsedData, req) {
+        const localizacao = await this.model.findOneAndUpdate({ _id: id, usuario: req.user_id }, parsedData, { new: true }).lean();
         if (!localizacao) {
             throw new CustomError({
                 statusCode: 404,
@@ -92,8 +92,8 @@ class LocalizacaoRepository {
         return localizacao;
     };
 
-    async deletar(id) {
-        const existeComponente = await ComponenteModel.exists({ localizacao: id });
+    async deletar(id, req) {
+        const existeComponente = await ComponenteModel.exists({ localizacao: id, usuario: req.user_id });
         if (existeComponente) {
             throw new CustomError({
                 statusCode: 400,
@@ -104,14 +104,14 @@ class LocalizacaoRepository {
             });
         };
 
-        const localizacao = await this.model.findByIdAndDelete(id);
+        const localizacao = await this.model.findOneAndDelete({ _id: id, usuario: req.user_id });
         return localizacao;
     };
 
     // Métodos auxiliares.
 
-    async buscarPorNome(nome, idIgnorado) {
-        const filtro = { nome };
+    async buscarPorNome(nome, idIgnorado, req) {
+        const filtro = { nome, usuario: req.user_id };
 
         if (idIgnorado) {
             filtro._id = { $ne: idIgnorado };
@@ -122,12 +122,8 @@ class LocalizacaoRepository {
         return documento;
     };
 
-    async buscarPorId(id, includeTokens = false) {
-        let query = this.model.findById(id);
-
-        // if (includeTokens) {
-        //     query = query.select('+refreshtoken +accesstoken');
-        // }
+    async buscarPorId(id, includeTokens = false, req) {
+        let query = this.model.findOne({ _id: id, usuario: req.user_id });
 
         const localizacao = await query;
 

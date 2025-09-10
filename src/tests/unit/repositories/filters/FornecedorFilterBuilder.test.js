@@ -38,27 +38,19 @@ describe('FornecedorFilterBuilder', () => {
             expect(resultado).toBe(fornecedorFilterBuilder);
         });
 
-        test('não deve adicionar filtro quando nome é undefined', () => {
-            const resultado = fornecedorFilterBuilder.comNome(undefined);
 
-            expect(fornecedorFilterBuilder.filtros.nome).toBeUndefined();
-
-            expect(resultado).toBe(fornecedorFilterBuilder);
+        test('não deve adicionar filtro para valores inválidos (undefined, null)', () => {
+            [undefined, null].forEach(valor => {
+                fornecedorFilterBuilder.filtros = {}; // Reset
+                const resultado = fornecedorFilterBuilder.comNome(valor);
+                expect(fornecedorFilterBuilder.filtros.nome).toBeUndefined();
+                expect(resultado).toBe(fornecedorFilterBuilder);
+            });
         });
 
-        test('não deve adicionar filtro quando nome é null', () => {
-            const resultado = fornecedorFilterBuilder.comNome(null);
-
-            expect(fornecedorFilterBuilder.filtros.nome).toBeUndefined();
-
-            expect(resultado).toBe(fornecedorFilterBuilder);
-        });
-
-        test('não deve adicionar filtro quando nome é string vazia', () => {
+        test('deve tratar string vazia como filtro válido', () => {
             const resultado = fornecedorFilterBuilder.comNome('');
-
             expect(fornecedorFilterBuilder.filtros.nome).toEqual({ $regex: '', $options: 'i' });
-
             expect(resultado).toBe(fornecedorFilterBuilder);
         });
     });

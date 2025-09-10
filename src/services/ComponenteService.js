@@ -8,11 +8,12 @@ class ComponenteService {
         this.repository = new ComponenteRepository();
     };
 
-    async criar(parsedData) {
-        await this.validateNome(parsedData.nome);
-        await this.validateLocalizacao(parsedData.localizacao);
-        await this.validateCategoria(parsedData.categoria);
+    async criar(parsedData, req) {
+        await this.validateNome(parsedData.nome, null, req);
+        await this.validateLocalizacao(parsedData.localizacao, req);
+        await this.validateCategoria(parsedData.categoria, req);
 
+        parsedData.usuario = req.user_id;
         const data = await this.repository.criar(parsedData);
 
         return data;
@@ -24,29 +25,29 @@ class ComponenteService {
         return data;
     };
 
-    async atualizar(id, parsedData) {
-        await this.ensureComponentExists(id);
-        await this.validateNome(parsedData.nome)
+    async atualizar(id, parsedData, req) {
+        await this.ensureComponentExists(id, req);
+        await this.validateNome(parsedData.nome, id, req);
 
         delete parsedData.quantidade;
 
-        const data = await this.repository.atualizar(id, parsedData);
+        const data = await this.repository.atualizar(id, parsedData, req);
 
         return data;
     };
 
-    async deletar(id) {
-        await this.ensureComponentExists(id);
+    async deletar(id, req) {
+        await this.ensureComponentExists(id, req);
 
-        const data = await this.repository.deletar(id);
+        const data = await this.repository.deletar(id, req);
 
         return data;
     };
 
     // Métodos auxiliares.
 
-    async validateNome(nome, id = null) {
-        const componenteExistente = await this.repository.buscarPorNome(nome, id);
+    async validateNome(nome, id = null, req) {
+        const componenteExistente = await this.repository.buscarPorNome(nome, id, req);
         if (componenteExistente) {
             throw new CustomError({
                 statusCode: HttpStatusCodes.BAD_REQUEST.code,
@@ -58,8 +59,8 @@ class ComponenteService {
         };
     };
 
-    async ensureComponentExists(id) {
-        const componenteExistente = await this.repository.buscarPorId(id);
+    async ensureComponentExists(id, req) {
+        const componenteExistente = await this.repository.buscarPorId(id, false, req);
         if (!componenteExistente) {
             throw new CustomError({
                 statusCode: 404,
@@ -73,8 +74,8 @@ class ComponenteService {
         return componenteExistente;
     };
 
-    async validateLocalizacao(localizacaoId) {
-        const localizacao = await LocalizacaoModel.findById(localizacaoId);
+    async validateLocalizacao(localizacaoId, req) {
+        const localizacao = await LocalizacaoModel.findOne({ _id: localizacaoId, usuario: req.user_id });
         if (!localizacao) {
             throw new CustomError({
                 statusCode: HttpStatusCodes.BAD_REQUEST.code,
@@ -86,8 +87,8 @@ class ComponenteService {
         };
     };
 
-    async validateCategoria(categoriaId) {
-        const categoria = await CategoriaModel.findById(categoriaId);
+    async validateCategoria(categoriaId, req) {
+        const categoria = await CategoriaModel.findOne({ _id: categoriaId, usuario: req.user_id });
         if (!categoria) {
             throw new CustomError({
                 statusCode: HttpStatusCodes.BAD_REQUEST.code,

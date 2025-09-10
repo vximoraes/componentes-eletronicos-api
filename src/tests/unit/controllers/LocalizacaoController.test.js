@@ -34,7 +34,7 @@ describe('LocalizacaoController', () => {
             await controller.criar(req, res);
 
             expect(LocalizacaoSchema.parse).toHaveBeenCalledWith(req.body);
-            expect(serviceMock.criar).toHaveBeenCalledWith({ nome: 'Prateleira A' });
+            expect(serviceMock.criar).toHaveBeenCalledWith({ nome: 'Prateleira A' }, req);
             expect(CommonResponse.created).toHaveBeenCalledWith(res, { nome: 'Prateleira A', _id: '1' });
         });
 
@@ -111,7 +111,7 @@ describe('LocalizacaoController', () => {
 
             expect(LocalizacaoIdSchema.parse).toHaveBeenCalledWith('1');
             expect(LocalizacaoUpdateSchema.parse).toHaveBeenCalledWith(req.body);
-            expect(serviceMock.atualizar).toHaveBeenCalledWith('1', { nome: 'Prateleira B' });
+            expect(serviceMock.atualizar).toHaveBeenCalledWith('1', { nome: 'Prateleira B' }, req);
             expect(CommonResponse.success).toHaveBeenCalledWith(
                 res,
                 { nome: 'Prateleira B' },
@@ -161,7 +161,7 @@ describe('LocalizacaoController', () => {
             await controller.deletar(req, res);
 
             expect(LocalizacaoIdSchema.parse).toHaveBeenCalledWith('1');
-            expect(serviceMock.deletar).toHaveBeenCalledWith('1');
+            expect(serviceMock.deletar).toHaveBeenCalledWith('1', req);
             expect(CommonResponse.success).toHaveBeenCalledWith(res, { nome: 'Prateleira A' }, 200, 'Localização excluída com sucesso.');
         });
 

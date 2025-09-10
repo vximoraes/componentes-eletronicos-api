@@ -34,7 +34,7 @@ describe('CategoriaController', () => {
             await controller.criar(req, res);
 
             expect(CategoriaSchema.parse).toHaveBeenCalledWith(req.body);
-            expect(serviceMock.criar).toHaveBeenCalledWith({ nome: 'Nova Categoria' });
+            expect(serviceMock.criar).toHaveBeenCalledWith({ nome: 'Nova Categoria' }, req);
             expect(CommonResponse.created).toHaveBeenCalledWith(res, { nome: 'Nova Categoria', _id: '1' });
         });
 
@@ -87,7 +87,7 @@ describe('CategoriaController', () => {
 
             expect(CategoriaIdSchema.parse).toHaveBeenCalledWith('1');
             expect(CategoriaUpdateSchema.parse).toHaveBeenCalledWith(req.body);
-            expect(serviceMock.atualizar).toHaveBeenCalledWith('1', { nome: 'Atualizada' });
+            expect(serviceMock.atualizar).toHaveBeenCalledWith('1', { nome: 'Atualizada' }, req);
             expect(CommonResponse.success).toHaveBeenCalledWith(res, { nome: 'Atualizada' }, 200, 'Categoria atualizada com sucesso.');
         });
 
@@ -116,7 +116,7 @@ describe('CategoriaController', () => {
             await controller.deletar(req, res);
 
             expect(CategoriaIdSchema.parse).toHaveBeenCalledWith('1');
-            expect(serviceMock.deletar).toHaveBeenCalledWith('1');
+            expect(serviceMock.deletar).toHaveBeenCalledWith('1', req);
             expect(CommonResponse.success).toHaveBeenCalledWith(res, { nome: 'Removida' }, 200, 'Categoria excluída com sucesso.');
         });
 

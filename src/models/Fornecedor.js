@@ -10,6 +10,11 @@ class Fornecedor {
                 unique: true,
                 required: true
             },
+            usuario: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'usuarios',
+                required: true
+            }
         });
 
         fornecedorSchema.plugin(mongoosePaginate);

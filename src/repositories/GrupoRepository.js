@@ -116,7 +116,6 @@ class GrupoRepository {
      */
     async listar(req) {
         try {
-            console.log('Estou no listar em GrupoRepository');
             const id = req.params.id || null;
 
             if (id) {
@@ -303,7 +302,29 @@ class GrupoRepository {
             });
         }
     }
-
+    async adiciotarRota(id, rota) {
+        try{
+            const grupo = await this.model.findById(id)
+            grupo.permissoes.push(rota)
+            const data = await grupo.save()
+            console.log("aqui")
+            return data
+        }catch (error){
+            console.error('Erro ao adicionar rota:', error);
+            // Verificar se o erro já possui uma propriedade 'statusCode'
+            if (error.statusCode) {
+                throw error;
+            }
+            // Caso contrário, lançar um erro interno do servidor
+            throw new this.customError({
+                statusCode: 500,
+                errorType: 'internalServerError',
+                field: 'Grupo',
+                details: [],
+                customMessage: messages.error.internalServerError('Grupo')
+            });
+        }
+    }
 
 }
 
