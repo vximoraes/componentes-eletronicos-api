@@ -112,24 +112,24 @@ describe('ComponenteController', () => {
         });
     });
 
-    describe('deletar', () => {
-        it('deve deletar componente existente', async () => {
+    describe('inativar', () => {
+        it('deve inativar componente existente', async () => {
             req.params = { id: '1' };
             ComponenteIdSchema.parse.mockReturnValue('1');
-            serviceMock.deletar.mockResolvedValue({ nome: 'Removido' });
+            serviceMock.inativar.mockResolvedValue({ nome: 'Componente', ativo: false });
 
-            await controller.deletar(req, res);
+            await controller.inativar(req, res);
 
             expect(ComponenteIdSchema.parse).toHaveBeenCalledWith('1');
-            expect(serviceMock.deletar).toHaveBeenCalledWith('1', req);
-            expect(CommonResponse.success).toHaveBeenCalledWith(res, { nome: 'Removido' }, 200, 'Componente excluído com sucesso.');
+            expect(serviceMock.inativar).toHaveBeenCalledWith('1', req);
+            expect(CommonResponse.success).toHaveBeenCalledWith(res, { nome: 'Componente', ativo: false }, 200, 'Componente inativado com sucesso.');
         });
 
-        it('deve retornar erro 404 ao tentar deletar componente inexistente', async () => {
+        it('deve retornar erro 404 ao tentar inativar componente inexistente', async () => {
             req.params = { id: '1' };
             ComponenteIdSchema.parse.mockReturnValue('1');
-            serviceMock.deletar.mockRejectedValue({ status: 404 });
-            await expect(controller.deletar(req, res)).rejects.toEqual(expect.objectContaining({ status: 404 }));
+            serviceMock.inativar.mockRejectedValue({ status: 404 });
+            await expect(controller.inativar(req, res)).rejects.toEqual(expect.objectContaining({ status: 404 }));
         });
     });
 

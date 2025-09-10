@@ -53,7 +53,8 @@ describe('Modelo de Componente', () => {
             estoque_minimo: 10,
             valor_unitario: 0.25,
             localizacao: new mongoose.Types.ObjectId(),
-            categoria: new mongoose.Types.ObjectId()
+            categoria: new mongoose.Types.ObjectId(),
+            usuario: new mongoose.Types.ObjectId()
         };
         const componente = new Componente(componenteData);
         await componente.save();
@@ -69,6 +70,7 @@ describe('Modelo de Componente', () => {
             descricao: 'Capacitor de 100nF',
             localizacao: new mongoose.Types.ObjectId(),
             categoria: new mongoose.Types.ObjectId(),
+            usuario: new mongoose.Types.ObjectId(),
             status: 'Baixo Estoque'
         };
         const componente = new Componente(componenteData);
