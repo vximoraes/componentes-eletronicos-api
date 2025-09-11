@@ -39,4 +39,4 @@ const upload = multer({storage, limits: {
         }
     }
 })
-export default upload.single('single')
+export default upload
