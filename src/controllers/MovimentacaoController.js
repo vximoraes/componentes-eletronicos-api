@@ -10,7 +10,7 @@ class MovimentacaoController {
 
     async criar(req, res) {
         const parsedData = MovimentacaoSchema.parse(req.body);
-        let data = await this.service.criar(parsedData);
+        let data = await this.service.criar(parsedData, req);
 
         let movimentacaoLimpa = data.toObject();
 

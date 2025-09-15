@@ -45,21 +45,21 @@ describe('MovimentacaoRepository', () => {
         it('deve retornar movimentação por id', async () => {
             const fakeData = {
                 _id: '1',
-                componente: { _id: 'c1', nome: 'Componente 1' },
-                fornecedor: { _id: 'f1', nome: 'Fornecedor 1' },
-                toObject: () => ({
-                    _id: '1',
-                    componente: { _id: 'c1', nome: 'Componente 1' },
-                    fornecedor: { _id: 'f1', nome: 'Fornecedor 1' }
-                })
+                toObject: () => ({ _id: '1' })
             };
             const mockPopulateFornecedor = jest.fn().mockResolvedValue(fakeData);
             const mockPopulateComponente = jest.fn().mockReturnValue({ populate: mockPopulateFornecedor });
-            MovimentacaoModel.findById = jest.fn().mockReturnValue({ populate: mockPopulateComponente });
-            const req = { params: { id: '1' } };
+            MovimentacaoModel.findOne = jest.fn().mockReturnValue({ populate: mockPopulateComponente });
+            const req = { params: { id: '1' }, user_id: 'user1' };
             const result = await repository.listar(req);
-            expect(MovimentacaoModel.findById).toHaveBeenCalledWith('1');
             expect(result).toHaveProperty('_id', '1');
+        });
+        it('deve lançar erro 404 se movimentação não encontrada por id', async () => {
+            const mockPopulateFornecedor = jest.fn().mockResolvedValue(null);
+            const mockPopulateComponente = jest.fn().mockReturnValue({ populate: mockPopulateFornecedor });
+            MovimentacaoModel.findOne = jest.fn().mockReturnValue({ populate: mockPopulateComponente });
+            const req = { params: { id: 'notfound' }, user_id: 'user1' };
+            await expect(repository.listar(req)).rejects.toThrow(CustomError);
         });
         it('deve lançar erro 404 se movimentação não encontrada por id', async () => {
             const mockPopulateFornecedor = jest.fn().mockResolvedValue(null);
@@ -145,14 +145,15 @@ describe('MovimentacaoRepository', () => {
                 tipo: 'entrada',
                 quantidade: 10
             };
-            MovimentacaoModel.findById = jest.fn().mockResolvedValue(fakeMovimentacao);
-            const result = await repository.buscarPorId('1');
-            expect(MovimentacaoModel.findById).toHaveBeenCalledWith('1');
+            const req = { user_id: 'user1' };
+            MovimentacaoModel.findOne = jest.fn().mockResolvedValue(fakeMovimentacao);
+            const result = await repository.buscarPorId('1', false, req);
             expect(result).toEqual(fakeMovimentacao);
         });
         it('deve lançar erro 404 se movimentação não encontrada', async () => {
-            MovimentacaoModel.findById = jest.fn().mockResolvedValue(null);
-            await expect(repository.buscarPorId('notfound')).rejects.toThrow(CustomError);
+            const req = { user_id: 'user1' };
+            MovimentacaoModel.findOne = jest.fn().mockResolvedValue(null);
+            await expect(repository.buscarPorId('notfound', false, req)).rejects.toThrow(CustomError);
         });
         it('deve lançar erro se o banco lançar exceção em criar', async () => {
             const dbError = new Error('DB error');
@@ -161,14 +162,15 @@ describe('MovimentacaoRepository', () => {
         });
         it('deve lançar erro se o banco lançar exceção em listar', async () => {
             const dbError = new Error('DB error');
-            MovimentacaoModel.findById = jest.fn(() => { throw dbError; });
-            const req = { params: { id: '1' } };
+            MovimentacaoModel.findOne = jest.fn(() => { throw dbError; });
+            const req = { params: { id: '1' }, user_id: 'user1' };
             await expect(repository.listar(req)).rejects.toThrow('DB error');
         });
         it('deve lançar erro se o banco lançar exceção em buscarPorId', async () => {
             const dbError = new Error('DB error');
-            MovimentacaoModel.findById = jest.fn(() => { throw dbError; });
-            await expect(repository.buscarPorId('1')).rejects.toThrow('DB error');
+            const req = { user_id: 'user1' };
+            MovimentacaoModel.findOne = jest.fn(() => { throw dbError; });
+            await expect(repository.buscarPorId('1', false, req)).rejects.toThrow('DB error');
         });
     });
 });

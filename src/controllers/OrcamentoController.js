@@ -36,7 +36,7 @@ class OrcamentoController {
             componentes
         };
 
-        let data = await this.service.criar(orcamentoParaSalvar);
+        let data = await this.service.criar(orcamentoParaSalvar, req);
         let orcamentoLimpo = data.toObject();
 
         return CommonResponse.created(res, orcamentoLimpo);
@@ -67,7 +67,7 @@ class OrcamentoController {
         }
 
         const parsedData = OrcamentoUpdateSchema.parse(req.body);
-        const orcamentoAtualizado = await this.service.atualizar(id, parsedData);
+        const orcamentoAtualizado = await this.service.atualizar(id, parsedData, req);
 
         return CommonResponse.success(res, orcamentoAtualizado, 200, 'Orçamento atualizado com sucesso.');
     };
@@ -75,7 +75,7 @@ class OrcamentoController {
     async deletar(req, res) {
         const { id } = req.params || {};
         OrcamentoIdSchema.parse(id);
-        const data = await this.service.deletar(id);
+        const data = await this.service.deletar(id, req);
         return CommonResponse.success(res, data, 200, 'Orçamento excluído com sucesso.');
     };
 
@@ -94,7 +94,7 @@ class OrcamentoController {
             subtotal,
             _id: new mongoose.Types.ObjectId()
         };
-        const orcamentoAtualizado = await this.service.adicionarComponente(orcamentoId, novoComponente);
+        const orcamentoAtualizado = await this.service.adicionarComponente(orcamentoId, novoComponente, req);
         return CommonResponse.success(res, orcamentoAtualizado, 200, 'Componente adicionado com sucesso.');
     };
 
@@ -106,8 +106,13 @@ class OrcamentoController {
         };
         const parsedComponente = ComponenteOrcamentoUpdateSchema.parse(componenteData);
 
+<<<<<<< HEAD
         // valores antigos para garantir subtotal correto
         const oldComponente = await this.service.getComponenteById(orcamentoId, id);
+=======
+        // Buscar valores antigos para garantir subtotal correto
+        const oldComponente = await this.service.getComponenteById(orcamentoId, id, req);
+>>>>>>> b4d02c85d2f618e669503a6507114fa9946ed682
         if (!oldComponente) {
             return CommonResponse.error(res, 404, 'resourceNotFound', 'componente', [{ message: 'Componente não encontrado.' }]);
         };
@@ -129,13 +134,13 @@ class OrcamentoController {
         componenteAtualizado.valor_unitario = valor_unitario;
         componenteAtualizado.subtotal = quantidade * valor_unitario;
 
-        const orcamentoAtualizado = await this.service.atualizarComponente(orcamentoId, id, componenteAtualizado);
+        const orcamentoAtualizado = await this.service.atualizarComponente(orcamentoId, id, componenteAtualizado, req);
         return CommonResponse.success(res, orcamentoAtualizado, 200, 'Componente atualizado com sucesso.');
     };
 
     async removerComponente(req, res) {
         const { orcamentoId, id } = req.params;
-        const orcamentoAtualizado = await this.service.removerComponente(orcamentoId, id);
+        const orcamentoAtualizado = await this.service.removerComponente(orcamentoId, id, req);
         return CommonResponse.success(res, orcamentoAtualizado, 200, 'Componente removido com sucesso.');
     };
 };

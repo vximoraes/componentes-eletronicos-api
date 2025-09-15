@@ -8,6 +8,7 @@ const NotificacaoSchema = z.object({
         .max(500, 'A mensagem deve ter no máximo 500 caracteres.'),
     usuario: z
         .string()
+        .optional()
         .refine((id) => !id || mongoose.Types.ObjectId.isValid(id), {
             message: "ID de usuário inválido",
         }),

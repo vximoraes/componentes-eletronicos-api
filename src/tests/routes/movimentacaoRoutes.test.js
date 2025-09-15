@@ -112,7 +112,7 @@ describe('Rotas de Movimentação', () => {
             expect(res.body.data).toHaveProperty('_id');
             expect(res.body.data._id).toBeTruthy();
             movimentacaoId = res.body.data._id;
-        }, 30000);
+        });
         it('deve falhar ao cadastrar sem campos obrigatórios', async () => {
             const res = await request(BASE_URL).post('/movimentacoes').set('Authorization', `Bearer ${token}`).send({});
             expect([400, 422]).toContain(res.status);
@@ -121,12 +121,12 @@ describe('Rotas de Movimentação', () => {
             const dados = await criarMovimentacaoValida('entrada', { fornecedor: undefined });
             const res = await request(BASE_URL).post('/movimentacoes').set('Authorization', `Bearer ${token}`).send(dados);
             expect([400, 422]).toContain(res.status);
-        }, 30000);
+        });
         it('deve falhar ao cadastrar com fornecedor inexistente', async () => {
             const dados = await criarMovimentacaoValida('entrada', { fornecedor: new mongoose.Types.ObjectId() });
             const res = await request(BASE_URL).post('/movimentacoes').set('Authorization', `Bearer ${token}`).send(dados);
             expect([400, 404, 422]).toContain(res.status);
-        }, 30000);
+        });
     });
 
     describe('GET /movimentacoes', () => {
@@ -143,7 +143,7 @@ describe('Rotas de Movimentação', () => {
             }
             expect(Array.isArray(lista)).toBe(true);
             expect(lista.length).toBeGreaterThan(0);
-        }, 30000);
+        });
     });
     describe('GET /movimentacoes/:id', () => {
         it('deve retornar movimentação por id', async () => {
@@ -154,7 +154,7 @@ describe('Rotas de Movimentação', () => {
             const res = await request(BASE_URL).get(`/movimentacoes/${id}`).set('Authorization', `Bearer ${token}`);
             expect([200, 201]).toContain(res.status);
             expect(res.body.data).toHaveProperty('_id', id);
-        }, 30000);
+        });
         it('deve retornar 404 para movimentação inexistente', async () => {
             const id = new mongoose.Types.ObjectId();
             const res = await request(BASE_URL).get(`/movimentacoes/${id}`).set('Authorization', `Bearer ${token}`);

@@ -10,6 +10,11 @@ class Localizacao {
                 unique: true,
                 required: true
             },
+            usuario: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'usuarios',
+                required: true
+            }
         });
 
         localizacaoSchema.plugin(mongoosePaginate);

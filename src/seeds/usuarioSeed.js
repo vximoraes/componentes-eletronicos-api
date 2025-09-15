@@ -39,7 +39,7 @@ export default async function usuarioSeed() {
         senha: await bcrypt.hash('Senha@123', 10),
         ativo: true,
         permissoes: rotasCompletas.map(r => r.toObject()),
-        grupos: grupos.map((g) => g._id),
+        grupos: grupos[0],
     };
 
     usuarios.push(admin);

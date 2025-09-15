@@ -36,6 +36,10 @@ class Usuario {
                 type: String,
                 select: false
             },
+            grupos:[{
+                type:mongoose.Schema.Types.ObjectId,
+                ref: 'grupos'
+            }],
             permissoes: [
                 {
                     rota: { type: String, index: true, required: true }, // usuários / grupos / unidades / rotas

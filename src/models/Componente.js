@@ -44,6 +44,11 @@ class Componente {
                 type: Boolean,
                 default: true
             },
+            usuario: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'usuarios',
+                required: true
+            }
         });
 
         componenteSchema.plugin(mongoosePaginate);

@@ -9,8 +9,8 @@ class MovimentacaoRepository {
         this.model = movimentacaoModel;
     };
 
-    async criar(dadosMovimentacao) {
-        const movimentacao = new this.model(dadosMovimentacao);
+    async criar(parsedData) {
+        const movimentacao = new this.model(parsedData);
         const movimentacaoSalva = await movimentacao.save();
         return await this.model.findById(movimentacaoSalva._id)
             .populate('componente')
@@ -22,7 +22,7 @@ class MovimentacaoRepository {
 
         // Se um ID for fornecido, retorna a movimentação enriquecida com estatísticas.
         if (id) {
-            const data = await this.model.findById(id)
+            const data = await this.model.findOne({ _id: id, usuario: req.user_id })
                 .populate('componente')
                 .populate('fornecedor');
 
@@ -64,7 +64,7 @@ class MovimentacaoRepository {
             });
         };
 
-        const filtros = filterBuilder.build();
+        const filtros = { ...filterBuilder.build(), usuario: req.user_id };
 
         const options = {
             page: parseInt(page),
@@ -92,8 +92,8 @@ class MovimentacaoRepository {
 
     // Métodos auxiliares.
 
-    async buscarPorId(id, includeTokens = false) {
-        let query = this.model.findById(id);
+    async buscarPorId(id, includeTokens = false, req) {
+        let query = this.model.findOne({ _id: id, usuario: req.user_id });
 
         const movimentacao = await query;
 

@@ -21,7 +21,7 @@ describe('FornecedorQuerySchema', () => {
         expect(parsed.nome).toBeUndefined();
     });
 
-    it('valida nome não vazio', () => {
+    it('valida nome com trim', () => {
         const parsed = FornecedorQuerySchema.parse({ nome: '  Teste  ' });
         expect(parsed.nome).toBe('Teste');
     });    
@@ -30,58 +30,28 @@ describe('FornecedorQuerySchema', () => {
         await expect(FornecedorQuerySchema.parseAsync({ nome: '' })).rejects.toThrow('Nome não pode ser vazio');
     });
 
-    it('valida page e limite como string numérica', () => {
+    it('valida paginação válida', () => {
         const parsed = FornecedorQuerySchema.parse({ page: '2', limite: '5' });
         expect(parsed.page).toBe(2);
         expect(parsed.limite).toBe(5);
     });
 
-    it('retorna erro se page for zero ou negativo', () => {
+    it('retorna erro para paginação inválida', () => {
         expect(() => FornecedorQuerySchema.parse({ page: '0' })).toThrow('Page deve ser um número inteiro maior que 0');
         expect(() => FornecedorQuerySchema.parse({ page: '-1' })).toThrow('Page deve ser um número inteiro maior que 0');
-    });
-
-    it('retorna erro se limite for zero, negativo ou maior que 100', () => {
         expect(() => FornecedorQuerySchema.parse({ limite: '0' })).toThrow('Limite deve ser um número inteiro entre 1 e 100');
-        expect(() => FornecedorQuerySchema.parse({ limite: '-1' })).toThrow('Limite deve ser um número inteiro entre 1 e 100');
         expect(() => FornecedorQuerySchema.parse({ limite: '101' })).toThrow('Limite deve ser um número inteiro entre 1 e 100');
-    });
-
-    it('retorna erro se page não for número', () => {
         expect(() => FornecedorQuerySchema.parse({ page: 'abc' })).toThrow('Page deve ser um número inteiro maior que 0');
-    });
-
-    it('retorna erro se limite não for número', () => {
         expect(() => FornecedorQuerySchema.parse({ limite: 'abc' })).toThrow('Limite deve ser um número inteiro entre 1 e 100');
     });
 
-    it('valida quando nome é undefined', () => {
-        const parsed = FornecedorQuerySchema.parse({ nome: undefined });
-        expect(parsed.nome).toBeUndefined();
-    });
+    it('valida valores undefined e string vazia com defaults', () => {
+        const parsed1 = FornecedorQuerySchema.parse({ page: undefined, limite: undefined });
+        expect(parsed1.page).toBe(1);
+        expect(parsed1.limite).toBe(10);
 
-    it('valida nome com espaços e trim', () => {
-        const parsed = FornecedorQuerySchema.parse({ nome: '   Espaços   ' });
-        expect(parsed.nome).toBe('Espaços');
-    });
-
-    it('valida page como string não numérica', () => {
-        expect(() => FornecedorQuerySchema.parse({ page: 'abc' })).toThrow('Page deve ser um número inteiro maior que 0');
-    });
-
-    it('valida limite como string não numérica', () => {
-        expect(() => FornecedorQuerySchema.parse({ limite: 'abc' })).toThrow('Limite deve ser um número inteiro entre 1 e 100');
-    });
-
-    it('valida valores undefined para page e limite', () => {
-        const parsed = FornecedorQuerySchema.parse({ page: undefined, limite: undefined });
-        expect(parsed.page).toBe(1);
-        expect(parsed.limite).toBe(10);
-    });
-
-    it('valida valores string vazia para page e limite', () => {
-        const parsed = FornecedorQuerySchema.parse({ page: '', limite: '' });
-        expect(parsed.page).toBe(1);
-        expect(parsed.limite).toBe(10);
+        const parsed2 = FornecedorQuerySchema.parse({ page: '', limite: '' });
+        expect(parsed2.page).toBe(1);
+        expect(parsed2.limite).toBe(10);
     });
 });

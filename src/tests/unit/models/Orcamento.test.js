@@ -25,6 +25,7 @@ describe('Model Orcamento', () => {
             nome: 'Orçamento 1',
             protocolo: 'PROTO-001',
             valor: 100,
+            usuario: new mongoose.Types.ObjectId(),
             componentes: [{
                 nome: 'Resistor',
                 fornecedor: 'Fornecedor A',
@@ -39,15 +40,17 @@ describe('Model Orcamento', () => {
     });
 
     it('não deve cadastrar orçamento sem campos obrigatórios', async () => {
-        await expect(Orcamento.create({ nome: 'Sem Protocolo' }))
+        await expect(Orcamento.create({ nome: 'Sem Protocolo', usuario: new mongoose.Types.ObjectId() }))
             .rejects.toThrow();
     });
 
     it('não deve permitir protocolo duplicado', async () => {
+        const userId = new mongoose.Types.ObjectId();
         await Orcamento.create({
             nome: 'Orçamento 1',
             protocolo: 'PROTO-002',
             valor: 50,
+            usuario: userId,
             componentes: [{
                 nome: 'Capacitor',
                 fornecedor: 'Fornecedor B',
@@ -60,6 +63,7 @@ describe('Model Orcamento', () => {
             nome: 'Orçamento 2',
             protocolo: 'PROTO-002',
             valor: 30,
+            usuario: userId,
             componentes: [{
                 nome: 'Diodo',
                 fornecedor: 'Fornecedor C',
@@ -75,6 +79,7 @@ describe('Model Orcamento', () => {
             nome: 'Orçamento Soma',
             protocolo: 'PROTO-003',
             valor: 60,
+            usuario: new mongoose.Types.ObjectId(),
             componentes: [
                 { nome: 'A', fornecedor: 'F1', quantidade: 2, valor_unitario: 10, subtotal: 20 },
                 { nome: 'B', fornecedor: 'F2', quantidade: 4, valor_unitario: 10, subtotal: 40 },
@@ -89,6 +94,7 @@ describe('Model Orcamento', () => {
             nome: 'BuscaNome',
             protocolo: 'PROTO-004',
             valor: 10,
+            usuario: new mongoose.Types.ObjectId(),
             componentes: [{ nome: 'X', fornecedor: 'F', quantidade: 1, valor_unitario: 10, subtotal: 10 }],
         });
         const found = await Orcamento.findOne({ nome: 'BuscaNome' });
@@ -101,6 +107,7 @@ describe('Model Orcamento', () => {
             nome: 'BuscaId',
             protocolo: 'PROTO-005',
             valor: 20,
+            usuario: new mongoose.Types.ObjectId(),
             componentes: [{ nome: 'Y', fornecedor: 'F', quantidade: 2, valor_unitario: 10, subtotal: 20 }],
         });
         const found = await Orcamento.findById(orcamento._id);
@@ -113,6 +120,7 @@ describe('Model Orcamento', () => {
             nome: 'Atualiza',
             protocolo: 'PROTO-006',
             valor: 10,
+            usuario: new mongoose.Types.ObjectId(),
             componentes: [{ nome: 'Z', fornecedor: 'F', quantidade: 1, valor_unitario: 10, subtotal: 10 }],
         });
         orcamento.nome = 'Atualizado';
@@ -126,6 +134,7 @@ describe('Model Orcamento', () => {
             nome: 'Remove',
             protocolo: 'PROTO-007',
             valor: 10,
+            usuario: new mongoose.Types.ObjectId(),
             componentes: [{ nome: 'W', fornecedor: 'F', quantidade: 1, valor_unitario: 10, subtotal: 10 }],
         });
         await Orcamento.findByIdAndDelete(orcamento._id);
@@ -138,6 +147,7 @@ describe('Model Orcamento', () => {
             nome: 'AddComp',
             protocolo: 'PROTO-008',
             valor: 10,
+            usuario: new mongoose.Types.ObjectId(),
             componentes: [{ nome: 'V', fornecedor: 'F', quantidade: 1, valor_unitario: 10, subtotal: 10 }],
         });
         orcamento.componentes.push({ nome: 'Novo', fornecedor: 'F2', quantidade: 2, valor_unitario: 5, subtotal: 10 });
@@ -153,6 +163,7 @@ describe('Model Orcamento', () => {
             nome: 'SemComp',
             protocolo: 'PROTO-009',
             valor: 0,
+            usuario: new mongoose.Types.ObjectId(),
             componentes: [{ nome: 'Invalido' }],
         })).rejects.toThrow();
     });

@@ -2,20 +2,13 @@
 
 import RotaModel from '../models/Rota.js';
 import RotaFilterBuilder from './filters/RotaFilterBuilder.js';
-import GrupoModel from '../models/Grupo.js';
-import UnidadeModel from '../models/Unidade.js';
-import UsuarioModel from '../models/Usuario.js';
 import { CustomError, messages } from '../utils/helpers/index.js';
 
 class RotaRepository {
     constructor({
         rotaModel = RotaModel,
-        grupoModel = GrupoModel,
-        unidadeModel = UnidadeModel,
     } = {}) {
         this.model = rotaModel;
-        this.grupoModel = grupoModel;
-        this.unidadeModel = unidadeModel;
     }
 
     /**
@@ -24,24 +17,23 @@ class RotaRepository {
  * cujo listar não atende por exigir req.
  */
     async buscarPorId(id) {
-        const group = await this.model.findById(id);
-        if (!group) {
+        const rota = await this.model.findById(id);
+        if (!rota) {
             throw new CustomError({
                 statusCode: 404,
                 errorType: 'resourceNotFound',
-                field: 'Grupo',
+                field: 'Rota',
                 details: [],
-                customMessage: messages.error.resourceNotFound('Grupo')
+                customMessage: messages.error.resourceNotFound('Rota')
             });
         }
-        return group;
+        return rota;
     }
 
     /**
      * Método para listar rotas no banco de dados.
      */
     async listar(req) {
-        console.log('Estou no listar em RotaRepository');
         const id = req?.params?.id || null;
 
         // Se um ID foi fornecido, retornar a rota correspondente
@@ -105,7 +97,7 @@ class RotaRepository {
      * Método para criar uma nova rota no banco de dados.
      */
     async criar(dados) {
-        console.log('Estou no criar em RotaRepository');
+
         const rota = new this.model(dados);
         return await rota.save();
     }
@@ -114,7 +106,6 @@ class RotaRepository {
      * Método para atualizar uma rota existente no banco de dados.
      */
     async atualizar(parsedData, id) {
-        console.log('Estou no atualizar em RotaRepository');
         const data = await this.model.findByIdAndUpdate(id, parsedData);
 
         // Garante que a rota exista
@@ -135,7 +126,7 @@ class RotaRepository {
      * Método para deletar uma rota existente no banco de dados.
      */
     async deletar(id) {
-        console.log('Estou no deletar em RotaRepository');
+
         const data = await this.model.findByIdAndDelete(id);
 
         // Garante que a rota exista
@@ -149,6 +140,15 @@ class RotaRepository {
             });
         }
         return data;
+    }
+    async buscarRotaPorNome(rota, idIgnorado = null){
+
+        const filtro = {rota: rota}
+        if(idIgnorado){
+            filtro._id = { $ne: idIgnorado }
+        }
+        const data = await this.model.findOne(filtro)
+        return data
     }
 }
 

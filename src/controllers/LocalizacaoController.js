@@ -10,7 +10,7 @@ class LocalizacaoController {
 
     async criar(req, res) {
         const parsedData = LocalizacaoSchema.parse(req.body);
-        let data = await this.service.criar(parsedData);
+        let data = await this.service.criar(parsedData, req);
 
         let localizacaoLimpa = data.toObject();
 
@@ -38,7 +38,7 @@ class LocalizacaoController {
         LocalizacaoIdSchema.parse(id);
 
         const parsedData = LocalizacaoUpdateSchema.parse(req.body);
-        const data = await this.service.atualizar(id, parsedData);
+        const data = await this.service.atualizar(id, parsedData, req);
 
         return CommonResponse.success(res, data, 200, 'Localização atualizada com sucesso.');
     };
@@ -47,7 +47,7 @@ class LocalizacaoController {
         const { id } = req.params || {};
         LocalizacaoIdSchema.parse(id);
 
-        const data = await this.service.deletar(id);
+        const data = await this.service.deletar(id, req);
 
         return CommonResponse.success(res, data, 200, 'Localização excluída com sucesso.');
     };
