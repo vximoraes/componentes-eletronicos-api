@@ -35,7 +35,7 @@ const ComponenteSchema = z.object({
         .default(true),
 });
 
-// não permite alterar quantidade e valor_unitario
+// não permite alterar quantidade e valor unitario
 const ComponenteUpdateSchema = ComponenteSchema.omit({
     quantidade: true,
     valor_unitario: true,
