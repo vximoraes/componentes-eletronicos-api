@@ -1,9 +1,9 @@
-import  Minio  from 'minio'
+import * as Minio from 'minio'
 import dotenv from 'dotenv'
 
 dotenv.config()
 
-const minioClient = new Minio.Cliente({
+const minioClient = new Minio.Client({
     endPoint: process.env.MINIO_ENDPOINT,
     port: parseInt(process.env.MINIO_PORT),
     useSSL: false,
@@ -20,5 +20,4 @@ minioClient.bucketExists(process.env.MINIO_BUCKET, (err, exists)=>{
         })
     }
 });
-
 export default minioClient;

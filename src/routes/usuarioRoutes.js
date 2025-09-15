@@ -3,6 +3,7 @@ import AuthMiddleware from "../middlewares/AuthMiddleware.js";
 import AuthPermission from "../middlewares/AuthPermission.js";
 import UsuarioController from '../controllers/UsuarioController.js';
 import { asyncWrapper } from '../utils/helpers/index.js';
+import upload from "../config/MulterConfig.js";
 
 const router = express.Router();
 
@@ -12,7 +13,8 @@ router
     .get("/usuarios", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.listar.bind(usuarioController)))
     .get("/usuarios/:id", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.listar.bind(usuarioController)))
     .post("/usuarios", asyncWrapper(usuarioController.criar.bind(usuarioController)))
-    .post("/usuarios/:id/foto", AuthMiddleware, asyncWrapper(usuarioController))
+    .get("/usuarios/:id/foto", AuthMiddleware, upload.single('file', asyncWrapper(usuarioController)))
+    .post("/usuarios/:id/foto", AuthMiddleware, upload.single('file'), asyncWrapper(usuarioController.uploadFoto.bind(usuarioController)))
     .patch("/usuarios/:id", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.atualizar.bind(usuarioController)))
     .put("/usuarios/:id", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.atualizar.bind(usuarioController)))
     .delete("/usuarios/:id", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.deletar.bind(usuarioController)))

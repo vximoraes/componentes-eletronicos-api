@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import UsuarioRepository from '../repositories/UsuarioRepository.js';
 import GrupoRepository from '../repositories/GrupoRepository.js';
 import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import minioClient from '../config/MinIO.js';
 // import AuthHelper from '../utils/AuthHelper.js';
 
 class UsuarioService {
@@ -91,6 +92,21 @@ class UsuarioService {
 
         return usuarioExistente;
     };
+
+    async uploadFoto(req, id) {
+        const file = req.file
+        const extensao = path.extname(file.originalname).toLowerCase();
+        const objectName = `${id}${extensao}`
+        const data = await minioClient.putObject(process.env.MINIO_BUCKET, objectName, file.buffer, {
+            'Content-Type': file.mimetype,
+        })
+
+        return data
+    }
+
+    async getFoto(req, id) {
+        const data = await minioClient.getObject(process.env.MINIO_BUCKET, )
+    }
 };
 
 export default UsuarioService;

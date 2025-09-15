@@ -1,6 +1,6 @@
 import multer from "multer";
 import path from "path";
-import { CustomError, messages, HttpStatusCodes } from "../utils/helpers";
+import { CustomError, messages, HttpStatusCodes } from "../utils/helpers/index.js";
 
 const storage = multer.memoryStorage()
 const upload = multer({storage, limits: {
@@ -33,7 +33,7 @@ const upload = multer({storage, limits: {
                 }), false
             )
         }
-        cb(null, false)
+        cb(null, true)
         }catch(error){
             cb(error, false)
         }

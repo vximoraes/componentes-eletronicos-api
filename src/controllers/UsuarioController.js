@@ -68,6 +68,7 @@ class UsuarioController {
         UsuarioIdSchema.parse(id)
 
         const data = await this.service.uploadFoto(req, id)
+        return CommonResponse.success(res, data, 201, 'Foto Atualizada com Sucesso.')
     }
 };
 
