@@ -115,7 +115,7 @@ class OrcamentoController {
             _id: id
         };
 
-        // Atualiza somente quantidade. Valor unitário sempre mantido
+        // Atualiza somente quantidade
         const quantidade = Object.prototype.hasOwnProperty.call(req.body, 'quantidade')
             ? Number(req.body.quantidade)
             : Number(oldComponente.quantidade);
