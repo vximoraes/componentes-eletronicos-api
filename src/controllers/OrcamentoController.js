@@ -60,7 +60,7 @@ class OrcamentoController {
 
     async atualizar(req, res) {
         const { id } = req.params;
-        // Não permitir alteração do valor_unitario no update do orçamento
+        // Não permitir alteração do valor unitario no update do orçamento
         if (req.body.componente_orcamento && req.body.componente_orcamento.valor_unitario) {
             delete req.body.componente_orcamento.valor_unitario;
         }
