@@ -21,7 +21,7 @@ class ComponenteRepository {
     async listar(req) {
         const id = req.params.id || null;
 
-        // Se um ID for fornecido, retorna o componente enriquecido com estatísticas.
+        // Se um ID for fornecido, retorna o componente com estatísticas.
         if (id) {
             const data = await this.model.findOne({ _id: id, usuario: req.user_id })
                 .populate('localizacao')
@@ -80,7 +80,7 @@ class ComponenteRepository {
 
         const resultado = await this.model.paginate(filtros, options);
 
-        // Enriquecer cada componente com estatísticas utilizando o length dos arrays.
+        // cada componente com estatísticas utilizando o length dos arrays.
         resultado.docs = resultado.docs.map(doc => {
             const componenteObj = typeof doc.toObject === 'function' ? doc.toObject() : doc;
 
