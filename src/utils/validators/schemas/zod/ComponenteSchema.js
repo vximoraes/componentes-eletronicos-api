@@ -28,13 +28,17 @@ const ComponenteSchema = z.object({
         .optional(),
     localizacao:
         objectIdSchema,
-    categoria: 
+    categoria:
         objectIdSchema,
     ativo: z
         .boolean()
         .default(true),
 });
 
-const ComponenteUpdateSchema = ComponenteSchema.partial();
+// não permite alterar quantidade e valor_unitario
+const ComponenteUpdateSchema = ComponenteSchema.omit({
+    quantidade: true,
+    valor_unitario: true,
+}).partial();
 
 export { ComponenteSchema, ComponenteUpdateSchema };

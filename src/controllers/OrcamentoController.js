@@ -60,15 +60,12 @@ class OrcamentoController {
 
     async atualizar(req, res) {
         const { id } = req.params;
-
         // Não permitir alteração do valor_unitario no update do orçamento
         if (req.body.componente_orcamento && req.body.componente_orcamento.valor_unitario) {
             delete req.body.componente_orcamento.valor_unitario;
         }
-
         const parsedData = OrcamentoUpdateSchema.parse(req.body);
-        const orcamentoAtualizado = await this.service.atualizar(id, parsedData, req);
-
+        const orcamentoAtualizado = await this.service.atualizar(id, parsedData);
         return CommonResponse.success(res, orcamentoAtualizado, 200, 'Orçamento atualizado com sucesso.');
     };
 
@@ -106,13 +103,8 @@ class OrcamentoController {
         };
         const parsedComponente = ComponenteOrcamentoUpdateSchema.parse(componenteData);
 
-<<<<<<< HEAD
         // valores antigos para garantir subtotal correto
         const oldComponente = await this.service.getComponenteById(orcamentoId, id);
-=======
-        // Buscar valores antigos para garantir subtotal correto
-        const oldComponente = await this.service.getComponenteById(orcamentoId, id, req);
->>>>>>> b4d02c85d2f618e669503a6507114fa9946ed682
         if (!oldComponente) {
             return CommonResponse.error(res, 404, 'resourceNotFound', 'componente', [{ message: 'Componente não encontrado.' }]);
         };

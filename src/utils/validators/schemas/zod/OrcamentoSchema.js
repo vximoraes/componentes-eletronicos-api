@@ -44,6 +44,10 @@ const OrcamentoSchema = z.object({
 });
 
 const OrcamentoUpdateSchema = OrcamentoSchema.omit({ componente_orcamento: true }).partial();
-const ComponenteOrcamentoUpdateSchema = ComponenteOrcamentoSchema.partial();
+
+//o valor unitário não possa ser atualizado
+const ComponenteOrcamentoUpdateSchema = ComponenteOrcamentoSchema.omit({
+    valor_unitario: true,
+}).partial();
 
 export { OrcamentoSchema, OrcamentoUpdateSchema, ComponenteOrcamentoSchema, ComponenteOrcamentoUpdateSchema };

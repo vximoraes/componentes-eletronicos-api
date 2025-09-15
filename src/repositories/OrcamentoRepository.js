@@ -18,7 +18,6 @@ class OrcamentoRepository {
     async listar(req) {
         const id = req.params.id || null;
 
-        // Se um ID for fornecido, retorna o orçamento enriquecido com estatísticas.
         if (id) {
             const data = await this.model.findOne({ _id: id, usuario: req.user_id })
 
@@ -66,7 +65,6 @@ class OrcamentoRepository {
 
         const resultado = await this.model.paginate(filtros, options);
 
-        // Enriquecer cada orçamento com estatísticas utilizando o length dos arrays.
         resultado.docs = resultado.docs.map(doc => {
             const orcamentoObj = typeof doc.toObject === 'function' ? doc.toObject() : doc;
 
@@ -110,14 +108,8 @@ class OrcamentoRepository {
     };
 
     // Manipular componentes.
-
-<<<<<<< HEAD
-       async adicionarComponente(orcamentoId, novoComponente) {
-        const orcamento = await this.model.findById(orcamentoId);
-=======
     async adicionarComponente(orcamentoId, novoComponente, req) {
         const orcamento = await this.model.findOne({ _id: orcamentoId, usuario: req.user_id });
->>>>>>> b4d02c85d2f618e669503a6507114fa9946ed682
         if (!orcamento) throw new CustomError({
             statusCode: 404,
             errorType: 'resourceNotFound',
@@ -126,10 +118,9 @@ class OrcamentoRepository {
             customMessage: messages.error.resourceNotFound('Orçamento')
         });
 
-        // Normalize numeric fields and ensure subtotal is correct.
         novoComponente.valor_unitario = Number(novoComponente.valor_unitario || 0);
         novoComponente.quantidade = Number(novoComponente.quantidade || 0);
-        // If subtotal wasn't provided, compute it from quantidade * valor_unitario
+
         novoComponente.subtotal = Number(novoComponente.subtotal ?? (novoComponente.quantidade * novoComponente.valor_unitario));
 
         orcamento.componentes.push(novoComponente);
@@ -159,11 +150,9 @@ class OrcamentoRepository {
             customMessage: 'Componente não encontrado.'
         });
 
-        // Preserve valor_unitario do componente existente 
         const old = (typeof componentes[idx].toObject === 'function') ? componentes[idx].toObject() : componentes[idx];
         componenteAtualizado.valor_unitario = Number(old.valor_unitario || 0);
 
-        // normalize quantidade and recompute subtotal
         componenteAtualizado.quantidade = Number(componenteAtualizado.quantidade ?? old.quantidade);
         componenteAtualizado.subtotal = Number((componenteAtualizado.quantidade || 0) * componenteAtualizado.valor_unitario);
 
@@ -179,10 +168,7 @@ class OrcamentoRepository {
 
         return orcamento;
     };
-<<<<<<< HEAD
     
-=======
-
     async removerComponente(orcamentoId, componenteId, req) {
         const orcamento = await this.model.findOne({ _id: orcamentoId, usuario: req.user_id });
         if (!orcamento) throw new CustomError({
@@ -200,10 +186,8 @@ class OrcamentoRepository {
         return orcamento;
     };
 
->>>>>>> b4d02c85d2f618e669503a6507114fa9946ed682
     // Métodos auxiliares.
-
-    async buscarPorId(id, includeTokens = false, req) {
+    async buscarPorId(id, req, includeTokens = false) {
         let query = this.model.findOne({ _id: id, usuario: req.user_id });
 
         const orcamento = await query;
