@@ -27,7 +27,8 @@ export default async function componenteSeed() {
             categoria: categoriaRandom._id,
             localizacao: localizacaoRandom._id,
             usuario: usuarioRandom._id,
-            ativo: fakeMappings.Componente.ativo.apply()
+            ativo: fakeMappings.Componente.ativo.apply(),
+            status: fakeMappings.Componente.status.apply()
         };
 
         await Componente.create(componente);

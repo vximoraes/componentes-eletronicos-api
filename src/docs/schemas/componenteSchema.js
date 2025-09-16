@@ -19,6 +19,7 @@ const componentesSchemas = {
             localizacao: componenteJsonSchema.properties.localizacao,
             categoria: componenteJsonSchema.properties.categoria,
             ativo: componenteJsonSchema.properties.ativo,
+            status: componenteJsonSchema.properties.status,
         }
     },
     ComponenteListagem: {

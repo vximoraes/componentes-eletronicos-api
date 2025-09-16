@@ -98,6 +98,13 @@ class ComponenteFilterBuilder {
         return this;
     };
 
+    comStatus(status) {
+        if (status && ['Indisponível', 'Baixo Estoque', 'Em Estoque'].includes(status)) {
+            this.filtros.status = status;
+        };
+        return this;
+    };
+
     build() {
         return this.filtros;
     };

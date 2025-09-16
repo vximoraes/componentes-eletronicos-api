@@ -47,6 +47,40 @@ class Componente {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'usuarios',
                 required: true
+            },
+            status: {
+                type: String,
+                enum: ['Indisponível', 'Baixo Estoque', 'Em Estoque'],
+                default: 'Indisponível',
+                required: true
+            },
+        });
+
+        // Middleware para calcular o status automaticamente
+        componenteSchema.pre('save', function() {
+            if (this.quantidade === 0) {
+                this.status = 'Indisponível';
+            } else if (this.quantidade < this.estoque_minimo) {
+                this.status = 'Baixo Estoque';
+            } else {
+                this.status = 'Em Estoque';
+            }
+        });
+
+        // Middleware para calcular o status em operações de update
+        componenteSchema.pre(['updateOne', 'findOneAndUpdate'], function() {
+            const update = this.getUpdate();
+            if (update.quantidade !== undefined || update.estoque_minimo !== undefined) {
+                const quantidade = update.quantidade !== undefined ? update.quantidade : 0;
+                const estoque_minimo = update.estoque_minimo !== undefined ? update.estoque_minimo : 0;
+                
+                if (quantidade === 0) {
+                    this.set({ status: 'Indisponível' });
+                } else if (quantidade < estoque_minimo) {
+                    this.set({ status: 'Baixo Estoque' });
+                } else {
+                    this.set({ status: 'Em Estoque' });
+                }
             }
         });
 
