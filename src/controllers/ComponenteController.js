@@ -33,6 +33,7 @@ class ComponenteController {
         return CommonResponse.success(res, data);
     };
 
+    // Atualiza dados de um componente (exceto quantidade)
     async atualizar(req, res) {
         const { id } = req.params;
         ComponenteIdSchema.parse(id);
