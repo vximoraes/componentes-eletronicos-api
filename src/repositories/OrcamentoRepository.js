@@ -123,6 +123,7 @@ class OrcamentoRepository {
 
         novoComponente.subtotal = Number(novoComponente.subtotal ?? (novoComponente.quantidade * novoComponente.valor_unitario));
 
+        // Adiciona como subdocumento e recalcula total
         orcamento.componentes.push(novoComponente);
         orcamento.valor = orcamento.componentes.reduce((acc, comp) => acc + Number(comp.subtotal || 0), 0);
         await orcamento.save();
@@ -130,6 +131,7 @@ class OrcamentoRepository {
         return orcamento;
     };
 
+   //preserva valor_unitario antigo e recalcula subtotal
     async atualizarComponente(orcamentoId, componenteId, componenteAtualizado, req) {
         const orcamento = await this.model.findOne({ _id: orcamentoId, usuario: req.user_id });
         if (!orcamento) throw new CustomError({
