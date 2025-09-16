@@ -19,7 +19,10 @@ const componentesRoutes = {
                 - Campos obrigatórios: nome, estoque_minimo, valor_unitario, categoria, localizacao.
                 - quantidade, estoque_minimo e valor_unitario não podem ser negativos.
                 - Campo 'ativo' tem padrão true.
-                - Campo 'status' tem padrão 'Indisponível' e aceita: 'Indisponível', 'Baixo Estoque', 'Em Estoque'.
+                - Campo 'status' é calculado automaticamente baseado na quantidade e estoque_minimo:
+                  * 'Indisponível' quando quantidade = 0
+                  * 'Baixo Estoque' quando quantidade > 0 e quantidade <= estoque_minimo
+                  * 'Em Estoque' quando quantidade > estoque_minimo
                 - Nome deve ser único no sistema.
                 - Categoria e localização devem existir no sistema.
                 - Quantidade inicial é 0 (alterada apenas via movimentação).
