@@ -114,7 +114,7 @@ describe('Rotas de Componente', () => {
             expect(res.body.data).toHaveProperty('status', 'Indisponível');
         }, 30000);
         
-        it('deve cadastrar componente com status específico', async () => {
+        it('deve cadastrar componente com status calculado automaticamente', async () => {
             const unique = Date.now();
             const catRes = await request(BASE_URL)
                 .post('/categorias')
@@ -137,8 +137,7 @@ describe('Rotas de Componente', () => {
                 categoria,
                 localizacao,
                 estoque_minimo: '10', 
-                valor_unitario: '1.5',
-                status: 'Baixo Estoque'
+                valor_unitario: '1.5'
             };
             
             const res = await request(BASE_URL)
@@ -147,7 +146,7 @@ describe('Rotas de Componente', () => {
                 .send(dados);
                 
             expect([200, 201]).toContain(res.status);
-            expect(res.body.data).toHaveProperty('status', 'Baixo Estoque');
+            expect(res.body.data).toHaveProperty('status', 'Indisponível');
         });
         it('deve falhar ao cadastrar sem campos obrigatórios', async () => {
             const res = await request(BASE_URL).post('/componentes').set('Authorization', `Bearer ${token}`).send({});
@@ -216,16 +215,17 @@ describe('Rotas de Componente', () => {
             expect(res.body.data.nome).toBe(novoNome);
         });
         
-        it('deve atualizar status do componente', async () => {
+        it('deve atualizar status do componente automaticamente', async () => {
             const dados = await criarComponenteValido();
             const compRes = await request(BASE_URL).post('/componentes').set('Authorization', `Bearer ${token}`).send(dados);
             await new Promise(r => setTimeout(r, 100));
             expect(compRes.body.data).toBeTruthy();
             const id = compRes.body.data._id;
-            const novoStatus = 'Baixo Estoque';
-            const res = await request(BASE_URL).patch(`/componentes/${id}`).set('Authorization', `Bearer ${token}`).send({ status: novoStatus });
+            const novoEstoqueMinimo = '5';
+            const res = await request(BASE_URL).patch(`/componentes/${id}`).set('Authorization', `Bearer ${token}`).send({ estoque_minimo: novoEstoqueMinimo });
             expect([200, 201]).toContain(res.status);
-            expect(res.body.data.status).toBe(novoStatus);
+            // Status deve continuar 'Indisponível' pois quantidade = 0
+            expect(res.body.data.status).toBe('Indisponível');
         });
         it('não deve permitir atualizar quantidade diretamente', async () => {
             // Cria um componente válido para testar a atualização
