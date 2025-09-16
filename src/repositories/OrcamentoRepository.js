@@ -152,9 +152,11 @@ class OrcamentoRepository {
             customMessage: 'Componente não encontrado.'
         });
 
+        //preserva valor_unitario antigo e recalcula subtotal
         const old = (typeof componentes[idx].toObject === 'function') ? componentes[idx].toObject() : componentes[idx];
         componenteAtualizado.valor_unitario = Number(old.valor_unitario || 0);
 
+        //recalcula subtotal com o valor_unitario preservado
         componenteAtualizado.quantidade = Number(componenteAtualizado.quantidade ?? old.quantidade);
         componenteAtualizado.subtotal = Number((componenteAtualizado.quantidade || 0) * componenteAtualizado.valor_unitario);
 
