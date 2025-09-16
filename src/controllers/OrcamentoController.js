@@ -120,12 +120,14 @@ class OrcamentoController {
             ? Number(req.body.quantidade)
             : Number(oldComponente.quantidade);
 
+        // Mantemos o valor_unitario antigo
         const valor_unitario = Number(oldComponente.valor_unitario);
 
         componenteAtualizado.quantidade = quantidade;
         componenteAtualizado.valor_unitario = valor_unitario;
         componenteAtualizado.subtotal = quantidade * valor_unitario;
 
+        // Passa para o service atualizar o subdocumento e recalcular o total do orçamento
         const orcamentoAtualizado = await this.service.atualizarComponente(orcamentoId, id, componenteAtualizado, req);
         return CommonResponse.success(res, orcamentoAtualizado, 200, 'Componente atualizado com sucesso.');
     };
