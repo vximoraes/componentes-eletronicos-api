@@ -64,12 +64,12 @@ class UsuarioController {
         return CommonResponse.success(res, data, 200, 'Usuário excluído com sucesso.');
     };
     async uploadFoto(req, res) {
-        const { id } = req.params || {};
-        UsuarioIdSchema.parse(id)
+        const { id } = req.params || {};;
+        UsuarioIdSchema.parse(id);
 
-        const data = await this.service.uploadFoto(req, id)
-        return CommonResponse.success(res, data, 201, 'Foto Atualizada com Sucesso.')
-    }
+        const data = await this.service.uploadFoto(req, id);
+        return CommonResponse.success(res, data, 201, 'Foto atualizada com sucesso.');
+    };
 };
 
 export default UsuarioController;

@@ -10,23 +10,25 @@ const minioClient = new Minio.Client({
     accessKey: process.env.MINIO_ACCESS_KEY,
     secretKey: process.env.MINIO_SECRET_KEY
 })
+const buckets = [process.env.MINIO_BUCKET, process.env.MINIO_BUCKET_2]
+for (const bucket of buckets) {
+    const policy = {
+        Version: "2012-10-17",
+        Statement: [
+            {
+                Effect: "Allow",
+                Principal: { AWS: ["*"] },
+                Action: ["s3:GetObject"],
+                Resource: [`arn:aws:s3:::${bucket}/*`]
+            }
+        ]
+    };
 
-// Define policy pública
-            const policy = {
-                Version: "2012-10-17",
-                Statement: [
-                    {
-                        Effect: "Allow",
-                        Principal: { AWS: ["*"] },
-                        Action: ["s3:GetObject"],
-                        Resource: [`arn:aws:s3:::${process.env.MINIO_BUCKET}/*`]
-                    }
-                ]
-            };
+    if (!(await minioClient.bucketExists(bucket))) {
+        await minioClient.makeBucket(bucket, 'us-east-1');
+        await minioClient.setBucketPolicy(bucket, JSON.stringify(policy));
+        console.log('Bucket criado:', bucket)
+    }
 
-if( ! (await minioClient.bucketExists(process.env.MINIO_BUCKET))) {
-    await minioClient.makeBucket(process.env.MINIO_BUCKET, 'us-east-1');
 }
-await minioClient.setBucketPolicy(process.env.MINIO_BUCKET, JSON.stringify(policy));
-console.log('Bucket criado:', process.env.MINIO_BUCKET)
 export default minioClient;

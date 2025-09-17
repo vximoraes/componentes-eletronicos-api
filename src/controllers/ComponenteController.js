@@ -2,6 +2,7 @@ import ComponenteService from '../services/ComponenteService.js';
 import { ComponenteQuerySchema, ComponenteIdSchema } from '../utils/validators/schemas/zod/querys/ComponenteQuerySchema.js';
 import { ComponenteSchema, ComponenteUpdateSchema } from '../utils/validators/schemas/zod/ComponenteSchema.js';
 import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import { UsuarioIdSchema } from '../utils/validators/schemas/zod/querys/UsuarioQuerySchema.js';
 
 class ComponenteController {
     constructor() {
@@ -50,6 +51,14 @@ class ComponenteController {
         const data = await this.service.deletar(id, req);
 
         return CommonResponse.success(res, data, 200, 'Componente excluído com sucesso.');
+    };
+
+        async uploadFoto(req, res) {
+        const { id } = req.params || {};
+        UsuarioIdSchema.parse(id);
+
+        const data = await this.service.uploadFoto(req, id);
+        return CommonResponse.success(res, data, 201, 'Foto enviada com sucesso.');
     };
 };
 

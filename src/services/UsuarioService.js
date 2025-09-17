@@ -96,23 +96,27 @@ class UsuarioService {
     };
 
     async uploadFoto(req, id) {
-        const file = req.file
+        const file = req.file;
         if (file.size > (5 * 1024 * 1024)) {
             throw new CustomError({
                 statusCode: HttpStatusCodes.PAYLOAD_TOO_LARGE.code,
-                errorType: 'payloadTooLarde',
+                errorType: 'payloadTooLarge',
                 field: "Imagem",
                 details: [{ path: "Imagem", message: "Arquivo é superior a 5 MB" }],
                 customMessage: "O arquivo é maior do que 5 MB."
-            })
+            });
         }
-        const newFile = await compress(file.buffer)
-        const objectName = `${id}.jpeg`
-        const data = await minioClient.putObject(process.env.MINIO_BUCKET, objectName, newFile, {
-            'Content-Type': file.mimetype,
-        })
+        try {
+            const newFile = await compress(file.buffer);
+            const objectName = `${id}.jpeg`;
+            const data = await minioClient.putObject(process.env.MINIO_BUCKET, objectName, newFile, {
+                'Content-Type': file.mimetype,
+            });
 
-        return data
+            return data;
+        } catch (err) {
+            throw new Error(err);
+        };
     }
 };
 
