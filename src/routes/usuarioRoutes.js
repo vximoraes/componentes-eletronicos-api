@@ -13,7 +13,6 @@ router
     .get("/usuarios", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.listar.bind(usuarioController)))
     .get("/usuarios/:id", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.listar.bind(usuarioController)))
     .post("/usuarios", asyncWrapper(usuarioController.criar.bind(usuarioController)))
-    .get("/usuarios/:id/foto", AuthMiddleware, upload.single('file', asyncWrapper(usuarioController)))
     .post("/usuarios/:id/foto", AuthMiddleware, upload.single('file'), asyncWrapper(usuarioController.uploadFoto.bind(usuarioController)))
     .patch("/usuarios/:id", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.atualizar.bind(usuarioController)))
     .put("/usuarios/:id", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.atualizar.bind(usuarioController)))

@@ -3,6 +3,8 @@ import UsuarioRepository from '../repositories/UsuarioRepository.js';
 import GrupoRepository from '../repositories/GrupoRepository.js';
 import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
 import minioClient from '../config/MinIO.js';
+import path from 'path';
+import compress from '../config/SharpConfig.js';
 // import AuthHelper from '../utils/AuthHelper.js';
 
 class UsuarioService {
@@ -95,17 +97,22 @@ class UsuarioService {
 
     async uploadFoto(req, id) {
         const file = req.file
-        const extensao = path.extname(file.originalname).toLowerCase();
-        const objectName = `${id}${extensao}`
-        const data = await minioClient.putObject(process.env.MINIO_BUCKET, objectName, file.buffer, {
+        if (file.size > (5 * 1024 * 1024)) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.PAYLOAD_TOO_LARGE.code,
+                errorType: 'payloadTooLarde',
+                field: "Imagem",
+                details: [{ path: "Imagem", message: "Arquivo é superior a 5 MB" }],
+                customMessage: "O arquivo é maior do que 5 MB."
+            })
+        }
+        const newFile = await compress(file.buffer)
+        const objectName = `${id}.jpeg`
+        const data = await minioClient.putObject(process.env.MINIO_BUCKET, objectName, newFile, {
             'Content-Type': file.mimetype,
         })
 
         return data
-    }
-
-    async getFoto(req, id) {
-        const data = await minioClient.getObject(process.env.MINIO_BUCKET, )
     }
 };
 
