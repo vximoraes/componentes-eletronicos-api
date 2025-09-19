@@ -315,20 +315,7 @@ const componentesRoutes = {
                     content: {
                         "application/json": {
                             schema: {
-                                type: "object",
-                                properties: {
-                                    data: {
-                                        $ref: "#/components/schemas/ComponenteDetalhes"
-                                    },
-                                    message: {
-                                        type: "string",
-                                        example: "Foto enviada com sucesso"
-                                    },
-                                    errors: {
-                                        type: "array",
-                                        example: []
-                                    }
-                                }
+                                $ref: "#/components/schemas/ComponenteUploadFotoResposta"
                             }
                         }
                     }

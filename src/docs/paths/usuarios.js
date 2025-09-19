@@ -278,20 +278,7 @@ const usuariosRoutes = {
                     content: {
                         "application/json": {
                             schema: {
-                                type: "object",
-                                properties: {
-                                    data: {
-                                        $ref: "#/components/schemas/UsuarioDetalhes"
-                                    },
-                                    message: {
-                                        type: "string",
-                                        example: "Foto atualizada com sucesso"
-                                    },
-                                    errors: {
-                                        type: "array",
-                                        example: []
-                                    }
-                                }
+                                $ref: "#/components/schemas/UsuarioUploadFotoResposta"
                             }
                         }
                     }
