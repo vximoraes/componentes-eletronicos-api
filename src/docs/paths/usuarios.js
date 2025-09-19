@@ -216,6 +216,93 @@ const usuariosRoutes = {
                 500: commonResponses[500]()
             }
         }
+    },
+    "/usuarios/{id}/foto": {
+        post: {
+            tags: ["Usuários"],
+            summary: "Faz upload da foto do usuário",
+            description: `
+            + Caso de uso: Upload de foto de perfil do usuário.
+            
+            + Função de Negócio:
+                - Permitir ao usuário autenticado fazer upload de uma foto de perfil.
+                + Recebe como path parameter:
+                    - **id**: identificador do usuário (MongoDB ObjectId).
+                + Recebe no corpo da requisição:
+                    - Arquivo de imagem via multipart/form-data no campo 'file'.
+
+            + Regras de Negócio:
+                - Usuário deve existir e estar ativo.
+                - Arquivo deve ser uma imagem válida (formatos aceitos pelo multer).
+                - Tamanho do arquivo deve respeitar os limites configurados.
+                - Usuário só pode alterar sua própria foto ou admin pode alterar qualquer foto.
+
+            + Resultado Esperado:
+                - HTTP 201 Created com dados do usuário atualizado incluindo caminho da foto.
+                - Em caso de usuário inexistente, retorna erro 404.
+                - Em caso de arquivo inválido, retorna erro 400.
+            `,
+            security: [{ bearerAuth: [] }],
+            parameters: [
+                {
+                    name: "id",
+                    in: "path",
+                    required: true,
+                    schema: {
+                        type: "string",
+                    },
+                    description: "ID do usuário"
+                }
+            ],
+            requestBody: {
+                required: true,
+                content: {
+                    "multipart/form-data": {
+                        schema: {
+                            type: "object",
+                            required: ["file"],
+                            properties: {
+                                file: {
+                                    type: "string",
+                                    format: "binary",
+                                    description: "Arquivo de imagem para foto de perfil"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            responses: {
+                201: {
+                    description: "Foto atualizada com sucesso",
+                    content: {
+                        "application/json": {
+                            schema: {
+                                type: "object",
+                                properties: {
+                                    data: {
+                                        $ref: "#/components/schemas/UsuarioDetalhes"
+                                    },
+                                    message: {
+                                        type: "string",
+                                        example: "Foto atualizada com sucesso"
+                                    },
+                                    errors: {
+                                        type: "array",
+                                        example: []
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                400: commonResponses[400](),
+                401: commonResponses[401](),
+                404: commonResponses[404](),
+                498: commonResponses[498](),
+                500: commonResponses[500]()
+            }
+        }
     }
 };
 

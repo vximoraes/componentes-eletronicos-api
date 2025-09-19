@@ -168,6 +168,24 @@
 - Usuário deletado.
 - Em caso de erro, retorna mensagem específica.
 
+### 2.5 POST /usuarios/:id/foto
+
+#### Caso de Uso
+- Fazer upload de foto de perfil do usuário.
+
+#### Regras de Negócio Implementadas
+- Usuário deve existir e estar ativo.
+- Arquivo deve ser uma imagem válida (formatos aceitos pelo sistema).
+- Tamanho do arquivo deve respeitar os limites configurados.
+- Usuário autenticado só pode alterar sua própria foto ou admin pode alterar qualquer foto.
+- Arquivo enviado via multipart/form-data no campo 'file'.
+
+#### Resultado Esperado
+- Foto atualizada com sucesso, retornando dados do usuário com caminho da nova foto.
+- Em caso de usuário inexistente, retorna erro 404.
+- Em caso de arquivo inválido ou muito grande, retorna erro 400.
+- Em caso de falta de permissão, retorna erro 403.
+
 ## 3. Componentes
 
 ### 3.1 POST /componentes
@@ -228,6 +246,24 @@
 #### Resultado
 - Confirmação de exclusão.
 - Em caso de erro, retorna mensagem específica.
+
+### 3.5 POST /componentes/:id/foto
+
+#### Caso de Uso
+- Fazer upload de foto do componente eletrônico.
+
+#### Regras de Negócio Implementadas
+- Componente deve existir e estar ativo.
+- Arquivo deve ser uma imagem válida (formatos aceitos pelo sistema).
+- Tamanho do arquivo deve respeitar os limites configurados.
+- Usuário deve ter permissão para alterar componentes.
+- Arquivo enviado via multipart/form-data no campo 'file'.
+
+#### Resultado Esperado
+- Foto enviada com sucesso, retornando dados do componente com caminho da nova foto.
+- Em caso de componente inexistente, retorna erro 404.
+- Em caso de arquivo inválido ou muito grande, retorna erro 400.
+- Em caso de falta de permissão, retorna erro 403.
 
 ## 4. Movimentações
 
@@ -529,36 +565,61 @@
 
 ## 10. Componentes do Orçamento
 
-### 10.1 GET /orcamentos/:id/componentes
+### 10.1 POST /orcamentos/:orcamentoId/componentes
+
+#### Caso de Uso
+- Adicionar um novo componente a um orçamento específico.
+
+#### Regras de Negócio Envolvidas
+- Campos obrigatórios: nome, fornecedor, quantidade, valor_unitario.
+- Quantidade deve ser maior que zero.
+- Valor unitário não pode ser negativo.
+- Calcula automaticamente o subtotal (quantidade × valor_unitario).
+- Atualiza o valor total do orçamento.
+- Orçamento deve existir.
+
+#### Resultado Esperado
+- Componente adicionado ao orçamento com sucesso.
+- Retorno do orçamento atualizado com o novo componente.
+- Em caso de orçamento inexistente, retorna erro 404.
+- Em caso de dados inválidos, retorna erro 400.
+
+### 10.2 GET /orcamentos/:orcamentoId/componentes
 
 #### Caso de Uso
 - Listar componentes de um orçamento específico.
 
-#### Regras de Negócio
+#### Regras de Negócio Envolvidas
 - Orçamento deve existir.
+- Retorna lista completa de componentes com detalhes (nome, fornecedor, quantidade, valor_unitario, subtotal).
 - Se orçamento não existir, retorna erro 404.
 
-#### Resultado
-- Lista de componentes do orçamento.
+#### Resultado Esperado
+- Lista de componentes do orçamento retornada com sucesso.
+- Array contendo todos os componentes com seus respectivos dados.
+- Em caso de orçamento inexistente, retorna erro 404.
 
-### 10.2 PATCH/PUT /orcamentos/:id/componentes/:componenteId
+### 10.3 PATCH/PUT /orcamentos/:orcamentoId/componentes/:id
 
 #### Caso de Uso
 - Atualizar informações de um componente do orçamento.
 
 #### Regras de Negócio
 - Permite atualização parcial dos campos do componente.
+- Recalcula subtotal se quantidade ou valor unitário forem alterados.
+- Atualiza valor total do orçamento.
 - Se componente ou orçamento não existir, retorna erro 404.
 
 #### Resultado
 - Componente do orçamento atualizado.
 
-### 10.3 DELETE /orcamentos/:id/componentes/:componenteId
+### 10.4 DELETE /orcamentos/:orcamentoId/componentes/:id
 
 #### Caso de Uso
 - Remover componente de um orçamento.
 
 #### Regras de Negócio
+- Atualiza o valor total do orçamento após remoção.
 - Se componente ou orçamento não existir, retorna erro 404.
 
 #### Resultado
@@ -630,6 +691,26 @@
 - Retorno de confirmação da exclusão.
 - Em caso de relacionamentos ativos, retorna erro de integridade.
 
+### 11.5 POST /grupos/:id/rotas
+
+#### Caso de Uso
+- Adicionar uma permissão (rota) específica a um grupo existente.
+
+#### Regras de Negócio Envolvidas
+- Campos obrigatórios: rota, dominio.
+- Campos opcionais: ativo, buscar, enviar, substituir, modificar, excluir (booleanos).
+- A rota deve existir no cadastro de rotas do sistema.
+- Não permite adicionar permissões duplicadas (mesma rota + dominio).
+- Se grupo não existir, retorna erro 404.
+- Se rota não existir no sistema, retorna erro 404.
+
+#### Resultado Esperado
+- Permissão adicionada ao grupo com sucesso.
+- Retorno do objeto grupo atualizado com a nova permissão.
+- Em caso de permissão duplicada, não adiciona novamente (comportamento idempotente).
+- Em caso de grupo ou rota inexistente, retorna erro 404.
+- Em caso de dados inválidos, retorna erro 400.
+
 ## 12. Rotas
 
 ### 12.1 POST /rotas
@@ -638,15 +719,16 @@
 - Criar nova rota de acesso no sistema para controle de permissões.
 
 #### Regras de Negócio Envolvidas
-- Campo obrigatório: nome (mínimo 3 caracteres).
-- Nome deve ser único no sistema.
-- Não permite campos além dos definidos no schema.
+- Campos obrigatórios: rota, dominio.
+- Rota deve ter no mínimo 1 caractere.
+- Combinação rota + dominio deve ser única no sistema.
 - Campo `ativo`: padrão true, pode ser informado.
+- Não permite campos além dos definidos no schema.
 
 #### Resultado Esperado
 - Rota criada com sucesso.
-- Retorno do objeto rota com `_id`, `nome`, `ativo` e `data_criacao`.
-- Em caso de nome duplicado, retorna erro 409.
+- Retorno do objeto rota com `_id`, `rota`, `dominio`, `ativo` e `data_criacao`.
+- Em caso de combinação rota+dominio duplicada, retorna erro 409.
 - Em caso de dados inválidos, retorna erro 400.
 
 ### 12.2 GET /rotas e /rotas/:id
@@ -656,7 +738,7 @@
 
 #### Regras de Negócio Envolvidas
 - Paginação: parâmetros `page` e `limite` opcionais, limite máximo 100.
-- Filtros disponíveis: nome, ativo.
+- Filtros disponíveis: rota, dominio, ativo.
 - Se id não existir na busca específica, retorna erro 404.
 
 #### Resultado Esperado
@@ -671,14 +753,14 @@
 
 #### Regras de Negócio Envolvidas
 - Permite atualização parcial dos campos.
-- Nome deve continuar sendo único.
+- Combinação rota + dominio deve continuar sendo única.
 - Se rota não existir, retorna erro 404.
 - Não permite campos além dos definidos no schema.
 
 #### Resultado Esperado
 - Rota atualizada com sucesso.
 - Retorno do objeto rota atualizado.
-- Em caso de nome duplicado, retorna erro 409.
+- Em caso de combinação rota+dominio duplicada, retorna erro 409.
 - Em caso de dados inválidos, retorna erro 400.
 
 ### 12.4 DELETE /rotas/:id
@@ -687,9 +769,9 @@
 - Remover rota do sistema.
 
 #### Regras de Negócio Envolvidas
-- Verificar se rota não possui relacionamentos ativos.
+- Verificar se rota não possui relacionamentos ativos com permissões.
 - Se rota não existir, retorna erro 404.
-- Não permite exclusão se houver permissões vinculadas.
+- Não permite exclusão se houver permissões vinculadas em grupos.
 
 #### Resultado Esperado
 - Rota removida com sucesso.
