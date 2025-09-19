@@ -19,6 +19,10 @@ const componentesRoutes = {
                 - Campos obrigatórios: nome, estoque_minimo, valor_unitario, categoria, localizacao.
                 - quantidade, estoque_minimo e valor_unitario não podem ser negativos.
                 - Campo 'ativo' tem padrão true.
+                - Campo 'status' é calculado automaticamente baseado na quantidade e estoque_minimo:
+                  * 'Indisponível' quando quantidade = 0
+                  * 'Baixo Estoque' quando quantidade > 0 e quantidade <= estoque_minimo
+                  * 'Em Estoque' quando quantidade > estoque_minimo
                 - Nome deve ser único no sistema.
                 - Categoria e localização devem existir no sistema.
                 - Quantidade inicial é 0 (alterada apenas via movimentação).
@@ -55,7 +59,7 @@ const componentesRoutes = {
         + Função de Negócio:
             - Permitir à front-end, App Mobile e serviços server-to-server obter uma lista paginada de componentes cadastrados.
             + Recebe como query parameters (opcionais):
-                • filtros: nome, categoria, localizacao, ativo, estoque_minimo, quantidade.  
+                • filtros: nome, categoria, localizacao, ativo, status, estoque_minimo, quantidade.  
                 • paginação: page (número da página), limite (quantidade de itens por página).
 
         + Regras de Negócio:
@@ -210,27 +214,29 @@ const componentesRoutes = {
                 498: commonResponses[498](),
                 500: commonResponses[500]()
             }
-        },
-
-        delete: {
+        }
+    },
+    "/componentes/{id}/inativar": {
+        patch: {
             tags: ["Componentes"],
-            summary: "Deleta um componente",
+            summary: "Inativa um componente",
             description: `
-            + Caso de uso: Exclusão de componente.
+            + Caso de uso: Inativação de componente preservando integridade referencial.
             
             + Função de Negócio:
-                - Permitir ao usuário autenticado remover um componente que não está sendo utilizado.
+                - Permitir ao usuário autenticado inativar um componente sem removê-lo fisicamente.
+                - Substitui a remoção física para manter histórico e integridade referencial.
                 + Recebe como path parameter:
                     - **id**: identificador do componente.
 
             + Regras de Negócio:
-                - Verificar se o componente existe antes de excluir.
-                - Não permitir exclusão se há movimentações vinculadas ao componente.  
-                - Registrar log de auditoria sobre a operação.  
-                - Garantir que não haja vínculos críticos pendentes.
+                - Verificar se o componente existe antes de inativar.
+                - Altera o campo 'ativo' para false.
+                - Mantém todos os vínculos e histórico intactos.
+                - Registrar log de auditoria sobre a operação.
 
             + Resultado Esperado:
-                - HTTP 200 OK - componente excluído com sucesso.
+                - HTTP 200 OK com corpo conforme **ComponenteDetalhes**, com ativo = false.
             `,
             security: [{ bearerAuth: [] }],
             parameters: [
@@ -245,7 +251,7 @@ const componentesRoutes = {
                 }
             ],
             responses: {
-                200: commonResponses[200](),
+                200: commonResponses[200]("#/components/schemas/ComponenteDetalhes"),
                 400: commonResponses[400](),
                 401: commonResponses[401](),
                 404: commonResponses[404](),

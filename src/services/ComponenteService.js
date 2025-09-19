@@ -38,10 +38,10 @@ class ComponenteService {
         return data;
     };
 
-    async deletar(id, req) {
+    async inativar(id, req) {
         await this.ensureComponentExists(id, req);
 
-        const data = await this.repository.deletar(id, req);
+        const data = await this.repository.atualizar(id, { ativo: false }, req);
 
         return data;
     };

@@ -44,14 +44,15 @@ class ComponenteRepository {
             return dataWithStats;
         };
 
-        const { nome, quantidade, estoque_minimo, localizacao, categoria, ativo, page = 1 } = req.query;
+        const { nome, quantidade, estoque_minimo, localizacao, categoria, ativo, status, page = 1 } = req.query;
         const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
 
         const filterBuilder = new ComponenteFilterBuilder()
             .comNome(nome || '')
             .comQuantidade(quantidade || '')
             .comEstoqueMinimo(estoque_minimo || '')
-            .comAtivo(ativo || '');
+            .comAtivo(ativo || '')
+            .comStatus(status || '');
 
         await filterBuilder.comLocalizacao(localizacao || '');
         await filterBuilder.comCategoria(categoria || '');
@@ -143,7 +144,9 @@ class ComponenteRepository {
     // Métodos auxiliares.
 
     async buscarPorId(id, includeTokens = false, req) {
-        let query = this.model.findOne({ _id: id, usuario: req.user_id });
+        let query = this.model.findOne({ _id: id, usuario: req.user_id })
+            .populate('localizacao')
+            .populate('categoria');
 
         const componente = await query;
 

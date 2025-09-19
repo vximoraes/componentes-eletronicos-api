@@ -140,36 +140,24 @@ describe('ComponenteService', () => {
         });
     });
 
-    describe('deletar', () => {
-        it('deve remover componente existente', async () => {
+    describe('inativar', () => {
+        it('deve inativar componente existente', async () => {
             const req = { user_id: 'user1' };
             repositoryMock.buscarPorId.mockResolvedValue(makeComponente());
-            repositoryMock.deletar.mockResolvedValue({ acknowledged: true, deletedCount: 1 });
-            const result = await service.deletar('comp1', req);
-            expect(result).toHaveProperty('acknowledged', true);
+            repositoryMock.atualizar.mockResolvedValue({ nome: 'Componente', ativo: false });
+            const result = await service.inativar('comp1', req);
+            expect(result).toHaveProperty('ativo', false);
         });
         it('deve lançar erro se componente não existir', async () => {
             const req = { user_id: 'user1' };
             repositoryMock.buscarPorId.mockResolvedValue(null);
-            await expect(service.deletar('compX', req)).rejects.toThrow(CustomError);
-        });
-        it('deve lançar erro se componente estiver vinculado a movimentações', async () => {
-            const req = { user_id: 'user1' };
-            repositoryMock.buscarPorId.mockResolvedValue(makeComponente());
-            repositoryMock.deletar.mockRejectedValue(new CustomError({
-                statusCode: 400,
-                errorType: 'resourceInUse',
-                field: 'Componente',
-                details: [],
-                customMessage: 'Componente vinculado a movimentações.'
-            }));
-            await expect(service.deletar('comp1', req)).rejects.toThrow('Componente vinculado a movimentações');
+            await expect(service.inativar('compX', req)).rejects.toThrow(CustomError);
         });
         it('deve lançar erro inesperado do repository', async () => {
             const req = { user_id: 'user1' };
             repositoryMock.buscarPorId.mockResolvedValue(makeComponente());
-            repositoryMock.deletar.mockRejectedValue(new Error('DB error'));
-            await expect(service.deletar('comp1', req)).rejects.toThrow('DB error');
+            repositoryMock.atualizar.mockRejectedValue(new Error('DB error'));
+            await expect(service.inativar('comp1', req)).rejects.toThrow('DB error');
         });
     });
 

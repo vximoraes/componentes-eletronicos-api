@@ -44,6 +44,52 @@ describe('Modelo de Componente', () => {
         expect(saved.localizacao.toString()).toBe(componenteData.localizacao.toString());
         expect(saved.categoria.toString()).toBe(componenteData.categoria.toString());
         expect(saved.ativo).toBe(true);
+        expect(saved.status).toBe('Indisponível');
+    });
+
+    it('deve criar componente com status padrão quando não informado', async () => {
+        const componenteData = {
+            nome: 'Diodo LED',
+            estoque_minimo: 10,
+            valor_unitario: 0.25,
+            localizacao: new mongoose.Types.ObjectId(),
+            categoria: new mongoose.Types.ObjectId(),
+            usuario: new mongoose.Types.ObjectId()
+        };
+        const componente = new Componente(componenteData);
+        await componente.save();
+        const saved = await Componente.findById(componente._id);
+        expect(saved.status).toBe('Indisponível');
+    });
+
+    it('deve criar componente com status específico', async () => {
+        const componenteData = {
+            nome: 'Capacitor 100nF',
+            estoque_minimo: 10,
+            valor_unitario: 0.05,
+            descricao: 'Capacitor de 100nF',
+            localizacao: new mongoose.Types.ObjectId(),
+            categoria: new mongoose.Types.ObjectId(),
+            usuario: new mongoose.Types.ObjectId(),
+            status: 'Baixo Estoque'
+        };
+        const componente = new Componente(componenteData);
+        await componente.save();
+        const saved = await Componente.findById(componente._id);
+        expect(saved.status).toBe('Indisponível');
+    });
+
+    it('deve falhar ao criar componente com status inválido', async () => {
+        const componenteData = {
+            nome: 'Resistor 22k',
+            estoque_minimo: 10,
+            valor_unitario: 0.05,
+            localizacao: new mongoose.Types.ObjectId(),
+            categoria: new mongoose.Types.ObjectId(),
+            status: 'Status Inválido'
+        };
+        const componente = new Componente(componenteData);
+        await expect(componente.save()).rejects.toThrow();
     });
 
     it('não deve criar componente sem campos obrigatórios', async () => {
@@ -96,5 +142,56 @@ describe('Modelo de Componente', () => {
         const nomes = componentes.map(c => c.nome);
         expect(nomes).toContain('Diodo');
         expect(nomes).toContain('Transistor');
+    });
+
+    it('deve calcular status automaticamente baseado na quantidade e estoque_minimo', async () => {
+        const componenteData = {
+            nome: 'Teste Status',
+            estoque_minimo: 10,
+            valor_unitario: 0.05,
+            localizacao: new mongoose.Types.ObjectId(),
+            categoria: new mongoose.Types.ObjectId(),
+            usuario: new mongoose.Types.ObjectId(),
+            quantidade: 0
+        };
+        
+        // Teste para quantidade = 0 (Indisponível)
+        let componente = new Componente(componenteData);
+        await componente.save();
+        expect(componente.status).toBe('Indisponível');
+        
+        // Teste para quantidade <= estoque_minimo (Baixo Estoque)
+        componente.quantidade = 5;
+        await componente.save();
+        expect(componente.status).toBe('Baixo Estoque');
+        
+        // Teste para quantidade > estoque_minimo (Em Estoque)
+        componente.quantidade = 15;
+        await componente.save();
+        expect(componente.status).toBe('Em Estoque');
+    });
+
+    it('deve atualizar status automaticamente em operações de update', async () => {
+        const componenteData = {
+            nome: 'Teste Update Status',
+            estoque_minimo: 10,
+            valor_unitario: 0.05,
+            localizacao: new mongoose.Types.ObjectId(),
+            categoria: new mongoose.Types.ObjectId(),
+            usuario: new mongoose.Types.ObjectId(),
+            quantidade: 0
+        };
+        
+        const componente = new Componente(componenteData);
+        await componente.save();
+        
+        // Update via findOneAndUpdate
+        await Componente.findOneAndUpdate(
+            { _id: componente._id },
+            { quantidade: 15 }
+        );
+        
+        const updated = await Componente.findById(componente._id);
+        expect(updated.status).toBe('Em Estoque');
     });
 });

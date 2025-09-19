@@ -14,7 +14,8 @@ router
     .get("/componentes/:id", AuthMiddleware, AuthPermission, asyncWrapper(componenteController.listar.bind(componenteController)))
     .post("/componentes", AuthMiddleware, AuthPermission, asyncWrapper(componenteController.criar.bind(componenteController)))
     .patch("/componentes/:id", AuthMiddleware, AuthPermission, asyncWrapper(componenteController.atualizar.bind(componenteController)))
+    .patch("/componentes/:id/inativar", AuthMiddleware, AuthPermission, asyncWrapper(componenteController.inativar.bind(componenteController)))
     .put("/componentes/:id", AuthMiddleware, AuthPermission, asyncWrapper(componenteController.atualizar.bind(componenteController)))
-    .delete("/componentes/:id", AuthMiddleware, AuthPermission, asyncWrapper(componenteController.deletar.bind(componenteController)))
     .post("/componentes/:id/foto", AuthMiddleware, AuthPermission, upload.single('file'), asyncWrapper(componenteController.uploadFoto.bind(componenteController)))
+
 export default router;
