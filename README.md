@@ -2,7 +2,7 @@
 
 Back-end para gerenciamento de estoque de componentes eletrônicos.
 
-## 📋 Índice
+## Índice
 - [Funcionalidades](#-funcionalidades)
 - [Tecnologias Utilizadas](#-tecnologias-utilizadas)
 - [Instalação](#-instalação)
@@ -15,7 +15,7 @@ Back-end para gerenciamento de estoque de componentes eletrônicos.
 - [Documentação](#-documentação)
 - [Contribuição](#-contribuição)
 
-## 🚀 Funcionalidades
+## Funcionalidades
 
 - **Gestão de Usuários**: Cadastro, autenticação e controle de acesso
 - **Gerenciamento de Componentes**: CRUD completo de componentes eletrônicos
@@ -27,7 +27,7 @@ Back-end para gerenciamento de estoque de componentes eletrônicos.
 - **Orçamentos**: Sistema de orçamentação com componentes
 - **Notificações**: Sistema de notificações para alertas
 
-## 🛠 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 ### Backend
 - **Node.js** - Runtime JavaScript
@@ -44,7 +44,7 @@ Back-end para gerenciamento de estoque de componentes eletrônicos.
 - **ESLint** - Linter para JavaScript
 - **Nodemon** - Hot reload em desenvolvimento
 
-## 📦 Instalação
+## Instalação
 
 ### Pré-requisitos
 - Node.js (versão 18 ou superior)
@@ -62,7 +62,7 @@ cd componentes-eletronicos
 npm install
 ```
 
-## ⚙️ Configuração
+## Configuração
 
 ### Variáveis de Ambiente
 Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
@@ -105,7 +105,7 @@ MAIL_API_URL=http://localhost:3001
 ### Configuração do Banco de Dados
 O sistema se conecta automaticamente ao MongoDB usando a URI fornecida no arquivo `.env`.
 
-## 🏃‍♂️ Executando o Projeto
+## Executando o Projeto
 
 ### Desenvolvimento
 ```bash
@@ -131,7 +131,7 @@ npm run seed
 npm test
 ```
 
-## 🐳 Docker
+## Docker
 
 ### Executando com Docker Compose
 ```bash
@@ -145,7 +145,7 @@ docker-compose down
 docker-compose up --build
 ```
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 componentes-eletronicos/
@@ -173,7 +173,7 @@ componentes-eletronicos/
 └── server.js                # Servidor que roda a aplicação
 ```
 
-## 🌐 API Endpoints
+## API Endpoints
 
 ### Autenticação
 - `POST /auth/login` - Login de usuário
@@ -232,9 +232,9 @@ componentes-eletronicos/
 - `PUT /notificacoes/:id` - Marcar como lida
 - `DELETE /notificacoes/:id` - Excluir notificação
 
-> 📚 **Documentação Completa**: Acesse `/docs` quando o servidor estiver rodando para ver a documentação completa da API com Swagger.
+> **Documentação Completa**: Acesse `/docs` quando o servidor estiver rodando para ver a documentação completa da API com Swagger.
 
-## 🧪 Testes
+## Testes
 
 O projeto utiliza Jest para testes unitários e de integração.
 
