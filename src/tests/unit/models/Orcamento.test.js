@@ -34,6 +34,7 @@ describe('Model Orcamento', () => {
                 subtotal: 100,
             }],
         });
+        // Asserções que verificam se o documento foi salvo corretamente e com os dados esperados.
         expect(orcamento._id).toBeDefined();
         expect(orcamento.protocolo).toBe('PROTO-001');
         expect(orcamento.componentes.length).toBe(1);
@@ -85,7 +86,9 @@ describe('Model Orcamento', () => {
                 { nome: 'B', fornecedor: 'F2', quantidade: 4, valor_unitario: 10, subtotal: 40 },
             ],
         });
+        // Calcula a soma dos subtotais dos componentes.
         const soma = orcamento.componentes.reduce((acc, c) => acc + c.subtotal, 0);
+        // Verifica se o valor total do orçamento corresponde à soma calculada.
         expect(orcamento.valor).toBe(soma);
     });
 
@@ -98,6 +101,7 @@ describe('Model Orcamento', () => {
             componentes: [{ nome: 'X', fornecedor: 'F', quantidade: 1, valor_unitario: 10, subtotal: 10 }],
         });
         const found = await Orcamento.findOne({ nome: 'BuscaNome' });
+        // Asserções para garantir que o documento foi encontrado e tem o nome correto.
         expect(found).not.toBeNull();
         expect(found.nome).toBe('BuscaNome');
     });
@@ -110,6 +114,7 @@ describe('Model Orcamento', () => {
             usuario: new mongoose.Types.ObjectId(),
             componentes: [{ nome: 'Y', fornecedor: 'F', quantidade: 2, valor_unitario: 10, subtotal: 20 }],
         });
+        // Busca o documento usando o ID salvo.
         const found = await Orcamento.findById(orcamento._id);
         expect(found).not.toBeNull();
         expect(found.nome).toBe('BuscaId');
@@ -123,8 +128,10 @@ describe('Model Orcamento', () => {
             usuario: new mongoose.Types.ObjectId(),
             componentes: [{ nome: 'Z', fornecedor: 'F', quantidade: 1, valor_unitario: 10, subtotal: 10 }],
         });
+        // Modifica o documento e salva a alteração.
         orcamento.nome = 'Atualizado';
         await orcamento.save();
+        // Busca o documento atualizado para verificar se a mudança foi persistida.
         const found = await Orcamento.findById(orcamento._id);
         expect(found.nome).toBe('Atualizado');
     });
@@ -138,7 +145,9 @@ describe('Model Orcamento', () => {
             componentes: [{ nome: 'W', fornecedor: 'F', quantidade: 1, valor_unitario: 10, subtotal: 10 }],
         });
         await Orcamento.findByIdAndDelete(orcamento._id);
+        // Tenta buscar o documento removido.
         const found = await Orcamento.findById(orcamento._id);
+        // Verifica se o resultado é nulo, confirmando a remoção.
         expect(found).toBeNull();
     });
 
@@ -150,15 +159,18 @@ describe('Model Orcamento', () => {
             usuario: new mongoose.Types.ObjectId(),
             componentes: [{ nome: 'V', fornecedor: 'F', quantidade: 1, valor_unitario: 10, subtotal: 10 }],
         });
+        // Adiciona um novo componente ao array e atualiza o valor total.
         orcamento.componentes.push({ nome: 'Novo', fornecedor: 'F2', quantidade: 2, valor_unitario: 5, subtotal: 10 });
         orcamento.valor = orcamento.componentes.reduce((acc, c) => acc + c.subtotal, 0);
         await orcamento.save();
+        // Busca o documento atualizado e verifica o número de componentes e o novo valor.
         const found = await Orcamento.findById(orcamento._id);
         expect(found.componentes.length).toBe(2);
         expect(found.valor).toBe(20);
     });
 
     it('não deve permitir componente sem campos obrigatórios', async () => {
+        // Tenta criar um documento com um componente incompleto.
         await expect(Orcamento.create({
             nome: 'SemComp',
             protocolo: 'PROTO-009',
