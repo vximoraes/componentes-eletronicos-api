@@ -3,6 +3,7 @@ import { CommonResponse } from '../../../utils/helpers/index.js';
 import { v4 as uuid } from 'uuid';
 
 jest.mock('../../../services/OrcamentoService.js', () => {
+    
     return jest.fn().mockImplementation(() => ({
         criar: jest.fn(),
         listar: jest.fn(),
@@ -42,12 +43,14 @@ describe('OrcamentoController', () => {
                         { nome: 'Capacitor', fornecedor: 'Fornecedor Teste', quantidade: '1', valor_unitario: '2' }
                     ]
                 }
-            };
+            }; 
             const fakeOrcamento = {
                 toObject: () => ({ _id: '507f1f77bcf86cd799439011', protocolo: uuid(), valor: 5, ...req.body })
             };
             service.criar.mockResolvedValue(fakeOrcamento);
+            // Chama o método do controlador a ser testado.
             await controller.criar(req, res);
+            // Asserções para verificar o comportamento:
             expect(service.criar).toHaveBeenCalled();
             expect(res.status).toHaveBeenCalledWith(201);
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ nome: 'Orçamento Teste' }) }));
@@ -66,6 +69,7 @@ describe('OrcamentoController', () => {
                 }
             };
             service.criar.mockRejectedValue({ code: 11000 });
+            // Espera que a promessa seja rejeitada, indicando a falha.
             await expect(controller.criar(req, res)).rejects.toBeDefined();
         });
     });
@@ -73,8 +77,10 @@ describe('OrcamentoController', () => {
     describe('listar', () => {
         it('deve retornar todos os orçamentos', async () => {
             const req = { params: {}, query: {} };
+            // lista de orçamentos retornada pelo serviço.
             service.listar.mockResolvedValue([{ nome: 'Orçamento 1' }]);
             await controller.listar(req, res);
+            // Verifica se o serviço foi chamado e se a resposta é um status 200 com um array.
             expect(service.listar).toHaveBeenCalled();
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ data: expect.any(Array) }));
@@ -84,8 +90,10 @@ describe('OrcamentoController', () => {
     describe('atualizar', () => {
         it('deve atualizar orçamento existente', async () => {
             const req = { params: { id: '507f1f77bcf86cd799439011' }, body: { nome: 'Novo Nome' } };
+            // sucesso na atualização.
             service.atualizar.mockResolvedValue({ _id: '507f1f77bcf86cd799439011', nome: 'Novo Nome' });
             await controller.atualizar(req, res);
+            // Verifica se o serviço foi chamado com os argumentos corretos.
             expect(service.atualizar).toHaveBeenCalledWith('507f1f77bcf86cd799439011', { nome: 'Novo Nome' }, req);
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringContaining('sucesso') }));
@@ -93,6 +101,7 @@ describe('OrcamentoController', () => {
         it('deve retornar erro 404 para orçamento inexistente', async () => {
             const req = { params: { id: '507f1f77bcf86cd799439011' }, body: { nome: 'Novo Nome' } };
             service.atualizar.mockRejectedValue({ status: 404 });
+            // Espera que a promessa seja rejeitada, indicando a falha.
             await expect(controller.atualizar(req, res)).rejects.toBeDefined();
         });
     });
@@ -123,6 +132,7 @@ describe('OrcamentoController', () => {
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringContaining('adicionado') }));
         });
         it('deve retornar erro 400 para dados inválidos', async () => {
+            // Requisição com dados inválidos que falharão na validação.
             const req = { params: { orcamentoId: '507f1f77bcf86cd799439011' }, body: { nome: '', quantidade: '0', fornecedor: '' } };
             await expect(controller.adicionarComponente(req, res)).rejects.toThrow();
         });
@@ -131,7 +141,9 @@ describe('OrcamentoController', () => {
     describe('atualizarComponente', () => {
         it('deve atualizar componente existente', async () => {
             const req = { params: { orcamentoId: '507f1f77bcf86cd799439011', id: '507f1f77bcf86cd799439012' }, body: { quantidade: '5' } };
+            // componente por ID.
             service.getComponenteById.mockResolvedValue({ _id: '507f1f77bcf86cd799439012', nome: 'Resistor', quantidade: '2', valor_unitario: '1.5' });
+            // atualização do componente.
             service.atualizarComponente.mockResolvedValue({ _id: '507f1f77bcf86cd799439011', componente_orcamento: [{ _id: '507f1f77bcf86cd799439012', quantidade: '5' }] });
             await controller.atualizarComponente(req, res);
             expect(service.atualizarComponente).toHaveBeenCalled();
@@ -140,10 +152,12 @@ describe('OrcamentoController', () => {
         });
         it('deve retornar erro 404 para componente inexistente', async () => {
             const req = { params: { orcamentoId: '507f1f77bcf86cd799439011', id: '507f1f77bcf86cd799439012' }, body: { quantidade: '5' } };
+            // indicando que o componente não foi encontrado.
             service.getComponenteById.mockResolvedValue(null);
             await controller.atualizarComponente(req, res);
             expect(res.status).toHaveBeenCalledWith(404);
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 404, error: true, message: expect.any(String) }));
+            // Asserção extra para verificar a mensagem de erro específica.
             expect(res.json.mock.calls[0][0].errors[0].message).toMatch(/componente/i);
         });
         it('deve retornar erro 400 se nenhum campo enviado', async () => {
@@ -160,6 +174,7 @@ describe('OrcamentoController', () => {
             const req = { params: { orcamentoId: '507f1f77bcf86cd799439011', id: 'cid' } };
             service.removerComponente.mockResolvedValue({ _id: '507f1f77bcf86cd799439011', componente_orcamento: [] });
             await controller.removerComponente(req, res);
+            //verifica se o serviço foi chamado com todos os argumentos esperados, incluindo o objeto `req`.
             expect(service.removerComponente).toHaveBeenCalledWith('507f1f77bcf86cd799439011', 'cid', req);
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringContaining('removido') }));
@@ -174,7 +189,9 @@ describe('OrcamentoController', () => {
     describe('falha inesperada', () => {
         it('deve retornar erro 500 para falha inesperada', async () => {
             const req = { params: {}, body: {} };
+            // Simula um erro genérico que não é tratado especificamente.
             service.listar.mockRejectedValue(new Error('Erro inesperado'));
+            // Espera que a promessa seja rejeitada com a mensagem de erro específica.
             await expect(controller.listar(req, res)).rejects.toThrow('Erro inesperado');
         });
     });
