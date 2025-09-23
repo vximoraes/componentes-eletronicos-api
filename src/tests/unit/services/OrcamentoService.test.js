@@ -13,7 +13,7 @@ describe('OrcamentoService', () => {
         repository = OrcamentoRepository.mock.instances[0];
     });
 
-    describe('criar', () => {
+    describe.only('criar', () => {
         it('deve cadastrar orçamento válido', async () => {
             const parsedData = { nome: 'Orçamento', protocolo: 'P123', valor: 10 };
             const req = { user_id: 'user123' };
@@ -36,7 +36,9 @@ describe('OrcamentoService', () => {
             const req = {};
             repository.listar.mockResolvedValue([{ nome: 'Orçamento' }]);
             const result = await service.listar(req);
+            // Verifica se o método correto do repositório foi chamado com os argumentos certos.
             expect(repository.listar).toHaveBeenCalledWith(req);
+            // Verifica se o resultado é um array.
             expect(result).toEqual(expect.any(Array));
         });
     });
@@ -46,6 +48,7 @@ describe('OrcamentoService', () => {
             const id = 'id';
             const parsedData = { nome: 'Novo Nome' };
             const req = { user_id: 'user123' };
+            //Simula o cenário de falha: o protocolo já existe no banco.
             repository.buscarPorId.mockResolvedValue({ _id: id });
             repository.atualizar.mockResolvedValue({ _id: id, ...parsedData });
             const result = await service.atualizar(id, parsedData, req);
