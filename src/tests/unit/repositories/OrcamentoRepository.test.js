@@ -48,9 +48,11 @@ describe('OrcamentoRepository', () => {
     });
 
     it('deve listar todos os orçamentos com paginação', async () => {
+        // simula uma resposta paginada.
         MockModel.paginate.mockResolvedValue({ docs: [{ toObject: () => ({ _id: 'id' }) }] });
         const req = { query: {}, params: {} };
         const result = await repository.listar(req);
+            // Verifica se a resposta contém um array de documentos, como esperado de uma resposta de paginação.
         expect(Array.isArray(result.docs)).toBe(true);
     });
 
