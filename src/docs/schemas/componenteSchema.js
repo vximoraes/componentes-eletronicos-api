@@ -60,6 +60,42 @@ const componentesSchemas = {
         ...deepCopy(componenteJsonSchema),
         required: [],
         description: "Schema para atualização de componente"
+    },
+    ComponenteUploadFotoResposta: {
+        type: "object",
+        properties: {
+            error: {
+                type: "boolean",
+                example: false
+            },
+            code: {
+                type: "number",
+                example: 201
+            },
+            message: {
+                type: "string",
+                example: "Foto enviada com sucesso."
+            },
+            data: {
+                type: "object",
+                properties: {
+                    etag: {
+                        type: "string",
+                        example: "3e73f59102c83ab67c509a414c22279e"
+                    },
+                    versionId: {
+                        type: "string",
+                        nullable: true,
+                        example: null
+                    }
+                }
+            },
+            errors: {
+                type: "array",
+                example: []
+            }
+        },
+        description: "Schema para resposta de upload de foto do componente"
     }
 };
 

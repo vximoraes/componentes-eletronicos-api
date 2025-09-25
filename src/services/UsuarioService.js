@@ -2,6 +2,10 @@ import bcrypt from 'bcrypt';
 import UsuarioRepository from '../repositories/UsuarioRepository.js';
 import GrupoRepository from '../repositories/GrupoRepository.js';
 import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
+import minioClient from '../config/MinIO.js';
+import path from 'path';
+import compress from '../config/SharpConfig.js';
+import { object } from 'zod/v4';
 // import AuthHelper from '../utils/AuthHelper.js';
 
 class UsuarioService {
@@ -91,6 +95,49 @@ class UsuarioService {
 
         return usuarioExistente;
     };
+
+    async uploadFoto(req, id) {
+        const file = req.file;
+        if (file.size > (5 * 1024 * 1024)) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.PAYLOAD_TOO_LARGE.code,
+                errorType: 'payloadTooLarge',
+                field: "Imagem",
+                details: [{ path: "Imagem", message: "Arquivo é superior a 5 MB" }],
+                customMessage: "O arquivo é maior do que 5 MB."
+            });
+        }
+        try {
+            const newFile = await compress(file.buffer);
+            const objectName = `${id}.jpeg`;
+            const data = await minioClient.putObject(process.env.MINIO_BUCKET, objectName, newFile, {
+                'Content-Type': file.mimetype,
+            });
+
+            return data;
+        } catch (err) {
+            throw new Error(err);
+        };
+    }
+    async deletarFoto(id){
+        try{
+            console.log(id)
+            const objectName = `${id}.jpeg`
+            const data = await minioClient.removeObject(process.env.MINIO_BUCKET, objectName)
+            return data
+        }catch(err){
+            if(err.code === 'NoSuchKey'){
+                throw new CustomError({
+                    statusCode: HttpStatusCodes.NOT_FOUND.code,
+                    errorType: `resourceNotFound`,
+                    field:"Imagem",
+                    details:[{path: "Imagem", message:"Foto não encontrada"}],
+                    customMessage: "Nenhuma foto corresponde ao id do usuário."
+                })
+            }
+            throw new Error("Erro ao deletar foto de usuário:", err)
+        }
+    }
 };
 
 export default UsuarioService;
