@@ -7,6 +7,8 @@ import localizacoesSchemas from "../schemas/localizacaoSchema.js";
 import movimentacoesSchemas from "../schemas/movimentacaoSchema.js";
 import notificacoesSchemas from "../schemas/notificacaoSchema.js";
 import orcamentosSchemas from "../schemas/orcamentoSchema.js";
+import gruposSchemas from "../schemas/grupoSchema.js";
+import rotasSchemas from "../schemas/rotaSchema.js";
 import usuariosPaths from "../paths/usuarios.js";
 import authPaths from "../paths/auth.js";
 import categoriasPaths from "../paths/categoria.js";
@@ -16,6 +18,8 @@ import localizacoesPaths from "../paths/localizacao.js";
 import movimentacoesPaths from "../paths/movimentacao.js";
 import notificacoesPaths from "../paths/notificacao.js";
 import orcamentosPaths from "../paths/orcamento.js";
+import gruposPaths from "../paths/grupo.js";
+import rotasPaths from "../paths/rota.js";
 
 // Função para definir as URLs do servidor dependendo do ambiente
 const getServersInCorrectOrder = () => {
@@ -77,6 +81,14 @@ const getSwaggerOptions = () => {
                 {
                     name: "Notificações",
                     description: "Rotas para gestão de notificações"
+                },
+                {
+                    name: "Grupos",
+                    description: "Rotas para gestão de grupos e permissões"
+                },
+                {
+                    name: "Rotas",
+                    description: "Rotas para gestão de rotas de acesso do sistema"
                 }
             ],
             paths: {
@@ -89,6 +101,8 @@ const getSwaggerOptions = () => {
                 ...movimentacoesPaths,
                 ...notificacoesPaths,
                 ...orcamentosPaths,
+                ...gruposPaths,
+                ...rotasPaths,
             },
             components: {
                 securitySchemes: {
@@ -108,6 +122,8 @@ const getSwaggerOptions = () => {
                     ...movimentacoesSchemas,
                     ...notificacoesSchemas,
                     ...orcamentosSchemas,
+                    ...gruposSchemas,
+                    ...rotasSchemas,
                 }
             },
             security: [{

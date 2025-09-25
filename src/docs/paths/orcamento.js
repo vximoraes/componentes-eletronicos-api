@@ -247,6 +247,70 @@ const orcamentosRoutes = {
         }
     },
     "/orcamentos/{orcamentoId}/componentes": {
+        get: {
+            tags: ["Orçamentos"],
+            summary: "Lista componentes de um orçamento",
+            description: `
+            + Caso de uso: Listar todos os componentes de um orçamento específico.
+            
+            + Função de Negócio:
+                - Permitir ao usuário visualizar todos os componentes de um orçamento.
+                + Recebe como path parameter:
+                    - **orcamentoId**: identificador do orçamento (MongoDB ObjectId).
+
+            + Regras de Negócio:
+                - Orçamento deve existir.
+                - Retorna lista completa de componentes com seus detalhes.
+
+            + Resultado Esperado:
+                - HTTP 200 OK com array de componentes do orçamento.
+        `,
+            security: [{ bearerAuth: [] }],
+            parameters: [
+                {
+                    name: "orcamentoId",
+                    in: "path",
+                    required: true,
+                    schema: {
+                        type: "string",
+                    },
+                    description: "ID do orçamento"
+                }
+            ],
+            responses: {
+                200: {
+                    description: "Componentes do orçamento retornados com sucesso",
+                    content: {
+                        "application/json": {
+                            schema: {
+                                type: "object",
+                                properties: {
+                                    data: {
+                                        type: "array",
+                                        items: {
+                                            $ref: "#/components/schemas/ComponenteOrcamento"
+                                        }
+                                    },
+                                    message: {
+                                        type: "string",
+                                        example: "Componentes do orçamento listados com sucesso"
+                                    },
+                                    errors: {
+                                        type: "array",
+                                        example: []
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                400: commonResponses[400](),
+                401: commonResponses[401](),
+                404: commonResponses[404](),
+                498: commonResponses[498](),
+                500: commonResponses[500]()
+            }
+        },
         post: {
             tags: ["Orçamentos"],
             summary: "Adiciona componente ao orçamento",
