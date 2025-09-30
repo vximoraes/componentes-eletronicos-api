@@ -83,14 +83,19 @@ export const fakeMappings = {
         nome: () => fakebr.helpers.randomize(fakeMappings.Componente.nomesFixos),
         quantidade: () => fakebr.random.number({ min: 0, max: 100 }),
         estoque_minimo: () => fakebr.random.number({ min: 1, max: 20 }),
-        valor_unitario: () => fakebr.commerce.price(1, 1000, 2),
         descricao: () => fakebr.lorem.sentence(),
         imagem: () => fakebr.image.imageUrl(),
         categoria: () => new mongoose.Types.ObjectId().toString(),
-        localizacao: () => new mongoose.Types.ObjectId().toString(),
         ativo: () => true,
         status: () => fakebr.helpers.randomize(['Indisponível', 'Baixo Estoque', 'Em Estoque']),
         usuario: () => new mongoose.Types.ObjectId().toString(),
+    },
+
+    Estoque: {
+        quantidade: () => fakebr.random.number({ min: 0, max: 100 }),
+        componente_id: () => new mongoose.Types.ObjectId().toString(),
+        localizacao_id: () => new mongoose.Types.ObjectId().toString(),
+        usuario_id: () => new mongoose.Types.ObjectId().toString(),
     },
 
     Fornecedor: {

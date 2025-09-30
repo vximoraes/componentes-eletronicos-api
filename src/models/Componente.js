@@ -19,10 +19,6 @@ class Componente {
                 type: Number,
                 required: true
             },
-            valor_unitario: {
-                type: Number,
-                required: true
-            },
             descricao: {
                 type: String,
                 required: false
@@ -30,10 +26,6 @@ class Componente {
             imagem: {
                 type: String,
                 required: false
-            },
-            localizacao: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "localizacoes", required: true
             },
             categoria: {
                 type: mongoose.Schema.Types.ObjectId,
