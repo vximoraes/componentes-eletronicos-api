@@ -18,41 +18,72 @@ class Orcamento {
                 type: String,
                 required: false
             },
-            valor: {
+            total: {
                 type: Number,
-                required: true
+                default: 0
             },
             componentes: [
                 {
-                    _id: { 
-                        type: mongoose.Schema.Types.ObjectId 
+                    componente: {
+                        type: mongoose.Schema.Types.ObjectId,
+                        ref: 'componentes',
+                        required: true
                     },
                     nome: {
                         type: String,
                         required: true
                     },
                     fornecedor: {
-                        type: String,
+                        type: mongoose.Schema.Types.ObjectId,
+                        ref: 'fornecedores',
                         required: true
                     },
                     quantidade: {
                         type: Number,
-                        required: true
+                        required: true,
+                        min: 1
                     },
                     valor_unitario: {
                         type: Number,
-                        required: true
+                        required: true,
+                        min: 0
                     },
                     subtotal: {
                         type: Number,
-                        required: true
-                    },
+                        default: 0,
+                        min: 0
+                    }
                 }
             ],
             usuario: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'usuarios',
                 required: true
+            }
+        });
+
+        // Middleware para calcular subtotal e total antes de salvar
+        orcamentoSchema.pre('save', function() {
+            // Calcular subtotal para cada componente
+            this.componentes.forEach(comp => {
+                comp.subtotal = comp.quantidade * comp.valor_unitario;
+            });
+            
+            // Calcular total do orçamento
+            this.total = this.componentes.reduce((acc, comp) => acc + comp.subtotal, 0);
+        });
+
+        // Middleware para recalcular após update
+        orcamentoSchema.pre(['updateOne', 'findOneAndUpdate'], function() {
+            const update = this.getUpdate();
+            if (update.componentes) {
+                // Calcular subtotal para cada componente
+                update.componentes.forEach(comp => {
+                    comp.subtotal = comp.quantidade * comp.valor_unitario;
+                });
+                
+                // Calcular total do orçamento
+                update.total = update.componentes.reduce((acc, comp) => acc + comp.subtotal, 0);
             }
         });
 

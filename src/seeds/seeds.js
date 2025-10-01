@@ -7,7 +7,6 @@ import fornecedorSeed from "./fornecedorSeed.js";
 import movimentacaoSeed from "./movimentacaoSeed.js";
 import usuarioSeed from "./usuarioSeed.js";
 import notificacaoSeed from "./notificacaoSeed.js";
-import componenteOrcamentoSeed from "./componenteOrcamentoSeed.js";
 import orcamentoSeed from "./orcamentoSeed.js";
 import rotasSeed from "./rotasSeed.js"
 
@@ -24,11 +23,9 @@ try {
     await fornecedorSeed(adminId);
     await movimentacaoSeed(adminId);
     await notificacaoSeed(adminId);
-    await componenteOrcamentoSeed();
     await orcamentoSeed(adminId);
 
     console.log(`[${new Date().toLocaleString()}] - Seeds criadas com sucesso!`);
-    console.log(`[${new Date().toLocaleString()}] - Admin criado com email: admin@admin.com e senha: Senha@123`);
 } catch (error) {
     console.error("Erro ao criar seeds:", error);
 } finally {

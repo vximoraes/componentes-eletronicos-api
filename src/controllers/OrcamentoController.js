@@ -4,6 +4,8 @@ import { OrcamentoSchema, OrcamentoUpdateSchema, ComponenteOrcamentoSchema, Comp
 import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
 import { v4 as uuid } from 'uuid';
 import mongoose from 'mongoose';
+import Componente from '../models/Componente.js';
+import Fornecedor from '../models/Fornecedor.js';
 
 class OrcamentoController {
     constructor() {
@@ -15,26 +17,44 @@ class OrcamentoController {
 
         const protocolo = uuid();
 
-        const componentes = parsedData.componente_orcamento.map((comp) => {
-            const quantidade = Number(comp.quantidade) || 0;
-            const valor_unitario = Number(comp.valor_unitario) || 0;
-            const subtotal = quantidade * valor_unitario;
-            return {
-                ...comp,
-                quantidade,
-                valor_unitario,
-                subtotal,
-                _id: new mongoose.Types.ObjectId()
-            };
-        });
+        const componentesProcessados = [];
+        for (const comp of parsedData.componentes) {
+            const componente = await Componente.findById(comp.componente);
+            if (!componente) {
+                throw new CustomError({
+                    statusCode: 404,
+                    errorType: 'resourceNotFound',
+                    field: 'componente',
+                    details: [{ path: 'componente', message: `Componente com ID ${comp.componente} não encontrado.` }],
+                    customMessage: `Componente com ID ${comp.componente} não encontrado.`
+                });
+            }
 
-        const valor = componentes.reduce((acc, comp) => acc + comp.subtotal, 0);
+            const fornecedor = await Fornecedor.findById(comp.fornecedor);
+            if (!fornecedor) {
+                throw new CustomError({
+                    statusCode: 404,
+                    errorType: 'resourceNotFound',
+                    field: 'fornecedor',
+                    details: [{ path: 'fornecedor', message: `Fornecedor com ID ${comp.fornecedor} não encontrado.` }],
+                    customMessage: `Fornecedor com ID ${comp.fornecedor} não encontrado.`
+                });
+            }
+
+            componentesProcessados.push({
+                componente: comp.componente,
+                nome: componente.nome, 
+                fornecedor: comp.fornecedor,
+                quantidade: comp.quantidade,
+                valor_unitario: comp.valor_unitario
+            });
+        }
 
         const orcamentoParaSalvar = {
-            ...parsedData,
+            nome: parsedData.nome,
             protocolo,
-            valor,
-            componentes
+            descricao: parsedData.descricao,
+            componentes: componentesProcessados
         };
 
         let data = await this.service.criar(orcamentoParaSalvar, req);
@@ -81,16 +101,37 @@ class OrcamentoController {
         const { orcamentoId } = req.params;
         const componenteData = req.body;
         const parsedComponente = ComponenteOrcamentoSchema.parse(componenteData);
-        const quantidade = Number(parsedComponente.quantidade) || 0;
-        const valor_unitario = Number(parsedComponente.valor_unitario) || 0;
-        const subtotal = quantidade * valor_unitario;
+
+        const componente = await Componente.findById(parsedComponente.componente);
+        if (!componente) {
+            throw new CustomError({
+                statusCode: 404,
+                errorType: 'resourceNotFound',
+                field: 'componente',
+                details: [{ path: 'componente', message: `Componente com ID ${parsedComponente.componente} não encontrado.` }],
+                customMessage: `Componente com ID ${parsedComponente.componente} não encontrado.`
+            });
+        }
+
+        const fornecedor = await Fornecedor.findById(parsedComponente.fornecedor);
+        if (!fornecedor) {
+            throw new CustomError({
+                statusCode: 404,
+                errorType: 'resourceNotFound',
+                field: 'fornecedor',
+                details: [{ path: 'fornecedor', message: `Fornecedor com ID ${parsedComponente.fornecedor} não encontrado.` }],
+                customMessage: `Fornecedor com ID ${parsedComponente.fornecedor} não encontrado.`
+            });
+        }
+
         const novoComponente = {
-            ...parsedComponente,
-            quantidade,
-            valor_unitario,
-            subtotal,
-            _id: new mongoose.Types.ObjectId()
+            componente: parsedComponente.componente,
+            nome: componente.nome, 
+            fornecedor: parsedComponente.fornecedor,
+            quantidade: parsedComponente.quantidade,
+            valor_unitario: parsedComponente.valor_unitario
         };
+
         const orcamentoAtualizado = await this.service.adicionarComponente(orcamentoId, novoComponente, req);
         return CommonResponse.success(res, orcamentoAtualizado, 200, 'Componente adicionado com sucesso.');
     };
@@ -103,11 +144,24 @@ class OrcamentoController {
         };
         const parsedComponente = ComponenteOrcamentoUpdateSchema.parse(componenteData);
 
-        // Buscar valores antigos para garantir subtotal correto
+        // Buscar valores antigos para garantir atualização correta
         const oldComponente = await this.service.getComponenteById(orcamentoId, id, req);
         if (!oldComponente) {
             return CommonResponse.error(res, 404, 'resourceNotFound', 'componente', [{ message: 'Componente não encontrado.' }]);
         };
+
+        if (parsedComponente.fornecedor && parsedComponente.fornecedor !== oldComponente.fornecedor.toString()) {
+            const fornecedor = await Fornecedor.findById(parsedComponente.fornecedor);
+            if (!fornecedor) {
+                throw new CustomError({
+                    statusCode: 404,
+                    errorType: 'resourceNotFound',
+                    field: 'fornecedor',
+                    details: [{ path: 'fornecedor', message: `Fornecedor com ID ${parsedComponente.fornecedor} não encontrado.` }],
+                    customMessage: `Fornecedor com ID ${parsedComponente.fornecedor} não encontrado.`
+                });
+            }
+        }
 
         // Atualiza apenas os campos enviados
         const componenteAtualizado = {
@@ -115,17 +169,6 @@ class OrcamentoController {
             ...parsedComponente,
             _id: id
         };
-
-        // Só sobrescreve se o campo veio no PATCH (req.body) e sempre converte para number
-        const quantidade = Object.prototype.hasOwnProperty.call(req.body, 'quantidade')
-            ? Number(req.body.quantidade)
-            : Number(oldComponente.quantidade);
-        const valor_unitario = Object.prototype.hasOwnProperty.call(req.body, 'valor_unitario')
-            ? Number(req.body.valor_unitario)
-            : Number(oldComponente.valor_unitario);
-        componenteAtualizado.quantidade = quantidade;
-        componenteAtualizado.valor_unitario = valor_unitario;
-        componenteAtualizado.subtotal = quantidade * valor_unitario;
 
         const orcamentoAtualizado = await this.service.atualizarComponente(orcamentoId, id, componenteAtualizado, req);
         return CommonResponse.success(res, orcamentoAtualizado, 200, 'Componente atualizado com sucesso.');
