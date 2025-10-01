@@ -3,16 +3,14 @@ import Componente from "../models/Componente.js";
 import Categoria from "../models/Categoria.js";
 import Usuario from "../models/Usuario.js";
 
-export default async function componenteSeed() {
+export default async function componenteSeed(adminId) {
     const categoriaList = await Categoria.find({});
-    const usuarios = await Usuario.find({});
 
     await Componente.deleteMany({});
 
     const nomesFixos = fakeMappings.Componente.nomesFixos;
     for (let nome of nomesFixos) {
         const categoriaRandom = categoriaList[Math.floor(Math.random() * categoriaList.length)];
-        const usuarioRandom = usuarios[Math.floor(Math.random() * usuarios.length)];
 
         const componente = {
             nome,
@@ -21,7 +19,7 @@ export default async function componenteSeed() {
             descricao: fakeMappings.Componente.descricao.apply(),
             imagem: fakeMappings.Componente.imagem.apply(),
             categoria: categoriaRandom._id,
-            usuario: usuarioRandom._id,
+            usuario: adminId,
             ativo: fakeMappings.Componente.ativo.apply(),
             status: fakeMappings.Componente.status.apply()
         };

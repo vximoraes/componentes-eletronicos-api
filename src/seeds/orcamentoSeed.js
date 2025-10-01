@@ -2,13 +2,10 @@ import { fakeMappings } from './globalFakeMapping.js';
 import Orcamento from '../models/Orcamento.js';
 import Usuario from '../models/Usuario.js';
 
-export default async function orcamentoSeed() {
-    const usuarios = await Usuario.find({});
-    
+export default async function orcamentoSeed(adminId) {
     await Orcamento.deleteMany({});
 
     for (let i = 0; i < 5; i++) {
-        const usuarioRandom = usuarios[Math.floor(Math.random() * usuarios.length)];
         const componentes = fakeMappings.Orcamento.componentes.apply();
         const valor = componentes.reduce((acc, comp) => acc + (comp.subtotal || 0), 0);
         
@@ -18,7 +15,7 @@ export default async function orcamentoSeed() {
             descricao: fakeMappings.Orcamento.descricao.apply(),
             valor: Number(valor.toFixed(2)),
             componentes,
-            usuario: usuarioRandom._id
+            usuario: adminId
         };
         
         await Orcamento.create(orcamento);

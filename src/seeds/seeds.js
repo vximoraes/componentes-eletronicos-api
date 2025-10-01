@@ -17,17 +17,18 @@ try {
     console.log(`[${new Date().toLocaleString()}] - Iniciando criação das seeds...`);
 
     await rotasSeed();
-    await usuarioSeed(); 
-    await categoriaSeed();
-    await localizacaoSeed();
-    await componenteSeed();
-    await fornecedorSeed();
-    await movimentacaoSeed();
-    await notificacaoSeed();
+    const { adminId } = await usuarioSeed(); 
+    await categoriaSeed(adminId);
+    await localizacaoSeed(adminId);
+    await componenteSeed(adminId);
+    await fornecedorSeed(adminId);
+    await movimentacaoSeed(adminId);
+    await notificacaoSeed(adminId);
     await componenteOrcamentoSeed();
-    await orcamentoSeed();
+    await orcamentoSeed(adminId);
 
     console.log(`[${new Date().toLocaleString()}] - Seeds criadas com sucesso!`);
+    console.log(`[${new Date().toLocaleString()}] - Admin criado com email: admin@admin.com e senha: Senha@123`);
 } catch (error) {
     console.error("Erro ao criar seeds:", error);
 } finally {

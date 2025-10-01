@@ -21,7 +21,7 @@ class Movimentacao {
             },
             componente: {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "componentes", // corrigido para bater com o nome do modelo
+                ref: "componentes",
                 required: true,
             },
             localizacao: {
