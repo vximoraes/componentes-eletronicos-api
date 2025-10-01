@@ -8,7 +8,6 @@ class MovimentacaoService {
     };
 
     async criar(parsedData, req) {
-        // Buscar o componente relacionado.
         const componente = await Componente.findOne({ _id: parsedData.componente, usuario: req.user_id });
         if (!componente) {
             throw new CustomError({
@@ -20,30 +19,30 @@ class MovimentacaoService {
             });
         };
 
-
+        if (parsedData.tipo === 'saida') {
+            const Estoque = await import('../models/Estoque.js');
+            const estoqueAtual = await Estoque.default.findOne({
+                componente: parsedData.componente,
+                localizacao: parsedData.localizacao
+            });
+            
+            const quantidadeDisponivel = estoqueAtual ? estoqueAtual.quantidade : 0;
+            
+            if (quantidadeDisponivel < parsedData.quantidade) {
+                throw new CustomError({
+                    statusCode: 400,
+                    errorType: 'validationError',
+                    field: 'quantidade',
+                    details: [{ path: 'quantidade', message: `Quantidade insuficiente em estoque. Disponível: ${quantidadeDisponivel}` }],
+                    customMessage: `Quantidade insuficiente em estoque. Disponível: ${quantidadeDisponivel}`
+                });
+            }
+        }
 
         const now = new Date();
         now.setHours(now.getHours() - 4);
         now.setDate(now.getDate() - 1);
         parsedData.data_hora = now.toISOString().slice(0, 23).replace('T', ' ');
-
-        // Atualizar quantidade conforme o tipo.
-        if (parsedData.tipo === 'entrada') {
-            componente.quantidade += parsedData.quantidade;
-        } else if (parsedData.tipo === 'saida') {
-            if (componente.quantidade < parsedData.quantidade) {
-                throw new CustomError({
-                    statusCode: 400,
-                    errorType: 'validationError',
-                    field: 'quantidade',
-                    details: [{ path: 'quantidade', message: 'Quantidade insuficiente em estoque.' }],
-                    customMessage: 'Quantidade insuficiente em estoque.'
-                });
-            }
-            componente.quantidade -= parsedData.quantidade;
-        };
-
-        await componente.save();
 
         parsedData.usuario = req.user_id;
         const data = await this.repository.criar(parsedData);

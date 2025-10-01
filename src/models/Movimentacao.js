@@ -66,8 +66,7 @@ class Movimentacao {
                 { 
                     $match: { 
                         componente: componenteId, 
-                        localizacao: localizacaoId,
-                        usuario: usuarioId
+                        localizacao: localizacaoId
                     } 
                 },
                 {
@@ -92,11 +91,11 @@ class Movimentacao {
             await EstoqueModel.findOneAndUpdate(
                 { 
                     componente: componenteId, 
-                    localizacao: localizacaoId,
-                    usuario: usuarioId
+                    localizacao: localizacaoId
                 },
                 { 
-                    quantidade: quantidadeTotal 
+                    quantidade: quantidadeTotal,
+                    usuario: usuarioId 
                 },
                 { 
                     upsert: true, 
