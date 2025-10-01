@@ -1,6 +1,5 @@
 import MovimentacaoRepository from '../repositories/MovimentacaoRepository.js';
 import Componente from '../models/Componente.js';
-import Fornecedor from '../models/Fornecedor.js';
 import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
 
 class MovimentacaoService {
@@ -21,28 +20,7 @@ class MovimentacaoService {
             });
         };
 
-        // Se tipo for entrada, validar fornecedor.
-        if (parsedData.tipo === 'entrada') {
-            if (!parsedData.fornecedor) {
-                throw new CustomError({
-                    statusCode: 400,
-                    errorType: 'validationError',
-                    field: 'fornecedor',
-                    details: [{ path: 'fornecedor', message: 'Fornecedor é obrigatório para movimentações de entrada.' }],
-                    customMessage: 'Fornecedor é obrigatório para movimentações de entrada.'
-                });
-            };
-            const fornecedor = await Fornecedor.findOne({ _id: parsedData.fornecedor, usuario: req.user_id });
-            if (!fornecedor) {
-                throw new CustomError({
-                    statusCode: 404,
-                    errorType: 'resourceNotFound',
-                    field: 'Fornecedor',
-                    details: [],
-                    customMessage: messages.error.resourceNotFound('Fornecedor')
-                });
-            };
-        };
+
 
         const now = new Date();
         now.setHours(now.getHours() - 4);
@@ -63,7 +41,6 @@ class MovimentacaoService {
                 });
             }
             componente.quantidade -= parsedData.quantidade;
-            delete parsedData.fornecedor;
         };
 
         await componente.save();

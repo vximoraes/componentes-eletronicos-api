@@ -12,13 +12,7 @@ const ComponenteSchema = z.object({
         .string()
         .transform((val) => (val ? parseInt(val) : undefined))
         .refine((val) => val === undefined || Number.isInteger(val), {
-            message: "Quantidade deve ser um número inteiro",
-        }),
-    valor_unitario: z
-        .string()
-        .transform((val) => (val ? parseFloat(val) : undefined))
-        .refine((val) => val === undefined || (!isNaN(val) && typeof val === "number"), {
-            message: "Valor unitário deve ser um número válido.",
+            message: "Estoque mínimo deve ser um número inteiro",
         }),
     descricao: z
         .string()
@@ -26,17 +20,11 @@ const ComponenteSchema = z.object({
     imagem: z
         .string()
         .optional(),
-    localizacao:
-        objectIdSchema,
     categoria: 
         objectIdSchema,
     ativo: z
         .boolean()
         .default(true),
-    status: z
-        .enum(['Indisponível', 'Baixo Estoque', 'Em Estoque'])
-        .default('Indisponível')
-        .optional(),
 });
 
 const ComponenteUpdateSchema = ComponenteSchema.partial();

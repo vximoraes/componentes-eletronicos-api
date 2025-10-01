@@ -10,17 +10,17 @@ class Estoque {
                 default: 0,
                 min: 0
             },
-            componente_id: {
+            componente: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'componentes',
                 required: true
             },
-            localizacao_id: {
+            localizacao: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'localizacoes',
                 required: true
             },
-            usuario_id: {
+            usuario: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'usuarios',
                 required: true
@@ -30,18 +30,18 @@ class Estoque {
         });
 
         // Index composto para garantir unicidade de componente por localização
-        estoqueSchema.index({ componente_id: 1, localizacao_id: 1 }, { unique: true });
+        estoqueSchema.index({ componente: 1, localizacao: 1 }, { unique: true });
 
         // Middleware para atualizar quantidade total do componente após salvar
         estoqueSchema.post('save', async function() {
-            await this.constructor.atualizarQuantidadeComponente(this.componente_id);
+            await this.constructor.atualizarQuantidadeComponente(this.componente);
         });
 
         // Middleware para atualizar quantidade total do componente após remoção
         estoqueSchema.post('deleteOne', async function() {
             const doc = await this.model.findOne(this.getQuery());
             if (doc) {
-                await this.model.atualizarQuantidadeComponente(doc.componente_id);
+                await this.model.atualizarQuantidadeComponente(doc.componente);
             }
         });
 
@@ -49,7 +49,7 @@ class Estoque {
         estoqueSchema.post(['updateOne', 'findOneAndUpdate'], async function() {
             const doc = await this.model.findOne(this.getQuery());
             if (doc) {
-                await this.model.atualizarQuantidadeComponente(doc.componente_id);
+                await this.model.atualizarQuantidadeComponente(doc.componente);
             }
         });
 
@@ -59,7 +59,7 @@ class Estoque {
             
             // Soma todas as quantidades do componente em todas as localizações
             const resultado = await this.aggregate([
-                { $match: { componente_id: componenteId } },
+                { $match: { componente: componenteId } },
                 { $group: { _id: null, quantidadeTotal: { $sum: '$quantidade' } } }
             ]);
 

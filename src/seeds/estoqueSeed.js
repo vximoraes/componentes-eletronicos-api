@@ -29,9 +29,9 @@ export default async function estoqueSeed() {
             
             const estoque = {
                 quantidade: fakeMappings.Estoque.quantidade.apply(),
-                componente_id: componente._id,
-                localizacao_id: localizacao._id,
-                usuario_id: usuarioRandom._id
+                componente: componente._id,
+                localizacao: localizacao._id,
+                usuario: usuarioRandom._id
             };
 
             await Estoque.create(estoque);

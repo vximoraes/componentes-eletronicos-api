@@ -14,7 +14,6 @@ class ComponenteRepository {
         const componente = new this.model(parsedData);
         const componenteSalvo = await componente.save();
         return await this.model.findById(componenteSalvo._id)
-            .populate('localizacao')
             .populate('categoria')
     };
 
@@ -24,7 +23,6 @@ class ComponenteRepository {
         // Se um ID for fornecido, retorna o componente enriquecido com estatísticas.
         if (id) {
             const data = await this.model.findOne({ _id: id, usuario: req.user_id })
-                .populate('localizacao')
                 .populate('categoria');
 
             if (!data) {
@@ -44,7 +42,7 @@ class ComponenteRepository {
             return dataWithStats;
         };
 
-        const { nome, quantidade, estoque_minimo, localizacao, categoria, ativo, status, page = 1 } = req.query;
+        const { nome, quantidade, estoque_minimo, categoria, ativo, status, page = 1 } = req.query;
         const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
 
         const filterBuilder = new ComponenteFilterBuilder()
@@ -54,7 +52,6 @@ class ComponenteRepository {
             .comAtivo(ativo || '')
             .comStatus(status || '');
 
-        await filterBuilder.comLocalizacao(localizacao || '');
         await filterBuilder.comCategoria(categoria || '');
 
         if (typeof filterBuilder.build !== 'function') {
@@ -73,7 +70,6 @@ class ComponenteRepository {
             page: parseInt(page),
             limit: parseInt(limite),
             populate: [
-                'localizacao',
                 'categoria'
             ],
             sort: { nome: 1 },
@@ -95,7 +91,6 @@ class ComponenteRepository {
 
     async atualizar(id, parsedData, req) {
         const componente = await this.model.findOneAndUpdate({ _id: id, usuario: req.user_id }, parsedData, { new: true })
-            .populate('localizacao')
             .populate('categoria')
             .lean();
         if (!componente) {
@@ -124,7 +119,6 @@ class ComponenteRepository {
         };
 
         const componente = await this.model.findOne({ _id: id, usuario: req.user_id })
-            .populate('localizacao')
             .populate('categoria');
 
         if (!componente) {
@@ -145,7 +139,6 @@ class ComponenteRepository {
 
     async buscarPorId(id, includeTokens = false, req) {
         let query = this.model.findOne({ _id: id, usuario: req.user_id })
-            .populate('localizacao')
             .populate('categoria');
 
         const componente = await query;
@@ -171,7 +164,6 @@ class ComponenteRepository {
         };
 
         const documento = await this.model.findOne(filtro)
-            .populate('localizacao')
             .populate('categoria');
 
         return documento;

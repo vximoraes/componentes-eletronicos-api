@@ -14,7 +14,7 @@ class MovimentacaoRepository {
         const movimentacaoSalva = await movimentacao.save();
         return await this.model.findById(movimentacaoSalva._id)
             .populate('componente')
-            .populate('fornecedor');
+            .populate('localizacao');
     };
 
     async listar(req) {
@@ -24,7 +24,7 @@ class MovimentacaoRepository {
         if (id) {
             const data = await this.model.findOne({ _id: id, usuario: req.user_id })
                 .populate('componente')
-                .populate('fornecedor');
+                .populate('localizacao');
 
             if (!data) {
                 throw new CustomError({
@@ -43,7 +43,7 @@ class MovimentacaoRepository {
             return dataWithStats;
         };
 
-        const { tipo, data, quantidade, componente, fornecedor, page = 1 } = req.query;
+        const { tipo, data, quantidade, componente, localizacao, page = 1 } = req.query;
         const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
 
         const filterBuilder = new MovimentacaoFilterBuilder()
@@ -52,7 +52,7 @@ class MovimentacaoRepository {
             .comQuantidade(quantidade || '')
 
         await filterBuilder.comComponente(componente || '');
-        await filterBuilder.comFornecedor(fornecedor || '');
+        await filterBuilder.comLocalizacao(localizacao || '');
 
         if (typeof filterBuilder.build !== 'function') {
             throw new CustomError({
@@ -71,9 +71,9 @@ class MovimentacaoRepository {
             limit: parseInt(limite),
             populate: [
                 'componente',
-                'fornecedor'
+                'localizacao'
             ],
-            sort: { nome: 1 },
+            sort: { data_hora: -1 },
         };
 
         const resultado = await this.model.paginate(filtros, options);

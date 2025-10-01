@@ -1,5 +1,6 @@
 import ComponenteModel from '../../models/Componente.js';
 import ComponenteRepository from '../ComponenteRepository.js';
+import Localizacao from '../../models/Localizacao.js'
 import Categoria from '../../models/Categoria.js'
 import mongoose from 'mongoose';
 const { Types } = mongoose;
@@ -35,6 +36,32 @@ class ComponenteFilterBuilder {
         return this;
     };
 
+    async comLocalizacao(localizacao) {
+        if (localizacao) {
+            if (Types.ObjectId.isValid(localizacao)) {
+                // Se já for um ObjectId, faz o populate direto.
+                this.filtros.localizacao = localizacao;
+                const localizacaoEncontrada = await Localizacao.findById(localizacao);
+                if (!localizacaoEncontrada) {
+                    // Caso não exista, força a busca “vazia”.
+                    this.filtros.localizacao = { $in: [] };
+                };
+            } else {
+                // Se for string.
+                const localizacaoEncontrada = await Localizacao.findOne({
+                    localizacao: { $regex: localizacao, $options: 'i' },
+                });
+                if (localizacaoEncontrada) {
+                    this.filtros.localizacao = localizacaoEncontrada._id;
+                } else {
+                    // Força a busca “vazia”.
+                    this.filtros.localizacao = { $in: [] };
+                };
+            };
+        };
+        return this;
+    };
+
     async comCategoria(categoria) {
         if (categoria) {
             if (Types.ObjectId.isValid(categoria)) {
@@ -42,18 +69,18 @@ class ComponenteFilterBuilder {
                 this.filtros.categoria = categoria;
                 const categoriaEncontrada = await Categoria.findById(categoria);
                 if (!categoriaEncontrada) {
-                    // Caso não exista, força a busca "vazia".
+                    // Caso não exista, força a busca “vazia”.
                     this.filtros.categoria = { $in: [] };
                 };
             } else {
                 // Se for string.
                 const categoriaEncontrada = await Categoria.findOne({
-                    nome: { $regex: categoria, $options: 'i' },
+                    categoria: { $regex: categoria, $options: 'i' },
                 });
                 if (categoriaEncontrada) {
                     this.filtros.categoria = categoriaEncontrada._id;
                 } else {
-                    // Força a busca "vazia".
+                    // Força a busca “vazia”.
                     this.filtros.categoria = { $in: [] };
                 };
             };

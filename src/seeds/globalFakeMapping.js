@@ -93,9 +93,9 @@ export const fakeMappings = {
 
     Estoque: {
         quantidade: () => fakebr.random.number({ min: 0, max: 100 }),
-        componente_id: () => new mongoose.Types.ObjectId().toString(),
-        localizacao_id: () => new mongoose.Types.ObjectId().toString(),
-        usuario_id: () => new mongoose.Types.ObjectId().toString(),
+        componente: () => new mongoose.Types.ObjectId().toString(),
+        localizacao: () => new mongoose.Types.ObjectId().toString(),
+        usuario: () => new mongoose.Types.ObjectId().toString(),
     },
 
     Fornecedor: {
@@ -109,7 +109,7 @@ export const fakeMappings = {
         data_hora: () => new Date().toISOString(),
         quantidade: () => fakebr.random.number({ min: 1, max: 10 }),
         componente: () => new mongoose.Types.ObjectId().toString(),
-        fornecedor: () => new mongoose.Types.ObjectId().toString(),
+        localizacao: () => new mongoose.Types.ObjectId().toString(),
         usuario: () => new mongoose.Types.ObjectId().toString(),
     },
 
