@@ -66,11 +66,11 @@ class Orcamento {
         orcamentoSchema.pre('save', function() {
             // Calcular subtotal para cada componente
             this.componentes.forEach(comp => {
-                comp.subtotal = comp.quantidade * comp.valor_unitario;
+                comp.subtotal = parseFloat((comp.quantidade * comp.valor_unitario).toFixed(2));
             });
             
             // Calcular total do orçamento
-            this.total = this.componentes.reduce((acc, comp) => acc + comp.subtotal, 0);
+            this.total = parseFloat(this.componentes.reduce((acc, comp) => acc + comp.subtotal, 0).toFixed(2));
         });
 
         // Middleware para recalcular após update
@@ -79,11 +79,11 @@ class Orcamento {
             if (update.componentes) {
                 // Calcular subtotal para cada componente
                 update.componentes.forEach(comp => {
-                    comp.subtotal = comp.quantidade * comp.valor_unitario;
+                    comp.subtotal = parseFloat((comp.quantidade * comp.valor_unitario).toFixed(2));
                 });
                 
                 // Calcular total do orçamento
-                update.total = update.componentes.reduce((acc, comp) => acc + comp.subtotal, 0);
+                update.total = parseFloat(update.componentes.reduce((acc, comp) => acc + comp.subtotal, 0).toFixed(2));
             }
         });
 
