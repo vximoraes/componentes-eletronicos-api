@@ -122,7 +122,7 @@ class OrcamentoRepository {
         });
 
         orcamento.componentes.push(novoComponente);
-        orcamento.valor = orcamento.componentes.reduce((acc, comp) => acc + comp.subtotal, 0);
+        orcamento.total = parseFloat(orcamento.componentes.reduce((acc, comp) => acc + comp.subtotal, 0).toFixed(2));
         await orcamento.save();
 
         return orcamento;
@@ -150,7 +150,7 @@ class OrcamentoRepository {
 
         componentes[idx] = { ...((typeof componentes[idx].toObject === 'function') ? componentes[idx].toObject() : componentes[idx]), ...componenteAtualizado };
         orcamento.componentes = componentes;
-        orcamento.valor = componentes.reduce((acc, comp) => acc + comp.subtotal, 0);
+        orcamento.total = parseFloat(componentes.reduce((acc, comp) => acc + comp.subtotal, 0).toFixed(2));
         await orcamento.save();
 
         return orcamento;
@@ -167,7 +167,7 @@ class OrcamentoRepository {
         });
 
         orcamento.componentes = orcamento.componentes.filter(c => c._id.toString() !== componenteId);
-        orcamento.valor = orcamento.componentes.reduce((acc, comp) => acc + comp.subtotal, 0);
+        orcamento.total = parseFloat(orcamento.componentes.reduce((acc, comp) => acc + comp.subtotal, 0).toFixed(2));
         await orcamento.save();
 
         return orcamento;

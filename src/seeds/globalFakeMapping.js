@@ -83,13 +83,18 @@ export const fakeMappings = {
         nome: () => fakebr.helpers.randomize(fakeMappings.Componente.nomesFixos),
         quantidade: () => fakebr.random.number({ min: 0, max: 100 }),
         estoque_minimo: () => fakebr.random.number({ min: 1, max: 20 }),
-        valor_unitario: () => fakebr.commerce.price(1, 1000, 2),
         descricao: () => fakebr.lorem.sentence(),
         imagem: () => fakebr.image.imageUrl(),
         categoria: () => new mongoose.Types.ObjectId().toString(),
-        localizacao: () => new mongoose.Types.ObjectId().toString(),
         ativo: () => true,
         status: () => fakebr.helpers.randomize(['Indisponível', 'Baixo Estoque', 'Em Estoque']),
+        usuario: () => new mongoose.Types.ObjectId().toString(),
+    },
+
+    Estoque: {
+        quantidade: () => fakebr.random.number({ min: 0, max: 100 }),
+        componente: () => new mongoose.Types.ObjectId().toString(),
+        localizacao: () => new mongoose.Types.ObjectId().toString(),
         usuario: () => new mongoose.Types.ObjectId().toString(),
     },
 
@@ -104,31 +109,8 @@ export const fakeMappings = {
         data_hora: () => new Date().toISOString(),
         quantidade: () => fakebr.random.number({ min: 1, max: 10 }),
         componente: () => new mongoose.Types.ObjectId().toString(),
-        fornecedor: () => new mongoose.Types.ObjectId().toString(),
-        usuario: () => new mongoose.Types.ObjectId().toString(),
-    },
-
-    ComponenteOrcamento: {
-        nomesFixos: [
-            "Placa Arduino Uno",
-            "Sensor de Movimento",
-            "Display LCD 16x2",
-            "Módulo Relé 4 Canais",
-            "Módulo Wifi ESP8266",
-            "Kit Jumpers 120 peças"
-        ],
-        nome: () => fakebr.helpers.randomize(fakeMappings.Componente.nomesFixos),
-        fornecedor: () => fakebr.company.companyName(),
-        quantidade: () => fakebr.random.number({ min: 0, max: 100 }),
-        estoque_minimo: () => fakebr.random.number({ min: 1, max: 20 }),
-        valor_unitario: () => fakebr.commerce.price(1, 1000, 2),
-        subtotal: () => fakebr.commerce.price(1, 1000, 2),
-        descricao: () => fakebr.lorem.sentence(),
-        imagem: () => fakebr.image.imageUrl(),
-        categoria: () => new mongoose.Types.ObjectId().toString(),
         localizacao: () => new mongoose.Types.ObjectId().toString(),
-        ativo: () => true,
-        status: () => fakebr.helpers.randomize(['Indisponível', 'Baixo Estoque', 'Em Estoque']),
+        usuario: () => new mongoose.Types.ObjectId().toString(),
     },
 
     Orcamento: {
@@ -137,25 +119,8 @@ export const fakeMappings = {
         nome: () => `Projeto ${fakeMappings.Orcamento.adjetivoNome()} - ${fakeMappings.Orcamento.produtoNome()}`,
         protocolo: () => uuid(),
         descricao: () => fakebr.lorem.sentence(),
-        componentes: () => {
-            const nomesFixos = fakeMappings.ComponenteOrcamento.nomesFixos;
-            const quantidade = fakebr.random.number({ min: 1, max: nomesFixos.length });
-            const nomesSelecionados = fakebr.helpers.shuffle(nomesFixos).slice(0, quantidade);
-            return nomesSelecionados.map(nome => {
-                const quantidade = fakebr.random.number({ min: 1, max: 100 });
-                const valor_unitario = Number(fakebr.commerce.price(1, 1000, 2));
-                const subtotal = Number((quantidade * valor_unitario).toFixed(2));
-                return {
-                    _id: new mongoose.Types.ObjectId(),
-                    nome,
-                    fornecedor: fakebr.company.companyName(),
-                    quantidade,
-                    valor_unitario,
-                    subtotal,
-                };
-            });
-        },
-        valor: () => 0,
+        total: () => 0, // Será calculado automaticamente pelo middleware
+        componentes: () => [], // Será preenchido no seed
         usuario: () => new mongoose.Types.ObjectId().toString(),
     },
 };

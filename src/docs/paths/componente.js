@@ -16,16 +16,16 @@ const componentesRoutes = {
                     - Objeto conforme schema **ComponentePost**, contendo dados do componente.
 
             + Regras de Negócio:
-                - Campos obrigatórios: nome, estoque_minimo, valor_unitario, categoria, localizacao.
-                - quantidade, estoque_minimo e valor_unitario não podem ser negativos.
+                - Campos obrigatórios: nome, estoque_minimo, categoria.
+                - estoque_minimo não pode ser negativo.
                 - Campo 'ativo' tem padrão true.
-                - Campo 'status' é calculado automaticamente baseado na quantidade e estoque_minimo:
+                - Campo 'status' é calculado automaticamente baseado na quantidade total e estoque_minimo:
                   * 'Indisponível' quando quantidade = 0
                   * 'Baixo Estoque' quando quantidade > 0 e quantidade <= estoque_minimo
                   * 'Em Estoque' quando quantidade > estoque_minimo
                 - Nome deve ser único no sistema.
-                - Categoria e localização devem existir no sistema.
-                - Quantidade inicial é 0 (alterada apenas via movimentação).
+                - Categoria deve existir no sistema.
+                - Quantidade inicial é 0 (atualizada automaticamente baseada no estoque por localização).
 
             + Resultado Esperado:
                 - HTTP 201 Created com corpo conforme **ComponenteDetalhes**, contendo todos os dados do componente criado.
@@ -59,7 +59,7 @@ const componentesRoutes = {
         + Função de Negócio:
             - Permitir à front-end, App Mobile e serviços server-to-server obter uma lista paginada de componentes cadastrados.
             + Recebe como query parameters (opcionais):
-                • filtros: nome, categoria, localizacao, ativo, status, estoque_minimo, quantidade.  
+                • filtros: nome, categoria, ativo, status, estoque_minimo, quantidade.  
                 • paginação: page (número da página), limite (quantidade de itens por página).
 
         + Regras de Negócio:

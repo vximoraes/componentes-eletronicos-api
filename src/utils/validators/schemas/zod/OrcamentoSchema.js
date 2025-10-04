@@ -1,49 +1,49 @@
 import { z } from 'zod';
+import mongoose from 'mongoose';
 
 const ComponenteOrcamentoSchema = z.object({
-    nome: z
+    componente: z
         .string()
-        .refine((val) => !val || val.trim().length > 0, {
-            message: "Nome não pode ser vazio",
-        })
-        .transform((val) => val?.trim()),
+        .refine((val) => mongoose.Types.ObjectId.isValid(val), {
+            message: "ID do componente deve ser um ObjectId válido",
+        }),
     fornecedor: z
         .string()
-        .refine((val) => !val || val.trim().length > 0, {
-            message: "Fornecedor não pode ser vazio",
-        })
-        .transform((val) => val?.trim()),
+        .refine((val) => mongoose.Types.ObjectId.isValid(val), {
+            message: "ID do fornecedor deve ser um ObjectId válido",
+        }),
     quantidade: z
-        .string()
-        .transform((val) => (val ? parseInt(val) : undefined))
-        .refine((val) => val === undefined || (Number.isInteger(val) && val > 0), {
+        .number()
+        .int()
+        .min(1, { message: "Quantidade deve ser um número inteiro maior que zero" })
+        .or(z.string().transform((val) => parseInt(val)).refine((val) => !isNaN(val) && val > 0, {
             message: "Quantidade deve ser um número inteiro maior que zero",
-        }),
+        })),
     valor_unitario: z
-        .string()
-        .transform((val) => (val ? parseFloat(val) : undefined))
-        .refine((val) => val === undefined || (!isNaN(val) && typeof val === "number"), {
-            message: "Valor unitário deve ser um número válido.",
-        }),
+        .number()
+        .min(0, { message: "Valor unitário deve ser maior ou igual a zero" })
+        .or(z.string().transform((val) => parseFloat(val)).refine((val) => !isNaN(val) && val >= 0, {
+            message: "Valor unitário deve ser um número válido maior ou igual a zero",
+        })),
 });
 
 const OrcamentoSchema = z.object({
     nome: z
         .string()
-        .optional()
-        .refine((val) => !val || val.trim().length > 0, {
+        .min(1, { message: "Nome é obrigatório" })
+        .refine((val) => val.trim().length > 0, {
             message: "Nome não pode ser vazio",
         })
-        .transform((val) => val?.trim()),
+        .transform((val) => val.trim()),
     descricao: z
         .string()
         .optional(),
-    componente_orcamento: z
+    componentes: z
         .array(ComponenteOrcamentoSchema)
         .min(1, { message: "Deve haver pelo menos um componente no orçamento." }),
 });
 
-const OrcamentoUpdateSchema = OrcamentoSchema.omit({ componente_orcamento: true }).partial();
+const OrcamentoUpdateSchema = OrcamentoSchema.omit({ componentes: true }).partial();
 const ComponenteOrcamentoUpdateSchema = ComponenteOrcamentoSchema.partial();
 
 export { OrcamentoSchema, OrcamentoUpdateSchema, ComponenteOrcamentoSchema, ComponenteOrcamentoUpdateSchema };

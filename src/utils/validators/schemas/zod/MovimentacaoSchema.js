@@ -23,9 +23,8 @@ const MovimentacaoSchema = z.object({
         }),
     componente:
         objectIdSchema,
-    fornecedor: 
-        objectIdSchema
-        .optional(),
+    localizacao:
+        objectIdSchema,
 });
 
 const MovimentacaoUpdateSchema = MovimentacaoSchema.partial();

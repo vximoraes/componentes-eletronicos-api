@@ -2,12 +2,10 @@ import Grupo from "../models/Grupo.js";
 import { fakeMappings } from "./globalFakeMapping.js";
 
 export default async function seedGrupos(rotas) {
-    // Remove
     await Grupo.deleteMany();
 
     const grupos = [];
 
-    // Grupo fixo com acesso total
     const grupoAdministrador = {
         nome: "Administrador",
         descricao: "Grupo com acesso total a todas as rotas",

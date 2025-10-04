@@ -1,6 +1,5 @@
 import ComponenteRepository from '../repositories/ComponenteRepository.js';
 import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
-import LocalizacaoModel from '../models/Localizacao.js';
 import CategoriaModel from '../models/Categoria.js';
 import minioClient from '../config/MinIO.js';
 import compress from '../config/SharpConfig.js';
@@ -12,10 +11,11 @@ class ComponenteService {
 
     async criar(parsedData, req) {
         await this.validateNome(parsedData.nome, null, req);
-        await this.validateLocalizacao(parsedData.localizacao, req);
         await this.validateCategoria(parsedData.categoria, req);
 
         parsedData.usuario = req.user_id;
+        parsedData.quantidade = 0;
+        
         const data = await this.repository.criar(parsedData);
 
         return data;
@@ -74,19 +74,6 @@ class ComponenteService {
         };
 
         return componenteExistente;
-    };
-
-    async validateLocalizacao(localizacaoId, req) {
-        const localizacao = await LocalizacaoModel.findOne({ _id: localizacaoId, usuario: req.user_id });
-        if (!localizacao) {
-            throw new CustomError({
-                statusCode: HttpStatusCodes.BAD_REQUEST.code,
-                errorType: 'validationError',
-                field: 'localizacao',
-                details: [{ path: 'localizacao', message: 'Localização não encontrada.' }],
-                customMessage: 'Localização não encontrada.',
-            });
-        };
     };
 
     async validateCategoria(categoriaId, req) {

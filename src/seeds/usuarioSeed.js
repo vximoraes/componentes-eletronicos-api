@@ -7,10 +7,8 @@ import seedGrupos from "./grupoSeed.js";
 export default async function usuarioSeed() {
     await Usuario.deleteMany({});
 
-    // Obter rotas criadas
     const rotasCompletas = await seedRotas();
     
-    // Obter grupos criados
     const grupos = await seedGrupos(rotasCompletas);
 
     const grupoUsuario = grupos.find((g) => g.nome === "Usuario");
@@ -45,4 +43,12 @@ export default async function usuarioSeed() {
     usuarios.push(admin);
 
     const result = await Usuario.collection.insertMany(usuarios);
+    
+    // Buscar o admin criado para retornar seu ID
+    const adminCriado = await Usuario.findOne({ email: "admin@admin.com" });
+    
+    return {
+        adminId: adminCriado._id,
+        usuarios: result
+    };
 }

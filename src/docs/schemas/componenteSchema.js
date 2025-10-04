@@ -16,7 +16,6 @@ const componentesSchemas = {
             nome: componenteJsonSchema.properties.nome,
             quantidade: componenteJsonSchema.properties.quantidade,
             estoque_minimo: componenteJsonSchema.properties.estoque_minimo,
-            localizacao: componenteJsonSchema.properties.localizacao,
             categoria: componenteJsonSchema.properties.categoria,
             ativo: componenteJsonSchema.properties.ativo,
             status: componenteJsonSchema.properties.status,
@@ -53,7 +52,7 @@ const componentesSchemas = {
     },
     ComponentePost: {
         ...deepCopy(componenteJsonSchema),
-        required: ["nome", "estoque_minimo", "valor_unitario", "categoria", "localizacao"],
+        required: ["nome", "estoque_minimo", "categoria"],
         description: "Schema para criação de componente"
     },
     ComponentePutPatch: {
@@ -119,17 +118,14 @@ componentesSchemas.ComponenteDetalhes.example = await generateExample(componente
 componentesSchemas.ComponentePost.example = {
     nome: "Resistor 10k Ohm",
     estoque_minimo: "50",
-    valor_unitario: "0.15",
     descricao: "Resistor de precisão 1/4W 5%",
     imagem: "https://exemplo.com/resistor-10k.jpg",
-    localizacao: "507f1f77bcf86cd799439011",
     categoria: "507f1f77bcf86cd799439012",
     ativo: true
 };
 componentesSchemas.ComponentePutPatch.example = {
     nome: "Resistor 10k Ohm - Atualizado",
     estoque_minimo: "75",
-    valor_unitario: "0.18",
     descricao: "Resistor de precisão 1/4W 5% - Versão atualizada",
     ativo: true
 };

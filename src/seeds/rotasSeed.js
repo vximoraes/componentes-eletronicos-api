@@ -21,6 +21,8 @@ export default async function seedRotas() {
         "componentes",
         "componentes:id",
         "componentes:id/foto",
+        "estoques",
+        "estoques:id",
         "fornecedores",
         "fornecedores:id",
         "movimentacoes",

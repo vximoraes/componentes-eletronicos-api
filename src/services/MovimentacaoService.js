@@ -1,6 +1,5 @@
 import MovimentacaoRepository from '../repositories/MovimentacaoRepository.js';
 import Componente from '../models/Componente.js';
-import Fornecedor from '../models/Fornecedor.js';
 import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
 
 class MovimentacaoService {
@@ -9,7 +8,6 @@ class MovimentacaoService {
     };
 
     async criar(parsedData, req) {
-        // Buscar o componente relacionado.
         const componente = await Componente.findOne({ _id: parsedData.componente, usuario: req.user_id });
         if (!componente) {
             throw new CustomError({
@@ -21,52 +19,30 @@ class MovimentacaoService {
             });
         };
 
-        // Se tipo for entrada, validar fornecedor.
-        if (parsedData.tipo === 'entrada') {
-            if (!parsedData.fornecedor) {
+        if (parsedData.tipo === 'saida') {
+            const Estoque = await import('../models/Estoque.js');
+            const estoqueAtual = await Estoque.default.findOne({
+                componente: parsedData.componente,
+                localizacao: parsedData.localizacao
+            });
+            
+            const quantidadeDisponivel = estoqueAtual ? estoqueAtual.quantidade : 0;
+            
+            if (quantidadeDisponivel < parsedData.quantidade) {
                 throw new CustomError({
                     statusCode: 400,
                     errorType: 'validationError',
-                    field: 'fornecedor',
-                    details: [{ path: 'fornecedor', message: 'Fornecedor é obrigatório para movimentações de entrada.' }],
-                    customMessage: 'Fornecedor é obrigatório para movimentações de entrada.'
+                    field: 'quantidade',
+                    details: [{ path: 'quantidade', message: `Quantidade insuficiente em estoque. Disponível: ${quantidadeDisponivel}` }],
+                    customMessage: `Quantidade insuficiente em estoque. Disponível: ${quantidadeDisponivel}`
                 });
-            };
-            const fornecedor = await Fornecedor.findOne({ _id: parsedData.fornecedor, usuario: req.user_id });
-            if (!fornecedor) {
-                throw new CustomError({
-                    statusCode: 404,
-                    errorType: 'resourceNotFound',
-                    field: 'Fornecedor',
-                    details: [],
-                    customMessage: messages.error.resourceNotFound('Fornecedor')
-                });
-            };
-        };
+            }
+        }
 
         const now = new Date();
         now.setHours(now.getHours() - 4);
         now.setDate(now.getDate() - 1);
         parsedData.data_hora = now.toISOString().slice(0, 23).replace('T', ' ');
-
-        // Atualizar quantidade conforme o tipo.
-        if (parsedData.tipo === 'entrada') {
-            componente.quantidade += parsedData.quantidade;
-        } else if (parsedData.tipo === 'saida') {
-            if (componente.quantidade < parsedData.quantidade) {
-                throw new CustomError({
-                    statusCode: 400,
-                    errorType: 'validationError',
-                    field: 'quantidade',
-                    details: [{ path: 'quantidade', message: 'Quantidade insuficiente em estoque.' }],
-                    customMessage: 'Quantidade insuficiente em estoque.'
-                });
-            }
-            componente.quantidade -= parsedData.quantidade;
-            delete parsedData.fornecedor;
-        };
-
-        await componente.save();
 
         parsedData.usuario = req.user_id;
         const data = await this.repository.criar(parsedData);
