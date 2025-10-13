@@ -14,7 +14,8 @@ class UsuarioService {
     };
 
     async criar(parsedData, req) {
-        await this.validateEmail(parsedData.email, null, req.user_id);
+        const userId = req?.user_id || null;
+        await this.validateEmail(parsedData.email, null, userId);
 
         if (parsedData.senha) {
             const saltRounds = 10;
@@ -24,7 +25,7 @@ class UsuarioService {
         // Buscar grupo "Usuario" padrão se não foram fornecidas permissões
         if (!parsedData.permissoes || parsedData.permissoes.length === 0) {
             try {
-                const grupoUsuario = await this.grupoRepository.buscarPorNome("Usuario", null, req.user_id);
+                const grupoUsuario = await this.grupoRepository.buscarPorNome("Usuario", null, userId);
                 if (grupoUsuario) {
                     parsedData.permissoes = grupoUsuario.permissoes || [];
                 }
@@ -34,7 +35,7 @@ class UsuarioService {
             }
         }
 
-        parsedData.usuarioId = req.user_id;
+        parsedData.usuarioId = userId;
         const data = await this.repository.criar(parsedData);
 
         return data;

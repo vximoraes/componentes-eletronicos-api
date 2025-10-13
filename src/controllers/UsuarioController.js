@@ -20,7 +20,7 @@ class UsuarioController {
 
     async criarComSenha(req, res) {
         const parsedData = UsuarioSchema.parse(req.body);
-        let data = await this.service.criar(parsedData);
+        let data = await this.service.criar(parsedData, req);
 
         let usuarioLimpo = data.toObject();
 
