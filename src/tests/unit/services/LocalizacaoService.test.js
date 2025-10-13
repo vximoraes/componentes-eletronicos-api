@@ -81,32 +81,21 @@ describe('LocalizacaoService', () => {
         });
     });
 
-    describe('deletar', () => {
-        it('deve remover localização existente', async () => {
+    describe('inativar', () => {
+        it('deve inativar localização existente', async () => {
             repositoryMock.buscarPorId.mockResolvedValue(makeLocalizacao());
-            repositoryMock.deletar.mockResolvedValue({ acknowledged: true, deletedCount: 1 });
-            const result = await service.deletar('loc1');
-            expect(result).toHaveProperty('acknowledged', true);
+            repositoryMock.atualizar.mockResolvedValue({ nome: 'Prateleira A', ativo: false });
+            const result = await service.inativar('loc1', {});
+            expect(result).toHaveProperty('ativo', false);
         });
         it('deve lançar erro se localização não existir', async () => {
             repositoryMock.buscarPorId.mockResolvedValue(null);
-            await expect(service.deletar('locX')).rejects.toThrow(CustomError);
-        });
-        it('deve lançar erro se localização estiver vinculada a componentes', async () => {
-            repositoryMock.buscarPorId.mockResolvedValue(makeLocalizacao());
-            repositoryMock.deletar.mockRejectedValue(new CustomError({
-                statusCode: 400,
-                errorType: 'resourceInUse',
-                field: 'Localizacao',
-                details: [],
-                customMessage: 'Localização vinculada a componentes.'
-            }));
-            await expect(service.deletar('loc1')).rejects.toThrow('Localização vinculada a componentes');
+            await expect(service.inativar('locX', {})).rejects.toThrow(CustomError);
         });
         it('deve lançar erro inesperado do repository', async () => {
             repositoryMock.buscarPorId.mockResolvedValue(makeLocalizacao());
-            repositoryMock.deletar.mockRejectedValue(new Error('DB error'));
-            await expect(service.deletar('loc1')).rejects.toThrow('DB error');
+            repositoryMock.atualizar.mockRejectedValue(new Error('DB error'));
+            await expect(service.inativar('loc1', {})).rejects.toThrow('DB error');
         });
     });
 

@@ -25,10 +25,8 @@ describe('Modelo de Componente', () => {
         const componenteData = {
             nome: 'Resistor 10k',
             estoque_minimo: 10,
-            valor_unitario: 0.05,
             descricao: 'Resistor de 10k Ohms',
             imagem: 'http://exemplo.com/resistor.jpg',
-            localizacao: new mongoose.Types.ObjectId(),
             categoria: new mongoose.Types.ObjectId(),
             usuario: new mongoose.Types.ObjectId()
         };
@@ -38,10 +36,8 @@ describe('Modelo de Componente', () => {
         expect(saved.nome).toBe(componenteData.nome);
         expect(saved.quantidade).toBe(0);
         expect(saved.estoque_minimo).toBe(componenteData.estoque_minimo);
-        expect(saved.valor_unitario).toBe(componenteData.valor_unitario);
         expect(saved.descricao).toBe(componenteData.descricao);
         expect(saved.imagem).toBe(componenteData.imagem);
-        expect(saved.localizacao.toString()).toBe(componenteData.localizacao.toString());
         expect(saved.categoria.toString()).toBe(componenteData.categoria.toString());
         expect(saved.ativo).toBe(true);
         expect(saved.status).toBe('Indisponível');

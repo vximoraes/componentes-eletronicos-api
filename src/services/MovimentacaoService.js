@@ -1,5 +1,6 @@
 import MovimentacaoRepository from '../repositories/MovimentacaoRepository.js';
 import Componente from '../models/Componente.js';
+import Estoque from '../models/Estoque.js';
 import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
 
 class MovimentacaoService {
@@ -20,8 +21,7 @@ class MovimentacaoService {
         };
 
         if (parsedData.tipo === 'saida') {
-            const Estoque = await import('../models/Estoque.js');
-            const estoqueAtual = await Estoque.default.findOne({
+            const estoqueAtual = await Estoque.findOne({
                 componente: parsedData.componente,
                 localizacao: parsedData.localizacao
             });

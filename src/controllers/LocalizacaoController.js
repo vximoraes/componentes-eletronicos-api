@@ -43,13 +43,13 @@ class LocalizacaoController {
         return CommonResponse.success(res, data, 200, 'Localização atualizada com sucesso.');
     };
 
-    async deletar(req, res) {
+    async inativar(req, res) {
         const { id } = req.params || {};
         LocalizacaoIdSchema.parse(id);
 
-        const data = await this.service.deletar(id, req);
+        const data = await this.service.inativar(id, req);
 
-        return CommonResponse.success(res, data, 200, 'Localização excluída com sucesso.');
+        return CommonResponse.success(res, data, 200, 'Localização inativada com sucesso.');
     };
 };
 

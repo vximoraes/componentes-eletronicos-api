@@ -1,6 +1,6 @@
 import ComponenteModel from '../../models/Componente.js';
 import ComponenteRepository from '../ComponenteRepository.js';
-import Categoria from '../../models/Categoria.js'
+import Categoria from '../../models/Categoria.js';
 import mongoose from 'mongoose';
 const { Types } = mongoose;
 

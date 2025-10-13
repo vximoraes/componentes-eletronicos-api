@@ -91,26 +91,6 @@ describe('LocalizacaoRepository', () => {
         });
     });
 
-    describe('deletar', () => {
-        it('deve remover localização sem vínculo', async () => {
-            const req = { user_id: 'user1' };
-            ComponenteModel.exists = jest.fn().mockResolvedValue(false);
-            LocalizacaoModel.findOneAndDelete = jest.fn().mockResolvedValue({ _id: 'loc1', nome: 'Estoque' });
-            const result = await repository.deletar('loc1', req);
-            expect(result).toEqual({ _id: 'loc1', nome: 'Estoque' });
-        });
-        it('deve lançar erro se houver vínculo com componente', async () => {
-            const req = { user_id: 'user1' };
-            ComponenteModel.exists = jest.fn().mockResolvedValue(true);
-            await expect(repository.deletar('loc1', req)).rejects.toThrow(CustomError);
-        });
-        it('deve lançar erro se o banco lançar exceção', async () => {
-            const req = { user_id: 'user1' };
-            ComponenteModel.exists = jest.fn().mockRejectedValue(new Error('DB error'));
-            await expect(repository.deletar('loc1', req)).rejects.toThrow('DB error');
-        });
-    });
-
     describe('buscarPorNome', () => {
         it('deve buscar localização por nome', async () => {
             const req = { user_id: 'user1' };

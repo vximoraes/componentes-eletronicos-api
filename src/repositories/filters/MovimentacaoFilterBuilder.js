@@ -1,5 +1,4 @@
 import MovimentacaoModel from '../../models/Movimentacao.js';
-import MovimentacaoRepository from '../MovimentacaoRepository.js';
 import Componente from '../../models/Componente.js';
 import Localizacao from '../../models/Localizacao.js';
 import mongoose from 'mongoose';
@@ -8,7 +7,6 @@ const { Types } = mongoose;
 class MovimentacaoFilterBuilder {
     constructor() {
         this.filtros = {};
-        this.movimentacaoRepository = new MovimentacaoRepository();
         this.movimentacaoModel = MovimentacaoModel;
     };
 

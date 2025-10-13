@@ -152,44 +152,30 @@ describe('LocalizacaoController', () => {
         });
     });
 
-    describe('deletar', () => {
-        it('deve deletar localização existente', async () => {
+    describe('inativar', () => {
+        it('deve inativar localização existente', async () => {
             req.params = { id: '1' };
             LocalizacaoIdSchema.parse.mockReturnValue('1');
-            serviceMock.deletar.mockResolvedValue({ nome: 'Prateleira A' });
+            serviceMock.inativar.mockResolvedValue({ nome: 'Prateleira A', ativo: false });
 
-            await controller.deletar(req, res);
+            await controller.inativar(req, res);
 
             expect(LocalizacaoIdSchema.parse).toHaveBeenCalledWith('1');
-            expect(serviceMock.deletar).toHaveBeenCalledWith('1', req);
-            expect(CommonResponse.success).toHaveBeenCalledWith(res, { nome: 'Prateleira A' }, 200, 'Localização excluída com sucesso.');
+            expect(serviceMock.inativar).toHaveBeenCalledWith('1', req);
+            expect(CommonResponse.success).toHaveBeenCalledWith(res, { nome: 'Prateleira A', ativo: false }, 200, 'Localização inativada com sucesso.');
         });
 
-        it('deve retornar erro 404 ao tentar deletar localização inexistente', async () => {
+        it('deve retornar erro 404 ao tentar inativar localização inexistente', async () => {
             req.params = { id: '999' };
             LocalizacaoIdSchema.parse.mockReturnValue('999');
-            serviceMock.deletar.mockRejectedValue({ status: 404 });
-            await expect(controller.deletar(req, res)).rejects.toEqual(expect.objectContaining({ status: 404 }));
+            serviceMock.inativar.mockRejectedValue({ status: 404 });
+            await expect(controller.inativar(req, res)).rejects.toEqual(expect.objectContaining({ status: 404 }));
         });
 
-        it('deve retornar erro 409 ao tentar deletar localização com vínculo', async () => {
-            req.params = { id: '1' };
-            LocalizacaoIdSchema.parse.mockReturnValue('1');
-            serviceMock.deletar.mockRejectedValue({ status: 409 });
-            await expect(controller.deletar(req, res)).rejects.toEqual(expect.objectContaining({ status: 409 }));
-        });
-
-        it('deve retornar erro 500 para falha inesperada', async () => {
-            req.params = { id: '1' };
-            LocalizacaoIdSchema.parse.mockReturnValue('1');
-            serviceMock.deletar.mockRejectedValue({ status: 500 });
-            await expect(controller.deletar(req, res)).rejects.toEqual(expect.objectContaining({ status: 500 }));
-        });
-
-        it('deve validar id ao deletar', async () => {
+        it('deve validar id ao inativar', async () => {
             req.params = { id: 'invalid-id' };
             LocalizacaoIdSchema.parse.mockImplementation(() => { throw { name: 'ZodError' }; });
-            await expect(controller.deletar(req, res)).rejects.toEqual(expect.objectContaining({ name: 'ZodError' }));
+            await expect(controller.inativar(req, res)).rejects.toEqual(expect.objectContaining({ name: 'ZodError' }));
         });
     });
 });

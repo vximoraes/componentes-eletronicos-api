@@ -1,6 +1,8 @@
 import OrcamentoController from '../../../controllers/OrcamentoController.js';
 import { CommonResponse } from '../../../utils/helpers/index.js';
 import { v4 as uuid } from 'uuid';
+import Componente from '../../../models/Componente.js';
+import Fornecedor from '../../../models/Fornecedor.js';
 
 jest.mock('../../../services/OrcamentoService.js', () => {
     return jest.fn().mockImplementation(() => ({
@@ -14,6 +16,14 @@ jest.mock('../../../services/OrcamentoService.js', () => {
         getComponenteById: jest.fn(),
     }));
 });
+
+jest.mock('../../../models/Componente.js', () => ({
+    findById: jest.fn()
+}));
+
+jest.mock('../../../models/Fornecedor.js', () => ({
+    findById: jest.fn()
+}));
 
 const mockRes = () => {
     const res = {};
@@ -30,6 +40,19 @@ describe('OrcamentoController', () => {
         service = controller.service;
         res = mockRes();
         jest.clearAllMocks();
+        
+        Componente.findById.mockImplementation((id) => {
+            if (id === '507f1f77bcf86cd799439012') return Promise.resolve({ _id: id, nome: 'Resistor' });
+            if (id === '507f1f77bcf86cd799439014') return Promise.resolve({ _id: id, nome: 'Capacitor' });
+            return Promise.resolve(null);
+        });
+        
+        Fornecedor.findById.mockImplementation((id) => {
+            if (id === '507f1f77bcf86cd799439013' || id === '507f1f77bcf86cd799439015') {
+                return Promise.resolve({ _id: id, nome: 'Fornecedor Teste' });
+            }
+            return Promise.resolve(null);
+        });
     });
 
     describe('criar', () => {
@@ -37,9 +60,9 @@ describe('OrcamentoController', () => {
             const req = {
                 body: {
                     nome: 'Orçamento Teste',
-                    componente_orcamento: [
-                        { nome: 'Resistor', fornecedor: 'Fornecedor Teste', quantidade: '2', valor_unitario: '1.5' },
-                        { nome: 'Capacitor', fornecedor: 'Fornecedor Teste', quantidade: '1', valor_unitario: '2' }
+                    componentes: [
+                        { componente: '507f1f77bcf86cd799439012', fornecedor: '507f1f77bcf86cd799439013', quantidade: '2', valor_unitario: '1.5' },
+                        { componente: '507f1f77bcf86cd799439014', fornecedor: '507f1f77bcf86cd799439015', quantidade: '1', valor_unitario: '2' }
                     ]
                 }
             };
@@ -54,7 +77,7 @@ describe('OrcamentoController', () => {
         });
 
         it('deve retornar erro 400 para dados inválidos', async () => {
-            const req = { body: { nome: '', componente_orcamento: [] } };
+            const req = { body: { nome: '', componentes: [] } };
             await expect(controller.criar(req, res)).rejects.toThrow();
         });
 
@@ -62,7 +85,7 @@ describe('OrcamentoController', () => {
             const req = {
                 body: {
                     nome: 'Orçamento Teste',
-                    componente_orcamento: [{ nome: 'Resistor', quantidade: '1', valor_unitario: '1' }]
+                    componentes: [{ componente: '507f1f77bcf86cd799439012', fornecedor: '507f1f77bcf86cd799439013', quantidade: '1', valor_unitario: '1' }]
                 }
             };
             service.criar.mockRejectedValue({ code: 11000 });
@@ -115,7 +138,7 @@ describe('OrcamentoController', () => {
 
     describe('adicionarComponente', () => {
         it('deve adicionar componente válido', async () => {
-            const req = { params: { orcamentoId: '507f1f77bcf86cd799439011' }, body: { nome: 'Resistor', fornecedor: 'Fornecedor Teste', quantidade: '2', valor_unitario: '1.5' } };
+            const req = { params: { orcamentoId: '507f1f77bcf86cd799439011' }, body: { componente: '507f1f77bcf86cd799439012', fornecedor: '507f1f77bcf86cd799439013', quantidade: '2', valor_unitario: '1.5' } };
             service.adicionarComponente.mockResolvedValue({ _id: '507f1f77bcf86cd799439011', componente_orcamento: [{ nome: 'Resistor' }] });
             await controller.adicionarComponente(req, res);
             expect(service.adicionarComponente).toHaveBeenCalled();
@@ -123,7 +146,7 @@ describe('OrcamentoController', () => {
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringContaining('adicionado') }));
         });
         it('deve retornar erro 400 para dados inválidos', async () => {
-            const req = { params: { orcamentoId: '507f1f77bcf86cd799439011' }, body: { nome: '', quantidade: '0', fornecedor: '' } };
+            const req = { params: { orcamentoId: '507f1f77bcf86cd799439011' }, body: { componente: '', quantidade: '0', fornecedor: '' } };
             await expect(controller.adicionarComponente(req, res)).rejects.toThrow();
         });
     });

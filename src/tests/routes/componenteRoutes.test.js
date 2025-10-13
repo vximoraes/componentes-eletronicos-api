@@ -163,11 +163,6 @@ describe('Rotas de Componente', () => {
             const res = await request(BASE_URL).post('/componentes').set('Authorization', `Bearer ${token}`).send(dados);
             expect([400, 404, 422]).toContain(res.status);
         });
-        it('deve falhar ao cadastrar com localizacao inexistente', async () => {
-            const dados = await criarComponenteValido({ localizacao: new mongoose.Types.ObjectId().toString() });
-            const res = await request(BASE_URL).post('/componentes').set('Authorization', `Bearer ${token}`).send(dados);
-            expect([400, 404, 422]).toContain(res.status);
-        });
     });
 
     describe('GET /componentes', () => {

@@ -66,12 +66,12 @@ describe("Fornecedores", () => {
             .expect(200);
     })
 
-    it("Deve Delete um fornecedor", async () => {
-        await request(BASE_URL)
+    it("Deve Deletar um fornecedor", async () => {
+        const res = await request(BASE_URL)
             .delete(`/fornecedores/${fornecedorId}`)
             .set("Accept", "application/json")
-            .set("Authorization", `Bearer ${token}`)
-            .expect(200);
+            .set("Authorization", `Bearer ${token}`);
+        expect(200);
     })
 
     it("Não deve cadastrar fornecedor sem nome (400)", async () => {

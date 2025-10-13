@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import Movimentacao from '../../../../src/models/Movimentacao.js';
 import Componente from '../../../../src/models/Componente.js';
 import Fornecedor from '../../../../src/models/Fornecedor.js';
+import Estoque from '../../../../src/models/Estoque.js';  // Importar para registrar o modelo
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
 let mongoServer;
@@ -34,8 +35,6 @@ describe('Modelo de Movimentacao', () => {
             nome: 'Resistor 1k',
             quantidade: 100,
             estoque_minimo: 10,
-            valor_unitario: 0.05,
-            localizacao: new mongoose.Types.ObjectId(),
             categoria: new mongoose.Types.ObjectId(),
             usuario: userId
         });
@@ -45,23 +44,23 @@ describe('Modelo de Movimentacao', () => {
         });
     });
 
-    it('deve criar uma movimentacao de entrada válida (fornecedor obrigatório)', async () => {
+    it('deve criar uma movimentacao de entrada válida', async () => {
         const movData = {
             tipo: 'entrada',
             quantidade: 10,
             componente: componente._id,
-            fornecedor: fornecedor._id,
+            localizacao: new mongoose.Types.ObjectId(),
             usuario: new mongoose.Types.ObjectId()
         };
         const mov = new Movimentacao(movData);
         await mov.save();
         const saved = await Movimentacao.findById(mov._id);
         expect(saved.tipo).toBe('entrada');
-        expect(saved.fornecedor.toString()).toBe(fornecedor._id.toString());
         expect(saved.componente.toString()).toBe(componente._id.toString());
+        expect(saved.localizacao).toBeDefined();
     });
 
-    it('não deve criar movimentacao de entrada sem fornecedor', async () => {
+    it('deve falhar se localizacao não informada', async () => {
         const movData = {
             tipo: 'entrada',
             quantidade: 10,
@@ -69,14 +68,15 @@ describe('Modelo de Movimentacao', () => {
             usuario: new mongoose.Types.ObjectId()
         };
         const mov = new Movimentacao(movData);
-        await mov.save(); 
+        await expect(mov.save()).rejects.toThrow();
     });
 
-    it('deve criar uma movimentacao de saida sem fornecedor', async () => {
+    it('deve criar uma movimentacao de saida', async () => {
         const movData = {
             tipo: 'saida',
             quantidade: 5,
             componente: componente._id,
+            localizacao: new mongoose.Types.ObjectId(),
             usuario: new mongoose.Types.ObjectId()
         };
         const mov = new Movimentacao(movData);
@@ -88,8 +88,9 @@ describe('Modelo de Movimentacao', () => {
 
     it('deve retornar todas as movimentacoes cadastradas', async () => {
         const userId = new mongoose.Types.ObjectId();
-        await Movimentacao.create({ tipo: 'entrada', quantidade: 10, componente: componente._id, fornecedor: fornecedor._id, usuario: userId });
-        await Movimentacao.create({ tipo: 'saida', quantidade: 5, componente: componente._id, usuario: userId });
+        const localizacao = new mongoose.Types.ObjectId();
+        await Movimentacao.create({ tipo: 'entrada', quantidade: 10, componente: componente._id, localizacao, usuario: userId });
+        await Movimentacao.create({ tipo: 'saida', quantidade: 5, componente: componente._id, localizacao, usuario: userId });
         const movs = await Movimentacao.find();
         expect(movs.length).toBe(2);
         const tipos = movs.map(m => m.tipo);
@@ -98,7 +99,7 @@ describe('Modelo de Movimentacao', () => {
     });
 
     it('deve remover uma movimentacao existente', async () => {
-        const mov = await Movimentacao.create({ tipo: 'entrada', quantidade: 10, componente: componente._id, fornecedor: fornecedor._id, usuario: new mongoose.Types.ObjectId() });
+        const mov = await Movimentacao.create({ tipo: 'entrada', quantidade: 10, componente: componente._id, localizacao: new mongoose.Types.ObjectId(), usuario: new mongoose.Types.ObjectId() });
         await Movimentacao.findByIdAndDelete(mov._id);
         const found = await Movimentacao.findById(mov._id);
         expect(found).toBeNull();
@@ -108,7 +109,7 @@ describe('Modelo de Movimentacao', () => {
         const movData = {
             quantidade: 10,
             componente: componente._id,
-            fornecedor: fornecedor._id,
+            localizacao: new mongoose.Types.ObjectId(),
             usuario: new mongoose.Types.ObjectId()
         };
         const mov = new Movimentacao(movData);
@@ -119,7 +120,7 @@ describe('Modelo de Movimentacao', () => {
         const movData = {
             tipo: 'entrada',
             quantidade: 10,
-            fornecedor: fornecedor._id,
+            localizacao: new mongoose.Types.ObjectId(),
             usuario: new mongoose.Types.ObjectId()
         };
         const mov = new Movimentacao(movData);
@@ -130,7 +131,7 @@ describe('Modelo de Movimentacao', () => {
         const movData = {
             tipo: 'entrada',
             componente: componente._id,
-            fornecedor: fornecedor._id,
+            localizacao: new mongoose.Types.ObjectId(),
             usuario: new mongoose.Types.ObjectId()
         };
         const mov = new Movimentacao(movData);
@@ -142,7 +143,7 @@ describe('Modelo de Movimentacao', () => {
             tipo: 'ajuste',
             quantidade: 10,
             componente: componente._id,
-            fornecedor: fornecedor._id,
+            localizacao: new mongoose.Types.ObjectId(),
             usuario: new mongoose.Types.ObjectId()
         };
         const mov = new Movimentacao(movData);

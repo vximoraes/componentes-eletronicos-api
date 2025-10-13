@@ -5,15 +5,15 @@ describe('OrcamentoSchema', () => {
         const data = {
             nome: 'Orçamento Teste',
             descricao: 'Desc',
-            componente_orcamento: [
-                { nome: 'Resistor', fornecedor: 'Fornecedor', quantidade: '2', valor_unitario: '1.5' },
-                { nome: 'Capacitor', fornecedor: 'Fornecedor', quantidade: '1', valor_unitario: '2' }
+            componentes: [
+                { componente: '64f234a0c781a7b30c2fe445', fornecedor: '64f234a0c781a7b30c2fe446', quantidade: '2', valor_unitario: '1.5' },
+                { componente: '64f234a0c781a7b30c2fe447', fornecedor: '64f234a0c781a7b30c2fe448', quantidade: '1', valor_unitario: '2' }
             ]
         };
         const result = OrcamentoSchema.safeParse(data);
         expect(result.success).toBe(true);
-        expect(result.data.componente_orcamento[0].quantidade).toBe(2);
-        expect(result.data.componente_orcamento[0].valor_unitario).toBe(1.5);
+        expect(result.data.componentes[0].quantidade).toBe(2);
+        expect(result.data.componentes[0].valor_unitario).toBe(1.5);
     });
 
     it('falha se faltar nome ou componente_orcamento', () => {
@@ -22,26 +22,26 @@ describe('OrcamentoSchema', () => {
         expect(result.error.issues.length).toBeGreaterThan(0);
     });
 
-    it('falha se componente_orcamento for vazio', () => {
-        const data = { nome: 'Teste', componente_orcamento: [] };
+    it('falha se componentes for vazio', () => {
+        const data = { nome: 'Teste', componentes: [] };
         const result = OrcamentoSchema.safeParse(data);
         expect(result.success).toBe(false);
         expect(result.error.issues[0].message).toMatch(/pelo menos um componente/i);
     });
 
-    it('falha se nome ou fornecedor for vazio', () => {
+    it('falha se nome for vazio', () => {
         const data = {
             nome: '',
-            componente_orcamento: [{ nome: '', fornecedor: '', quantidade: '1', valor_unitario: '1' }]
+            componentes: [{ componente: '64f234a0c781a7b30c2fe445', fornecedor: '64f234a0c781a7b30c2fe446', quantidade: '1', valor_unitario: '1' }]
         };
         const result = OrcamentoSchema.safeParse(data);
-        expect(result.success).toBe(true);
+        expect(result.success).toBe(false);
     });
 
     it('falha se quantidade não for inteiro > 0', () => {
         const data = {
             nome: 'Teste',
-            componente_orcamento: [{ nome: 'C', fornecedor: 'F', quantidade: '0', valor_unitario: '1' }]
+            componentes: [{ componente: '64f234a0c781a7b30c2fe445', fornecedor: '64f234a0c781a7b30c2fe446', quantidade: '0', valor_unitario: '1' }]
         };
         const result = OrcamentoSchema.safeParse(data);
         expect(result.success).toBe(false);
@@ -51,7 +51,7 @@ describe('OrcamentoSchema', () => {
     it('falha se valor_unitario não for número', () => {
         const data = {
             nome: 'Teste',
-            componente_orcamento: [{ nome: 'C', fornecedor: 'F', quantidade: '1', valor_unitario: 'abc' }]
+            componentes: [{ componente: '64f234a0c781a7b30c2fe445', fornecedor: '64f234a0c781a7b30c2fe446', quantidade: '1', valor_unitario: 'abc' }]
         };
         const result = OrcamentoSchema.safeParse(data);
         expect(result.success).toBe(false);
@@ -61,17 +61,17 @@ describe('OrcamentoSchema', () => {
 
 describe('ComponenteOrcamentoSchema', () => {
     it('valida componente válido', () => {
-        const data = { nome: 'C', fornecedor: 'F', quantidade: '2', valor_unitario: '1.5' };
+        const data = { componente: '64f234a0c781a7b30c2fe445', fornecedor: '64f234a0c781a7b30c2fe446', quantidade: '2', valor_unitario: '1.5' };
         const result = ComponenteOrcamentoSchema.safeParse(data);
         expect(result.success).toBe(true);
         expect(result.data.quantidade).toBe(2);
         expect(result.data.valor_unitario).toBe(1.5);
     });
 
-    it('falha se nome vazio', () => {
-        const data = { nome: '', fornecedor: 'F', quantidade: '1', valor_unitario: '1' };
+    it('falha se componente inválido', () => {
+        const data = { componente: 'invalid-id', fornecedor: '64f234a0c781a7b30c2fe446', quantidade: '1', valor_unitario: '1' };
         const result = ComponenteOrcamentoSchema.safeParse(data);
-        expect(result.success).toBe(true); // O schema atual aceita string vazia
+        expect(result.success).toBe(false);
     });
 });
 
