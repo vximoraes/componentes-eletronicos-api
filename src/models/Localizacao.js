@@ -10,6 +10,10 @@ class Localizacao {
                 unique: true,
                 required: true
             },
+            ativo: {
+                type: Boolean,
+                default: true
+            },
             usuario: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'usuarios',

@@ -1,6 +1,7 @@
 import LocalizacaoFilterBuilder from './filters/LocalizacaoFilterBuilder.js';
 import LocalizacaoModel from '../models/Localizacao.js';
-import ComponenteModel from '../models/Componente.js';
+import EstoqueModel from '../models/Estoque.js';
+import MovimentacaoModel from '../models/Movimentacao.js';
 import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
 
 class LocalizacaoRepository {
@@ -20,7 +21,7 @@ class LocalizacaoRepository {
 
         // Se um ID for fornecido, retorna a localização enriquecida com estatísticas.
         if (id) {
-            const data = await this.model.findOne({ _id: id, usuario: req.user_id });
+            const data = await this.model.findOne({ _id: id, usuario: req.user_id, ativo: true });
 
             if (!data) {
                 throw new CustomError({
@@ -55,7 +56,7 @@ class LocalizacaoRepository {
             });
         };
 
-        const filtros = { ...filterBuilder.build(), usuario: req.user_id };
+        const filtros = { ...filterBuilder.build(), usuario: req.user_id, ativo: true };
 
         const options = {
             page: parseInt(page, 10),
@@ -92,26 +93,10 @@ class LocalizacaoRepository {
         return localizacao;
     };
 
-    async deletar(id, req) {
-        const existeComponente = await ComponenteModel.exists({ localizacao: id, usuario: req.user_id });
-        if (existeComponente) {
-            throw new CustomError({
-                statusCode: 400,
-                errorType: 'resourceInUse',
-                field: 'Localizacao',
-                details: [],
-                customMessage: 'Não é possível deletar: localizacão está vinculada a componentes.'
-            });
-        };
-
-        const localizacao = await this.model.findOneAndDelete({ _id: id, usuario: req.user_id });
-        return localizacao;
-    };
-
     // Métodos auxiliares.
 
     async buscarPorNome(nome, idIgnorado, req) {
-        const filtro = { nome, usuario: req.user_id };
+        const filtro = { nome, usuario: req.user_id, ativo: true };
 
         if (idIgnorado) {
             filtro._id = { $ne: idIgnorado };
@@ -123,7 +108,7 @@ class LocalizacaoRepository {
     };
 
     async buscarPorId(id, includeTokens = false, req) {
-        let query = this.model.findOne({ _id: id, usuario: req.user_id });
+        let query = this.model.findOne({ _id: id, usuario: req.user_id, ativo: true });
 
         const localizacao = await query;
 

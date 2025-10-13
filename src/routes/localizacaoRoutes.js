@@ -13,7 +13,7 @@ router
     .get("/localizacoes/:id", AuthMiddleware, AuthPermission, asyncWrapper(localizacaoController.listar.bind(localizacaoController)))
     .post("/localizacoes", AuthMiddleware, AuthPermission, asyncWrapper(localizacaoController.criar.bind(localizacaoController)))
     .patch("/localizacoes/:id", AuthMiddleware, AuthPermission, asyncWrapper(localizacaoController.atualizar.bind(localizacaoController)))
+    .patch("/localizacoes/:id/inativar", AuthMiddleware, AuthPermission, asyncWrapper(localizacaoController.inativar.bind(localizacaoController)))
     .put("/localizacoes/:id", AuthMiddleware, AuthPermission, asyncWrapper(localizacaoController.atualizar.bind(localizacaoController)))
-    .delete("/localizacoes/:id", AuthMiddleware, AuthPermission, asyncWrapper(localizacaoController.deletar.bind(localizacaoController)))
 
 export default router;
