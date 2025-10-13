@@ -63,13 +63,7 @@ describe('ComponenteService', () => {
             await expect(service.criar({ nome: 'Resistor', localizacao: 'loc1', categoria: 'cat1' }, req))
                 .rejects.toThrow(CustomError);
         });
-        it('deve lançar erro se localizacao não existir', async () => {
-            const req = { user_id: 'user1' };
-            repositoryMock.buscarPorNome.mockResolvedValue(null);
-            LocalizacaoModel.findOne.mockResolvedValue(null);
-            await expect(service.criar({ nome: 'Resistor', localizacao: 'locX', categoria: 'cat1' }, req))
-                .rejects.toThrow(CustomError);
-        });
+
         it('deve lançar erro se categoria não existir', async () => {
             const req = { user_id: 'user1' };
             repositoryMock.buscarPorNome.mockResolvedValue(null);
@@ -105,17 +99,11 @@ describe('ComponenteService', () => {
     describe('atualizar', () => {
         it('deve atualizar dados do componente, exceto quantidade', async () => {
             const req = { user_id: 'user1' };
-            // Simula que o componente existe no banco
             repositoryMock.buscarPorId.mockResolvedValue(makeComponente());
-            // Simula que não existe outro componente com o mesmo nome
             repositoryMock.buscarPorNome.mockResolvedValue(null);
-            // Simula atualização no banco, mas mantém quantidade original
             repositoryMock.atualizar.mockResolvedValue(makeComponente({ nome: 'Novo Nome', quantidade: 10 }));
-            // Tenta atualizar o nome e a quantidade do componente
             const result = await service.atualizar('comp1', { nome: 'Novo Nome', quantidade: 999 }, req);
-            // Verifica se o nome foi atualizado corretamente
             expect(result.nome).toBe('Novo Nome');
-            // Garante que o método atualizar foi chamado sem o campo quantidade
             expect(repositoryMock.atualizar).toHaveBeenCalledWith('comp1', { nome: 'Novo Nome' }, req);
         });
         it('deve lançar erro se componente não existir', async () => {
@@ -178,14 +166,7 @@ describe('ComponenteService', () => {
             repositoryMock.buscarPorId.mockResolvedValue(makeComponente());
             await expect(service.ensureComponentExists('comp1')).resolves.toHaveProperty('_id', 'comp1');
         });
-        it('validateLocalizacao lança erro se não existir', async () => {
-            LocalizacaoModel.findOne.mockResolvedValue(null);
-            await expect(service.validateLocalizacao('locX', { user_id: 'user1' })).rejects.toThrow(CustomError);
-        });
-        it('validateLocalizacao não lança erro se existir', async () => {
-            LocalizacaoModel.findOne.mockResolvedValue(makeLocalizacao());
-            await expect(service.validateLocalizacao('loc1', { user_id: 'user1' })).resolves.toBeUndefined();
-        });
+
         it('validateCategoria lança erro se não existir', async () => {
             CategoriaModel.findOne.mockResolvedValue(null);
             await expect(service.validateCategoria('catX', { user_id: 'user1' })).rejects.toThrow(CustomError);

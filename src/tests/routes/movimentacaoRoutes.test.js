@@ -44,23 +44,10 @@ const criarMovimentacaoValida = async (tipo = 'entrada', override = {}) => {
             categoria, 
             quantidade: 100, 
             estoque_minimo: "10", 
-            valor_unitario: "0.5", 
-            localizacao
+            valor_unitario: "0.5"
         });
     const componente = compRes.body?.data?._id;
     expect(componente).toBeTruthy();
-    
-    let fornecedor = null;
-    if (tipo === 'entrada') {
-        const fornecedorNome = `Fornecedor Teste ${unique}`;
-        const fornRes = await request(BASE_URL)
-            .post('/fornecedores')
-            .set('Authorization', `Bearer ${token}`)
-            .send({ nome: fornecedorNome, cnpj: '12345678000199' });
-        const fornecedorId = fornRes.body?.data?._id;
-        expect(fornecedorId).toBeTruthy();
-        fornecedor = fornecedorId;
-    }
     
     // Aguarda mais um pouco para garantir que todas as entidades estejam persistidas
     await new Promise(r => setTimeout(r, 150));
@@ -69,8 +56,7 @@ const criarMovimentacaoValida = async (tipo = 'entrada', override = {}) => {
         componente,
         tipo,
         quantidade: "10",
-        data: new Date(),
-        ...(fornecedor && { fornecedor }),
+        localizacao,
         ...override,
     };
 };
@@ -117,16 +103,7 @@ describe('Rotas de Movimentação', () => {
             const res = await request(BASE_URL).post('/movimentacoes').set('Authorization', `Bearer ${token}`).send({});
             expect([400, 422]).toContain(res.status);
         });
-        it('deve exigir fornecedor em movimentação de entrada', async () => {
-            const dados = await criarMovimentacaoValida('entrada', { fornecedor: undefined });
-            const res = await request(BASE_URL).post('/movimentacoes').set('Authorization', `Bearer ${token}`).send(dados);
-            expect([400, 422]).toContain(res.status);
-        });
-        it('deve falhar ao cadastrar com fornecedor inexistente', async () => {
-            const dados = await criarMovimentacaoValida('entrada', { fornecedor: new mongoose.Types.ObjectId() });
-            const res = await request(BASE_URL).post('/movimentacoes').set('Authorization', `Bearer ${token}`).send(dados);
-            expect([400, 404, 422]).toContain(res.status);
-        });
+
     });
 
     describe('GET /movimentacoes', () => {
@@ -135,15 +112,9 @@ describe('Rotas de Movimentação', () => {
             await request(BASE_URL).post('/movimentacoes').set('Authorization', `Bearer ${token}`).send(dados);
             const res = await request(BASE_URL).get('/movimentacoes').set('Authorization', `Bearer ${token}`);
             expect([200, 201]).toContain(res.status);
-            let lista = res.body.data;
-            if (!Array.isArray(lista)) {
-                if (Array.isArray(res.body.data?.docs)) lista = res.body.data.docs;
-                else if (Array.isArray(res.body.data?.items)) lista = res.body.data.items;
-                else if (Array.isArray(res.body.data?.results)) lista = res.body.data.results;
-            }
-            expect(Array.isArray(lista)).toBe(true);
-            expect(lista.length).toBeGreaterThan(0);
-        });
+            expect(res.body.data).toHaveProperty('docs');
+            expect(Array.isArray(res.body.data.docs)).toBe(true);
+        }, 10000);
     });
     describe('GET /movimentacoes/:id', () => {
         it('deve retornar movimentação por id', async () => {

@@ -35,16 +35,17 @@ describe("Usuários", () => {
     });
 
     it("Deve cadastrar um usuário válido (POST)", async () => {
+        const unique = Date.now();
         const objUsuario = {
-            nome: faker.name.firstName(),
-            email: faker.internet.email(),
+            nome: `João Silva`,
+            email: `teste${unique}@teste.com`,
             senha: 'Senha1234!'
         };
         const res = await request(BASE_URL)
             .post("/signup")
             .send(objUsuario);
         
-        expect([201, 500]).toContain(res.status);
+        expect(res.status).toBe(201);
         
         if (res.status === 201) {
             usuarioId = res.body.data._id;

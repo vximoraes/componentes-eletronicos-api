@@ -87,39 +87,5 @@ describe('MovimentacaoFilterBuilder', () => {
         });
     });
 
-    describe('comFornecedor', () => {
-        it('deve adicionar filtro de fornecedor por ObjectId válido e encontrado', async () => {
-            const builder = new MovimentacaoFilterBuilder();
-            jest.spyOn(mongoose.Types.ObjectId, 'isValid').mockReturnValue(true);
-            Fornecedor.findById.mockResolvedValue({ _id: 'f1' });
-            await builder.comFornecedor('f1');
-            expect(builder.build()).toEqual({ fornecedor: 'f1' });
-        });
-        it('deve adicionar filtro de fornecedor por ObjectId válido e não encontrado', async () => {
-            const builder = new MovimentacaoFilterBuilder();
-            jest.spyOn(mongoose.Types.ObjectId, 'isValid').mockReturnValue(true);
-            Fornecedor.findById.mockResolvedValue(null);
-            await builder.comFornecedor('f1');
-            expect(builder.build()).toEqual({ fornecedor: { $in: [] } });
-        });
-        it('deve adicionar filtro de fornecedor por string encontrada', async () => {
-            const builder = new MovimentacaoFilterBuilder();
-            jest.spyOn(mongoose.Types.ObjectId, 'isValid').mockReturnValue(false);
-            Fornecedor.findOne.mockResolvedValue({ _id: 'f2' });
-            await builder.comFornecedor('fornecedorX');
-            expect(builder.build()).toEqual({ fornecedor: 'f2' });
-        });
-        it('deve adicionar filtro de fornecedor por string não encontrada', async () => {
-            const builder = new MovimentacaoFilterBuilder();
-            jest.spyOn(mongoose.Types.ObjectId, 'isValid').mockReturnValue(false);
-            Fornecedor.findOne.mockResolvedValue(null);
-            await builder.comFornecedor('fornecedorY');
-            expect(builder.build()).toEqual({ fornecedor: { $in: [] } });
-        });
-        it('não deve adicionar filtro se valor for vazio', async () => {
-            const builder = new MovimentacaoFilterBuilder();
-            await builder.comFornecedor('');
-            expect(builder.build()).toEqual({});
-        });
-    });
+
 });

@@ -123,17 +123,18 @@ describe('Rotas de Localização', () => {
         });
     });
 
-    describe('DELETE /localizacoes/:id', () => {
-        it('deve remover localização existente', async () => {
+    describe('PATCH /localizacoes/:id/inativar', () => {
+        it('deve inativar localização existente', async () => {
             const dados = await criarLocalizacaoValida();
             const locRes = await request(BASE_URL).post('/localizacoes').set('Authorization', `Bearer ${token}`).send(dados);
             const id = locRes.body.data._id;
-            const res = await request(BASE_URL).delete(`/localizacoes/${id}`).set('Authorization', `Bearer ${token}`);
-            expect([200, 201, 204]).toContain(res.status);
+            const res = await request(BASE_URL).patch(`/localizacoes/${id}/inativar`).set('Authorization', `Bearer ${token}`);
+            expect(res.status).toBe(200);
+            expect(res.body.data.ativo).toBe(false);
         });
-        it('deve retornar 404 ao remover localização inexistente', async () => {
+        it('deve retornar 404 ao inativar localização inexistente', async () => {
             const id = new mongoose.Types.ObjectId();
-            const res = await request(BASE_URL).delete(`/localizacoes/${id}`).set('Authorization', `Bearer ${token}`);
+            const res = await request(BASE_URL).patch(`/localizacoes/${id}/inativar`).set('Authorization', `Bearer ${token}`);
             expect(res.status).toBe(404);
         });
     });

@@ -135,85 +135,7 @@ describe('ComponenteFilterBuilder', () => {
         });
     });
 
-    describe('comLocalizacao', () => {
-        test('deve adicionar filtro com localizacao quando é ObjectId válido e localizacao existe', async () => {
-            const localizacaoId = 'validObjectId';
-            mongoose.Types.ObjectId.isValid.mockReturnValue(true);
 
-            const mockLocalizacao = { _id: localizacaoId, localizacao: 'Prateleira A' };
-            Localizacao.findById.mockResolvedValue(mockLocalizacao);
-
-            const resultado = await componenteFilterBuilder.comLocalizacao(localizacaoId);
-
-            expect(mongoose.Types.ObjectId.isValid).toHaveBeenCalledWith(localizacaoId);
-            expect(Localizacao.findById).toHaveBeenCalledWith(localizacaoId);
-            expect(componenteFilterBuilder.filtros.localizacao).toBe(localizacaoId);
-            expect(resultado).toBe(componenteFilterBuilder);
-        });
-
-        test('deve definir filtro como vazio quando ObjectId é válido mas localizacao não existe', async () => {
-            const localizacaoId = 'validObjectId';
-            mongoose.Types.ObjectId.isValid.mockReturnValue(true);
-            Localizacao.findById.mockResolvedValue(null);
-
-            const resultado = await componenteFilterBuilder.comLocalizacao(localizacaoId);
-
-            expect(mongoose.Types.ObjectId.isValid).toHaveBeenCalledWith(localizacaoId);
-            expect(Localizacao.findById).toHaveBeenCalledWith(localizacaoId);
-            expect(componenteFilterBuilder.filtros.localizacao).toEqual({ $in: [] });
-            expect(resultado).toBe(componenteFilterBuilder);
-        });
-
-        test('deve buscar localizacao por nome e adicionar filtro quando localizacao existe', async () => {
-            const localizacaoNome = 'Prateleira A';
-            mongoose.Types.ObjectId.isValid.mockReturnValue(false);
-
-            const mockLocalizacao = { _id: 'someId', localizacao: localizacaoNome };
-            Localizacao.findOne.mockResolvedValue(mockLocalizacao);
-
-            const resultado = await componenteFilterBuilder.comLocalizacao(localizacaoNome);
-
-            expect(mongoose.Types.ObjectId.isValid).toHaveBeenCalledWith(localizacaoNome);
-            expect(Localizacao.findOne).toHaveBeenCalledWith({
-                localizacao: { $regex: localizacaoNome, $options: 'i' },
-            });
-            expect(componenteFilterBuilder.filtros.localizacao).toBe('someId');
-            expect(resultado).toBe(componenteFilterBuilder);
-        });
-
-        test('deve definir filtro como vazio quando localizacao por nome não existe', async () => {
-            const localizacaoNome = 'Prateleira Inexistente';
-            mongoose.Types.ObjectId.isValid.mockReturnValue(false);
-            Localizacao.findOne.mockResolvedValue(null);
-
-            const resultado = await componenteFilterBuilder.comLocalizacao(localizacaoNome);
-
-            expect(mongoose.Types.ObjectId.isValid).toHaveBeenCalledWith(localizacaoNome);
-            expect(Localizacao.findOne).toHaveBeenCalledWith({
-                localizacao: { $regex: localizacaoNome, $options: 'i' },
-            });
-            expect(componenteFilterBuilder.filtros.localizacao).toEqual({ $in: [] });
-            expect(resultado).toBe(componenteFilterBuilder);
-        });
-
-        test('não deve adicionar filtro para valores inválidos (undefined, null, string vazia)', async () => {
-            const valoresInvalidos = [undefined, null, ''];
-            
-            for (const valor of valoresInvalidos) {
-                componenteFilterBuilder.filtros = {}; // Reset
-                
-                const resultado = await componenteFilterBuilder.comLocalizacao(valor);
-                
-                expect(mongoose.Types.ObjectId.isValid).not.toHaveBeenCalled();
-                expect(Localizacao.findById).not.toHaveBeenCalled();
-                expect(Localizacao.findOne).not.toHaveBeenCalled();
-                expect(componenteFilterBuilder.filtros.localizacao).toBeUndefined();
-                expect(resultado).toBe(componenteFilterBuilder);
-                
-                jest.clearAllMocks();
-            }
-        });
-    });
 
     describe('comCategoria', () => {
         test('deve adicionar filtro com categoria quando é ObjectId válido e categoria existe', async () => {
@@ -255,7 +177,7 @@ describe('ComponenteFilterBuilder', () => {
 
             expect(mongoose.Types.ObjectId.isValid).toHaveBeenCalledWith(categoriaNome);
             expect(Categoria.findOne).toHaveBeenCalledWith({
-                categoria: { $regex: categoriaNome, $options: 'i' },
+                nome: { $regex: categoriaNome, $options: 'i' },
             });
             expect(componenteFilterBuilder.filtros.categoria).toBe('someId');
             expect(resultado).toBe(componenteFilterBuilder);
@@ -270,7 +192,7 @@ describe('ComponenteFilterBuilder', () => {
 
             expect(mongoose.Types.ObjectId.isValid).toHaveBeenCalledWith(categoriaNome);
             expect(Categoria.findOne).toHaveBeenCalledWith({
-                categoria: { $regex: categoriaNome, $options: 'i' },
+                nome: { $regex: categoriaNome, $options: 'i' },
             });
             expect(componenteFilterBuilder.filtros.categoria).toEqual({ $in: [] });
             expect(resultado).toBe(componenteFilterBuilder);
@@ -379,7 +301,6 @@ describe('ComponenteFilterBuilder', () => {
             componenteFilterBuilder.comNome('Resistor');
             componenteFilterBuilder.comQuantidade('10');
             componenteFilterBuilder.comAtivo('true');
-            await componenteFilterBuilder.comLocalizacao('localizacaoId');
             await componenteFilterBuilder.comCategoria('categoriaId');
 
             const filtros = componenteFilterBuilder.build();
@@ -388,7 +309,6 @@ describe('ComponenteFilterBuilder', () => {
                 nome: { $regex: 'Resistor', $options: 'i' },
                 quantidade: 10,
                 ativo: true,
-                localizacao: 'localizacaoId',
                 categoria: 'categoriaId'
             });
         });

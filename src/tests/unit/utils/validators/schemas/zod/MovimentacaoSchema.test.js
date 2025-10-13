@@ -8,6 +8,7 @@ describe('MovimentacaoSchema', () => {
                 tipo: 'entrada',
                 componente: '64f234a0c781a7b30c2fe445',
                 quantidade: '10',
+                localizacao: '64f234a0c781a7b30c2fe447',
                 fornecedor: '64f234a0c781a7b30c2fe446'
             };
             const result = MovimentacaoSchema.parse(data);
@@ -15,7 +16,7 @@ describe('MovimentacaoSchema', () => {
                 tipo: 'entrada',
                 componente: '64f234a0c781a7b30c2fe445',
                 quantidade: 10,
-                fornecedor: '64f234a0c781a7b30c2fe446'
+                localizacao: '64f234a0c781a7b30c2fe447'
             }));
         });
 
@@ -23,13 +24,15 @@ describe('MovimentacaoSchema', () => {
             const data = {
                 tipo: 'saida',
                 componente: '64f234a0c781a7b30c2fe445',
-                quantidade: '5'
+                quantidade: '5',
+                localizacao: '64f234a0c781a7b30c2fe447'
             };
             const result = MovimentacaoSchema.parse(data);
             expect(result).toEqual(expect.objectContaining({
                 tipo: 'saida',
                 componente: '64f234a0c781a7b30c2fe445',
-                quantidade: 5
+                quantidade: 5,
+                localizacao: '64f234a0c781a7b30c2fe447'
             }));
         });
 
@@ -37,7 +40,8 @@ describe('MovimentacaoSchema', () => {
             const data = {
                 tipo: 'invalido',
                 componente: '64f234a0c781a7b30c2fe445',
-                quantidade: '10'
+                quantidade: '10',
+                localizacao: '64f234a0c781a7b30c2fe447'
             };
             expect(() => MovimentacaoSchema.parse(data)).toThrow(ZodError);
         });
@@ -45,12 +49,14 @@ describe('MovimentacaoSchema', () => {
         it('deve aceitar quando tipo não é fornecido (opcional)', () => {
             const data = {
                 componente: '64f234a0c781a7b30c2fe445',
-                quantidade: '10'
+                quantidade: '10',
+                localizacao: '64f234a0c781a7b30c2fe447'
             };
             const result = MovimentacaoSchema.parse(data);
             expect(result).toEqual(expect.objectContaining({
                 componente: '64f234a0c781a7b30c2fe445',
-                quantidade: 10
+                quantidade: 10,
+                localizacao: '64f234a0c781a7b30c2fe447'
             }));
             expect(result.tipo).toBeUndefined();
         });
@@ -62,6 +68,7 @@ describe('MovimentacaoSchema', () => {
                 tipo: 'entrada',
                 componente: '64f234a0c781a7b30c2fe445',
                 quantidade: '10',
+                localizacao: '64f234a0c781a7b30c2fe447',
                 data_hora: '2025-05-28T10:00:00Z'
             };
             expect(() => MovimentacaoSchema.parse(data)).toThrow(ZodError);
@@ -71,7 +78,8 @@ describe('MovimentacaoSchema', () => {
             const data = {
                 tipo: 'entrada',
                 componente: '64f234a0c781a7b30c2fe445',
-                quantidade: '10'
+                quantidade: '10',
+                localizacao: '64f234a0c781a7b30c2fe447'
             };
             const result = MovimentacaoSchema.parse(data);
             expect(result.data_hora).toBeUndefined();
@@ -83,7 +91,8 @@ describe('MovimentacaoSchema', () => {
             const data = {
                 tipo: 'entrada',
                 componente: '64f234a0c781a7b30c2fe445',
-                quantidade: '10'
+                quantidade: '10',
+                localizacao: '64f234a0c781a7b30c2fe447'
             };
             const result = MovimentacaoSchema.parse(data);
             expect(result.quantidade).toBe(10);
@@ -93,7 +102,8 @@ describe('MovimentacaoSchema', () => {
         it('deve aceitar quando quantidade não é fornecida (opcional)', () => {
             const data = {
                 tipo: 'entrada',
-                componente: '64f234a0c781a7b30c2fe445'
+                componente: '64f234a0c781a7b30c2fe445',
+                localizacao: '64f234a0c781a7b30c2fe447'
             };
             const result = MovimentacaoSchema.parse(data);
             expect(result.quantidade).toBeUndefined();
@@ -103,7 +113,8 @@ describe('MovimentacaoSchema', () => {
             const data = {
                 tipo: 'entrada',
                 componente: '64f234a0c781a7b30c2fe445',
-                quantidade: 'abc'
+                quantidade: 'abc',
+                localizacao: '64f234a0c781a7b30c2fe447'
             };
             expect(() => MovimentacaoSchema.parse(data)).toThrow(ZodError);
         });
@@ -114,7 +125,8 @@ describe('MovimentacaoSchema', () => {
             const data = {
                 tipo: 'entrada',
                 componente: '64f234a0c781a7b30c2fe445',
-                quantidade: '10'
+                quantidade: '10',
+                localizacao: '64f234a0c781a7b30c2fe447'
             };
             const result = MovimentacaoSchema.parse(data);
             expect(result.componente).toBe('64f234a0c781a7b30c2fe445');
@@ -123,7 +135,8 @@ describe('MovimentacaoSchema', () => {
         it('deve rejeitar quando componente não é fornecido', () => {
             const data = {
                 tipo: 'entrada',
-                quantidade: '10'
+                quantidade: '10',
+                localizacao: '64f234a0c781a7b30c2fe447'
             };
             expect(() => MovimentacaoSchema.parse(data)).toThrow(ZodError);
         });
@@ -132,44 +145,14 @@ describe('MovimentacaoSchema', () => {
             const data = {
                 tipo: 'entrada',
                 componente: 'invalid-id',
-                quantidade: '10'
+                quantidade: '10',
+                localizacao: '64f234a0c781a7b30c2fe447'
             };
             expect(() => MovimentacaoSchema.parse(data)).toThrow(ZodError);
         });
     });
 
-    describe('Validação de fornecedor', () => {
-        it('deve aceitar quando fornecedor é um ObjectId válido', () => {
-            const data = {
-                tipo: 'entrada',
-                componente: '64f234a0c781a7b30c2fe445',
-                quantidade: '10',
-                fornecedor: '64f234a0c781a7b30c2fe446'
-            };
-            const result = MovimentacaoSchema.parse(data);
-            expect(result.fornecedor).toBe('64f234a0c781a7b30c2fe446');
-        });
 
-        it('deve aceitar quando fornecedor não é fornecido (opcional)', () => {
-            const data = {
-                tipo: 'saida',
-                componente: '64f234a0c781a7b30c2fe445',
-                quantidade: '5'
-            };
-            const result = MovimentacaoSchema.parse(data);
-            expect(result.fornecedor).toBeUndefined();
-        });
-
-        it('deve rejeitar quando fornecedor não é um ObjectId válido', () => {
-            const data = {
-                tipo: 'entrada',
-                componente: '64f234a0c781a7b30c2fe445',
-                quantidade: '10',
-                fornecedor: 'invalid-id'
-            };
-            expect(() => MovimentacaoSchema.parse(data)).toThrow(ZodError);
-        });
-    });
 
     describe('Cenários completos', () => {
         it('deve validar uma movimentação de entrada completa', () => {
@@ -177,14 +160,14 @@ describe('MovimentacaoSchema', () => {
                 tipo: 'entrada',
                 componente: '64f234a0c781a7b30c2fe445',
                 quantidade: '10',
-                fornecedor: '64f234a0c781a7b30c2fe446'
+                localizacao: '64f234a0c781a7b30c2fe447'
             };
             const result = MovimentacaoSchema.parse(data);
             expect(result).toEqual({
                 tipo: 'entrada',
                 componente: '64f234a0c781a7b30c2fe445',
                 quantidade: 10,
-                fornecedor: '64f234a0c781a7b30c2fe446'
+                localizacao: '64f234a0c781a7b30c2fe447'
             });
         });
 
@@ -192,13 +175,15 @@ describe('MovimentacaoSchema', () => {
             const data = {
                 tipo: 'saida',
                 componente: '64f234a0c781a7b30c2fe445',
-                quantidade: '5'
+                quantidade: '5',
+                localizacao: '64f234a0c781a7b30c2fe447'
             };
             const result = MovimentacaoSchema.parse(data);
             expect(result).toEqual({
                 tipo: 'saida',
                 componente: '64f234a0c781a7b30c2fe445',
-                quantidade: 5
+                quantidade: 5,
+                localizacao: '64f234a0c781a7b30c2fe447'
             });
         });
 
@@ -207,6 +192,7 @@ describe('MovimentacaoSchema', () => {
                 tipo: 'invalido',
                 componente: 'invalid-id',
                 quantidade: 'abc',
+                localizacao: 'invalid-localizacao',
                 data_hora: '2025-05-28T10:00:00Z'
             };
             expect(() => MovimentacaoSchema.parse(data)).toThrow(ZodError);
@@ -222,16 +208,6 @@ describe('MovimentacaoUpdateSchema', () => {
         const result = MovimentacaoUpdateSchema.parse(updateData);
         expect(result).toEqual({
             quantidade: 20
-        });
-    });
-
-    it('deve permitir atualização parcial - apenas fornecedor', () => {
-        const updateData = {
-            fornecedor: '64f234a0c781a7b30c2fe447'
-        };
-        const result = MovimentacaoUpdateSchema.parse(updateData);
-        expect(result).toEqual({
-            fornecedor: '64f234a0c781a7b30c2fe447'
         });
     });
 
