@@ -7,6 +7,16 @@ const FornecedorSchema = z.object({
     ativo: z
         .boolean()
         .default(true),
+    url: z
+        .string()
+        .url('URL deve ser válida.')
+        .optional(),
+    contato: z
+        .string()
+        .optional(),
+    descricao: z
+        .string()
+        .optional(),
 });
 
 const FornecedorUpdateSchema = FornecedorSchema

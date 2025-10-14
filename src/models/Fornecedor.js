@@ -14,6 +14,18 @@ class Fornecedor {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'usuarios',
                 required: true
+            },
+            url: {
+                type: String,
+                required: false
+            },
+            contato: {
+                type: String,
+                required: false
+            },
+            descricao: {
+                type: String,
+                required: false
             }
         });
 
