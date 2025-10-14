@@ -101,6 +101,9 @@ export const fakeMappings = {
     Fornecedor: {
         nome: () => fakebr.company.companyName(),
         usuario: () => new mongoose.Types.ObjectId().toString(),
+        url: () => fakebr.internet.url(),
+        contato: () => fakebr.phone.phoneNumber(),
+        descricao: () => fakebr.lorem.sentence(),
     },
 
     Movimentacao: {

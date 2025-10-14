@@ -15,6 +15,27 @@ class FornecedorFilterBuilder {
         return this;
     };
 
+    comContato(contato) {
+        if (contato !== undefined && contato !== null) {
+            this.filtros.contato = { $regex: contato, $options: 'i' };
+        };
+        return this;
+    };
+
+    comDescricao(descricao) {
+        if (descricao !== undefined && descricao !== null) {
+            this.filtros.descricao = { $regex: descricao, $options: 'i' };
+        };
+        return this;
+    };
+
+    comUrl(url) {
+        if (url !== undefined && url !== null) {
+            this.filtros.url = { $regex: url, $options: 'i' };
+        };
+        return this;
+    };
+
     build() {
         return this.filtros;
     };

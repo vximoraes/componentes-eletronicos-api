@@ -39,11 +39,14 @@ class FornecedorRepository {
             return dataWithStats;
         };
 
-        const { nome, page = 1 } = req.query;
+        const { nome, contato, descricao, url, page = 1 } = req.query;
         const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
 
         const filterBuilder = new FornecedorFilterBuilder()
-            .comNome(nome || '');
+            .comNome(nome || '')
+            .comContato(contato || '')
+            .comDescricao(descricao || '')
+            .comUrl(url || '');
 
         if (typeof filterBuilder.build !== 'function') {
             throw new CustomError({

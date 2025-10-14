@@ -15,6 +15,9 @@ const fornecedoresSchemas = {
         properties: {
             nome: fornecedorJsonSchema.properties.nome,
             ativo: fornecedorJsonSchema.properties.ativo,
+            url: fornecedorJsonSchema.properties.url,
+            contato: fornecedorJsonSchema.properties.contato,
+            descricao: fornecedorJsonSchema.properties.descricao,
         }
     },
     FornecedorListagem: {
@@ -76,10 +79,16 @@ const fornecedorMongooseSchema = Fornecedor.schema;
 fornecedoresSchemas.FornecedorItem.example = await generateExample(fornecedoresSchemas.FornecedorItem, null, fornecedorMongooseSchema);
 fornecedoresSchemas.FornecedorDetalhes.example = await generateExample(fornecedoresSchemas.FornecedorDetalhes, null, fornecedorMongooseSchema);
 fornecedoresSchemas.FornecedorPost.example = {
-    nome: "TechComponents LTDA"
+    nome: "TechComponents LTDA",
+    url: "https://www.techcomponents.com.br",
+    contato: "(11) 98765-4321",
+    descricao: "Fornecedor especializado em componentes eletrônicos"
 };
 fornecedoresSchemas.FornecedorPutPatch.example = {
-    nome: "TechComponents LTDA - Atualizado"
+    nome: "TechComponents LTDA - Atualizado",
+    url: "https://www.newtechcomponents.com.br",
+    contato: "(11) 91234-5678",
+    descricao: "Fornecedor atualizado especializado em componentes eletrônicos avançados"
 };
 
 export default fornecedoresSchemas;

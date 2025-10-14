@@ -8,7 +8,10 @@ export default async function fornecedorSeed(adminId) {
     for (let i = 0; i < 10; i++) {
         const fornecedor = {
             nome: fakeMappings.Fornecedor.nome.apply(),
-            usuario: adminId
+            usuario: adminId,
+            url: fakeMappings.Fornecedor.url.apply(),
+            contato: fakeMappings.Fornecedor.contato.apply(),
+            descricao: fakeMappings.Fornecedor.descricao.apply()
         };
 
         await Fornecedor.create(fornecedor);
