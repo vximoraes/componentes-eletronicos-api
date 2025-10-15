@@ -17,27 +17,6 @@ class EstoqueRepository {
     };
 
     async listar(req) {
-        const id = req.params.id || null;
-
-        // Se um ID for fornecido, retorna o estoque específico
-        if (id) {
-            const data = await this.model.findOne({ _id: id, usuario: req.user_id })
-                .populate('componente')
-                .populate('localizacao');
-
-            if (!data) {
-                throw new CustomError({
-                    statusCode: 404,
-                    errorType: 'resourceNotFound',
-                    field: 'Estoque',
-                    details: [],
-                    customMessage: messages.error.resourceNotFound('Estoque')
-                });
-            };
-
-            return data;
-        };
-
         const { componente, localizacao, quantidade, page = 1 } = req.query;
         const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
 
@@ -46,6 +25,42 @@ class EstoqueRepository {
         if (componente) {
             filtros.componente = componente;
         }
+
+        if (localizacao) {
+            filtros.localizacao = localizacao;
+        }
+
+        if (quantidade !== undefined && quantidade !== null && quantidade !== '') {
+            const num = Number(quantidade);
+            if (!isNaN(num)) {
+                filtros.quantidade = num;
+            }
+        }
+
+        const options = {
+            page: parseInt(page),
+            limit: parseInt(limite),
+            populate: [
+                'componente',
+                'localizacao'
+            ],
+            sort: { createdAt: -1 },
+        };
+
+        const resultado = await this.model.paginate(filtros, options);
+
+        return resultado;
+    };
+
+    async listarPorComponente(req) {
+        const { componenteId } = req.params;
+        const { localizacao, quantidade, page = 1 } = req.query;
+        const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
+
+        const filtros = { 
+            usuario: req.user_id,
+            componente: componenteId 
+        };
 
         if (localizacao) {
             filtros.localizacao = localizacao;
@@ -121,6 +136,16 @@ class EstoqueRepository {
         const estoque = await this.model.findOne({ _id: id, usuario: req.user_id })
             .populate('componente')
             .populate('localizacao');
+
+        if (!estoque) {
+            throw new CustomError({
+                statusCode: 404,
+                errorType: 'resourceNotFound',
+                field: 'Estoque',
+                details: [],
+                customMessage: messages.error.resourceNotFound('Estoque')
+            });
+        };
 
         return estoque;
     };

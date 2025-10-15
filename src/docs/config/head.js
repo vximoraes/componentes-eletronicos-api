@@ -4,6 +4,7 @@ import categoriasSchemas from "../schemas/categoriaSchema.js";
 import componentesSchemas from "../schemas/componenteSchema.js";
 import fornecedoresSchemas from "../schemas/fornecedorSchema.js";
 import localizacoesSchemas from "../schemas/localizacaoSchema.js";
+import estoquesSchemas from "../schemas/estoqueSchema.js";
 import movimentacoesSchemas from "../schemas/movimentacaoSchema.js";
 import notificacoesSchemas from "../schemas/notificacaoSchema.js";
 import orcamentosSchemas from "../schemas/orcamentoSchema.js";
@@ -15,6 +16,7 @@ import categoriasPaths from "../paths/categoria.js";
 import componentesPaths from "../paths/componente.js";
 import fornecedoresPaths from "../paths/fornecedor.js";
 import localizacoesPaths from "../paths/localizacao.js";
+import estoquesPaths from "../paths/estoque.js";
 import movimentacoesPaths from "../paths/movimentacao.js";
 import notificacoesPaths from "../paths/notificacao.js";
 import orcamentosPaths from "../paths/orcamento.js";
@@ -71,6 +73,10 @@ const getSwaggerOptions = () => {
                     description: "Rotas para gestão de localização de componentes"
                 },
                 {
+                    name: "Estoque",
+                    description: "Rotas para gestão de estoque de componentes"
+                },
+                {
                     name: "Movimentação",
                     description: "Rotas para gestão de movimentação de componentes"
                 },
@@ -98,6 +104,7 @@ const getSwaggerOptions = () => {
                 ...componentesPaths,
                 ...fornecedoresPaths,
                 ...localizacoesPaths,
+                ...estoquesPaths,
                 ...movimentacoesPaths,
                 ...notificacoesPaths,
                 ...orcamentosPaths,
@@ -119,6 +126,7 @@ const getSwaggerOptions = () => {
                     ...componentesSchemas,
                     ...fornecedoresSchemas,
                     ...localizacoesSchemas,
+                    ...estoquesSchemas,
                     ...movimentacoesSchemas,
                     ...notificacoesSchemas,
                     ...orcamentosSchemas,

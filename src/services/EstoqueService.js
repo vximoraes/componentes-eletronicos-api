@@ -13,6 +13,18 @@ class EstoqueService {
 
         return data;
     };
+
+    async buscarPorId(req) {
+        const data = await this.repository.buscarPorId(req.params.id, req);
+
+        return data;
+    };
+
+    async listarPorComponente(req) {
+        const data = await this.repository.listarPorComponente(req);
+
+        return data;
+    };
 };
 
 export default EstoqueService;
