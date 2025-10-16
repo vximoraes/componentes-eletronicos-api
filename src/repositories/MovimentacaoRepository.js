@@ -12,6 +12,13 @@ class MovimentacaoRepository {
     async criar(parsedData) {
         const movimentacao = new this.model(parsedData);
         const movimentacaoSalva = await movimentacao.save();
+        
+        await this.model.atualizarEstoque(
+            movimentacaoSalva.componente,
+            movimentacaoSalva.localizacao,
+            movimentacaoSalva.usuario
+        );
+        
         return await this.model.findById(movimentacaoSalva._id)
             .populate('componente')
             .populate('localizacao');
