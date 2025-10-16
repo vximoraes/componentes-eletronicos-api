@@ -60,18 +60,22 @@ class Componente {
         });
 
         // Middleware para calcular o status em operações de update
-        componenteSchema.pre(['updateOne', 'findOneAndUpdate'], function() {
+        componenteSchema.pre(['updateOne', 'findOneAndUpdate'], async function() {
             const update = this.getUpdate();
             if (update.quantidade !== undefined || update.estoque_minimo !== undefined) {
-                const quantidade = update.quantidade !== undefined ? update.quantidade : 0;
-                const estoque_minimo = update.estoque_minimo !== undefined ? update.estoque_minimo : 0;
+                const docAtual = await this.model.findOne(this.getQuery());
                 
-                if (quantidade === 0) {
-                    this.set({ status: 'Indisponível' });
-                } else if (quantidade < estoque_minimo) {
-                    this.set({ status: 'Baixo Estoque' });
-                } else {
-                    this.set({ status: 'Em Estoque' });
+                if (docAtual) {
+                    const quantidade = update.quantidade !== undefined ? update.quantidade : docAtual.quantidade;
+                    const estoque_minimo = update.estoque_minimo !== undefined ? update.estoque_minimo : docAtual.estoque_minimo;
+                    
+                    if (quantidade === 0) {
+                        this.set({ status: 'Indisponível' });
+                    } else if (quantidade < estoque_minimo) {
+                        this.set({ status: 'Baixo Estoque' });
+                    } else {
+                        this.set({ status: 'Em Estoque' });
+                    }
                 }
             }
         });
