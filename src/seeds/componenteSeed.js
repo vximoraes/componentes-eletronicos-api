@@ -14,10 +14,10 @@ export default async function componenteSeed(adminId) {
 
         const componente = {
             nome,
-            quantidade: fakeMappings.Componente.quantidade.apply(),
+            quantidade: 0,
             estoque_minimo: fakeMappings.Componente.estoque_minimo.apply(),
             descricao: fakeMappings.Componente.descricao.apply(),
-            imagem: fakeMappings.Componente.imagem.apply(),
+            // imagem: fakeMappings.Componente.imagem.apply(),
             categoria: categoriaRandom._id,
             usuario: adminId,
             ativo: fakeMappings.Componente.ativo.apply(),

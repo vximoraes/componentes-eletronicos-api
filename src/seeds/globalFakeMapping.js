@@ -64,21 +64,35 @@ export const fakeMappings = {
             return this.categorias[index];
         },
         usuario: () => new mongoose.Types.ObjectId().toString(),
-    },
+        },
 
-    Localizacao: {
+        Localizacao: {
         nome: () => `${String.fromCharCode(65 + fakebr.random.number({ min: 0, max: 25 }))}${fakebr.random.number({ min: 1, max: 100 })}`,
         usuario: () => new mongoose.Types.ObjectId().toString(),
-    },
+        },
 
-    Componente: {
+        Componente: {
         nomesFixos: [
             "Placa Arduino Uno",
+            "Placa Arduino Mega",
             "Sensor de Movimento",
+            "Sensor de Temperatura DHT11",
+            "Sensor de Umidade DHT22",
             "Display LCD 16x2",
+            "Display OLED 0.96",
             "Módulo Relé 4 Canais",
+            "Módulo Relé 1 Canal",
             "Módulo Wifi ESP8266",
-            "Kit Jumpers 120 peças"
+            "Módulo Bluetooth HC-05",
+            "Módulo Ethernet ENC28J60",
+            "Microcontrolador ESP32",
+            "Microcontrolador ATmega328P",
+            "Kit Jumpers 120 peças",
+            "Protoboard 400 pontos",
+            "Resistor Pack 1k-10M",
+            "Capacitor Pack",
+            "Sensor Ultrassônico HC-SR04",
+            "Módulo Sensor de Luz LDR"
         ],
         nome: () => fakebr.helpers.randomize(fakeMappings.Componente.nomesFixos),
         quantidade: () => fakebr.random.number({ min: 0, max: 100 }),
@@ -89,24 +103,24 @@ export const fakeMappings = {
         ativo: () => true,
         status: () => fakebr.helpers.randomize(['Indisponível', 'Baixo Estoque', 'Em Estoque']),
         usuario: () => new mongoose.Types.ObjectId().toString(),
-    },
+        },
 
-    Estoque: {
+        Estoque: {
         quantidade: () => fakebr.random.number({ min: 0, max: 100 }),
         componente: () => new mongoose.Types.ObjectId().toString(),
         localizacao: () => new mongoose.Types.ObjectId().toString(),
         usuario: () => new mongoose.Types.ObjectId().toString(),
-    },
+        },
 
-    Fornecedor: {
+        Fornecedor: {
         nome: () => fakebr.company.companyName(),
         usuario: () => new mongoose.Types.ObjectId().toString(),
         url: () => fakebr.internet.url(),
         contato: () => fakebr.phone.phoneNumber(),
         descricao: () => fakebr.lorem.sentence(),
-    },
+        },
 
-    Movimentacao: {
+        Movimentacao: {
         tipos: ["entrada", "saida"],
         tipo: () => fakebr.helpers.randomize(fakeMappings.Movimentacao.tipos),
         data_hora: () => new Date().toISOString(),
@@ -114,9 +128,9 @@ export const fakeMappings = {
         componente: () => new mongoose.Types.ObjectId().toString(),
         localizacao: () => new mongoose.Types.ObjectId().toString(),
         usuario: () => new mongoose.Types.ObjectId().toString(),
-    },
+        },
 
-    Orcamento: {
+        Orcamento: {
         produtoNome: () => fakebr.commerce.productName(),
         adjetivoNome: () => fakebr.lorem.word(),
         nome: () => `Projeto ${fakeMappings.Orcamento.adjetivoNome()} - ${fakeMappings.Orcamento.produtoNome()}`,
