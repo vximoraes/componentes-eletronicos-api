@@ -49,7 +49,7 @@ class ComponenteRepository {
             .comNome(nome || '')
             .comQuantidade(quantidade || '')
             .comEstoqueMinimo(estoque_minimo || '')
-            .comAtivo(ativo || '')
+            .comAtivo(ativo || 'true')
             .comStatus(status || '');
 
         await filterBuilder.comCategoria(categoria || '');
