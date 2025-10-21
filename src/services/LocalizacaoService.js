@@ -1,4 +1,6 @@
 import LocalizacaoRepository from '../repositories/LocalizacaoRepository.js';
+import EstoqueModel from '../models/Estoque.js';
+import ComponenteModel from '../models/Componente.js';
 import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
 
 class LocalizacaoService {
@@ -32,6 +34,26 @@ class LocalizacaoService {
 
     async inativar(id, req) {
         await this.ensureLocationExists(id, req);
+
+        // Verificar se existem estoques nesta localização vinculados a componentes ativos
+        const estoques = await EstoqueModel.find({ 
+            localizacao: id, 
+            usuario: req.user_id 
+        }).populate('componente');
+
+        const temComponenteAtivo = estoques.some(estoque => 
+            estoque.componente && estoque.componente.ativo === true
+        );
+
+        if (temComponenteAtivo) {
+            throw new CustomError({
+                statusCode: 400,
+                errorType: 'resourceInUse',
+                field: 'Localizacao',
+                details: [],
+                customMessage: 'Não é possível inativar: localização possui estoque de componentes ativos.'
+            });
+        }
 
         const data = await this.repository.atualizar(id, { ativo: false }, req);
 

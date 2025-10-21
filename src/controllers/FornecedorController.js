@@ -43,13 +43,13 @@ class FornecedorController {
         return CommonResponse.success(res, data, 200, 'Fornecedor atualizado com sucesso.');
     };
 
-    async deletar(req, res) {
+    async inativar(req, res) {
         const { id } = req.params || {};
         FornecedorIdSchema.parse(id);
 
-        const data = await this.service.deletar(id, req);
+        const data = await this.service.inativar(id, req);
 
-        return CommonResponse.success(res, data, 200, 'Fornecedor excluído com sucesso.');
+        return CommonResponse.success(res, data, 200, 'Fornecedor inativado com sucesso.');
     };
 };
 

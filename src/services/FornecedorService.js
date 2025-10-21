@@ -30,10 +30,10 @@ class FornecedorService {
         return data;
     };
 
-    async deletar(id, req) {
+    async inativar(id, req) {
         await this.ensureSupplierExists(id, req);
 
-        const data = await this.repository.deletar(id, req);
+        const data = await this.repository.atualizar(id, { ativo: false }, req);
 
         return data;
     };

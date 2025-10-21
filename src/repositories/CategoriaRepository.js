@@ -1,6 +1,5 @@
 import CategoriaFilterBuilder from './filters/CategoriaFilterBuilder.js';
 import CategoriaModel from '../models/Categoria.js';
-import ComponenteModel from '../models/Componente.js';
 import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
 
 class CategoriaRepository {
@@ -20,7 +19,7 @@ class CategoriaRepository {
 
         // Se um ID for fornecido, retorna a categoria enriquecida com estatísticas.
         if (id) {
-            const data = await this.model.findOne({ _id: id, usuario: req.user_id });
+            const data = await this.model.findOne({ _id: id, usuario: req.user_id, ativo: true });
 
             if (!data) {
                 throw new CustomError({
@@ -55,7 +54,7 @@ class CategoriaRepository {
             });
         };
 
-        const filtros = { ...filterBuilder.build(), usuario: req.user_id };
+        const filtros = { ...filterBuilder.build(), usuario: req.user_id, ativo: true };
 
         const options = {
             page: parseInt(page, 10),
@@ -92,26 +91,10 @@ class CategoriaRepository {
         return categoria;
     };
 
-    async deletar(id, req) {
-        const existeComponente = await ComponenteModel.exists({ categoria: id, usuario: req.user_id });
-        if (existeComponente) {
-            throw new CustomError({
-                statusCode: 400,
-                errorType: 'resourceInUse',
-                field: 'Categoria',
-                details: [],
-                customMessage: 'Não é possível deletar: categoria está vinculada a componentes.'
-            });
-        };
-
-        const categoria = await this.model.findOneAndDelete({ _id: id, usuario: req.user_id });
-        return categoria;
-    };
-
     // Métodos auxiliares.
 
     async buscarPorNome(nome, idIgnorado, req) {
-        const filtro = { nome, usuario: req.user_id };
+        const filtro = { nome, usuario: req.user_id, ativo: true };
 
         if (idIgnorado) {
             filtro._id = { $ne: idIgnorado };
@@ -123,7 +106,7 @@ class CategoriaRepository {
     };
 
     async buscarPorId(id, includeTokens = false, req) {
-        let query = this.model.findOne({ _id: id, usuario: req.user_id });
+        let query = this.model.findOne({ _id: id, usuario: req.user_id, ativo: true });
 
         const categoria = await query;
 
