@@ -8,6 +8,10 @@ class Categoria {
                 type: String,
                 required: true
             },
+            ativo: {
+                type: Boolean,
+                default: true
+            },
             usuario: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'usuarios',

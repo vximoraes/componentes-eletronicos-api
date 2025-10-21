@@ -43,13 +43,13 @@ class CategoriaController {
         return CommonResponse.success(res, data, 200, 'Categoria atualizada com sucesso.');
     };
 
-    async deletar(req, res) {
+    async inativar(req, res) {
         const { id } = req.params || {};
         CategoriaIdSchema.parse(id);
 
-        const data = await this.service.deletar(id, req);
+        const data = await this.service.inativar(id, req);
 
-        return CommonResponse.success(res, data, 200, 'Categoria excluída com sucesso.');
+        return CommonResponse.success(res, data, 200, 'Categoria inativada com sucesso.');
     };
 };
 

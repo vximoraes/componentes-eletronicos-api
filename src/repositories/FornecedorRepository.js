@@ -1,6 +1,5 @@
 import FornecedorFilterBuilder from './filters/FornecedorFilterBuilder.js';
 import FornecedorModel from '../models/Fornecedor.js';
-import MovimentacaoModel from '../models/Movimentacao.js';
 import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
 
 class FornecedorRepository {
@@ -20,7 +19,7 @@ class FornecedorRepository {
 
         // Se um ID for fornecido, retorna o fornecedor enriquecido com estatísticas.
         if (id) {
-            const data = await this.model.findOne({ _id: id, usuario: req.user_id });
+            const data = await this.model.findOne({ _id: id, usuario: req.user_id, ativo: true });
 
             if (!data) {
                 throw new CustomError({
@@ -58,7 +57,7 @@ class FornecedorRepository {
             });
         };
 
-        const filtros = { ...filterBuilder.build(), usuario: req.user_id };
+        const filtros = { ...filterBuilder.build(), usuario: req.user_id, ativo: true };
 
         const options = {
             page: parseInt(page, 10),
@@ -95,26 +94,10 @@ class FornecedorRepository {
         return fornecedor;
     };
 
-    async deletar(id, req) {
-        const existeMovimentacao = await MovimentacaoModel.exists({ fornecedor: id, usuario: req.user_id });
-        if (existeMovimentacao) {
-            throw new CustomError({
-                statusCode: 400,
-                errorType: 'resourceInUse',
-                field: 'Fornecedor',
-                details: [],
-                customMessage: 'Não é possível deletar: fornecedor está vinculado a movimentações.'
-            });
-        };
-
-        const fornecedor = await this.model.findOneAndDelete({ _id: id, usuario: req.user_id });
-        return fornecedor;
-    };
-
     // Métodos auxiliares.
 
     async buscarPorNome(nome, idIgnorado, req) {
-        const filtro = { nome, usuario: req.user_id };
+        const filtro = { nome, usuario: req.user_id, ativo: true };
 
         if (idIgnorado) {
             filtro._id = { $ne: idIgnorado };
@@ -126,7 +109,7 @@ class FornecedorRepository {
     };
 
     async buscarPorId(id, includeTokens = false, req) {
-        let query = this.model.findOne({ _id: id, usuario: req.user_id });
+        let query = this.model.findOne({ _id: id, usuario: req.user_id, ativo: true });
 
         const fornecedor = await query;
 

@@ -1,4 +1,5 @@
 import CategoriaRepository from '../repositories/CategoriaRepository.js';
+import ComponenteModel from '../models/Componente.js';
 import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
 
 class CategoriaService {
@@ -30,10 +31,27 @@ class CategoriaService {
         return data;
     };
 
-    async deletar(id, req) {
+    async inativar(id, req) {
         await this.ensureCategoryExists(id, req);
 
-        const data = await this.repository.deletar(id, req);
+        // Verificar se existem componentes ativos vinculados a esta categoria
+        const existeComponenteAtivo = await ComponenteModel.exists({ 
+            categoria: id, 
+            usuario: req.user_id,
+            ativo: true 
+        });
+
+        if (existeComponenteAtivo) {
+            throw new CustomError({
+                statusCode: 400,
+                errorType: 'resourceInUse',
+                field: 'Categoria',
+                details: [],
+                customMessage: 'Não é possível inativar: categoria está vinculada a componentes ativos.'
+            });
+        }
+
+        const data = await this.repository.atualizar(id, { ativo: false }, req);
 
         return data;
     };

@@ -13,7 +13,7 @@ router
     .get("/fornecedores/:id", AuthMiddleware, AuthPermission, asyncWrapper(fornecedorController.listar.bind(fornecedorController)))
     .post("/fornecedores", AuthMiddleware, AuthPermission, asyncWrapper(fornecedorController.criar.bind(fornecedorController)))
     .patch("/fornecedores/:id", AuthMiddleware, AuthPermission, asyncWrapper(fornecedorController.atualizar.bind(fornecedorController)))
+    .patch("/fornecedores/:id/inativar", AuthMiddleware, AuthPermission, asyncWrapper(fornecedorController.inativar.bind(fornecedorController)))
     .put("/fornecedores/:id", AuthMiddleware, AuthPermission, asyncWrapper(fornecedorController.atualizar.bind(fornecedorController)))
-    .delete("/fornecedores/:id", AuthMiddleware, AuthPermission, asyncWrapper(fornecedorController.deletar.bind(fornecedorController)))
 
 export default router;
