@@ -49,7 +49,7 @@ class UsuarioService {
 
     async atualizar(id, parsedData, req) {
         delete parsedData.senha;
-        delete parsedData.email; 
+        delete parsedData.email;
 
         await this.ensureUserExists(id, req.user_id);
 
@@ -98,6 +98,15 @@ class UsuarioService {
 
     async uploadFoto(req, id) {
         const file = req.file;
+        if (!file) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.BAD_REQUEST.code,
+                errorType: "badRequest",
+                field: "Foto",
+                details: [{ path: "Foto", message: "Nenhum arquivo foi enviado ou o arquivo está vazio." }],
+                customMessage: "Nenhum arquivo foi enviado ou o arquivo está vazio."
+            })
+        }
         if (file.size > (5 * 1024 * 1024)) {
             throw new CustomError({
                 statusCode: HttpStatusCodes.PAYLOAD_TOO_LARGE.code,
@@ -108,16 +117,36 @@ class UsuarioService {
             });
         }
         try {
+            const data = await this.repository.atualizar(id, {
+                fotoPerfil:
+                    `${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT}/${process.env.MINIO_BUCKET}/${id}.jpeg`
+            })
             const newFile = await compress(file.buffer);
             const objectName = `${id}.jpeg`;
-            const data = await minioClient.putObject(process.env.MINIO_BUCKET, objectName, newFile, {
+            await minioClient.putObject(process.env.MINIO_BUCKET, objectName, newFile, {
                 'Content-Type': file.mimetype,
             });
-
-            return data;
+            return {fotoPerfil: data.fotoPerfil};
         } catch (err) {
             throw new Error(err);
         };
+    }
+
+    async deletarFoto(req, id) {
+        const objectName = `${id}.jpeg`
+        await minioClient.removeObject(process.env.MINIO_BUCKET, objectName, (err) => {
+            if (err) {
+                throw new CustomError({
+                    statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR.code,
+                    errorType: 'internalServerError',
+                    field: 'Foto',
+                    details: [],
+                    customMessage: 'Erro ao deletar a foto do usuário.',
+                })
+            }
+        })
+        const data = await this.repository.atualizar(id, { fotoPerfil: "" })
+        return {fotoPerfil: data.fotoPerfil}
     }
 };
 
