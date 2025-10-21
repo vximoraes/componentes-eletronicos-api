@@ -218,7 +218,7 @@ const usuariosRoutes = {
         }
     },
     "/usuarios/{id}/foto": {
-        post: {
+        put: {
             tags: ["Usuários"],
             summary: "Faz upload da foto do usuário",
             description: `
@@ -234,13 +234,16 @@ const usuariosRoutes = {
             + Regras de Negócio:
                 - Usuário deve existir e estar ativo.
                 - Arquivo deve ser uma imagem válida (formatos aceitos pelo multer).
-                - Tamanho do arquivo deve respeitar os limites configurados.
+                - Tamanho máximo do arquivo: 5 MB.
+                - Arquivo não pode estar vazio.
+                - Imagem é comprimida automaticamente antes do armazenamento.
                 - Usuário só pode alterar sua própria foto ou admin pode alterar qualquer foto.
 
             + Resultado Esperado:
-                - HTTP 201 Created com dados do usuário atualizado incluindo caminho da foto.
+                - HTTP 201 Created com dados do upload (etag, versionId).
                 - Em caso de usuário inexistente, retorna erro 404.
-                - Em caso de arquivo inválido, retorna erro 400.
+                - Em caso de arquivo inválido ou vazio, retorna erro 400.
+                - Em caso de arquivo maior que 5 MB, retorna erro 413.
             `,
             security: [{ bearerAuth: [] }],
             parameters: [
@@ -265,7 +268,7 @@ const usuariosRoutes = {
                                 file: {
                                     type: "string",
                                     format: "binary",
-                                    description: "Arquivo de imagem para foto de perfil"
+                                    description: "Arquivo de imagem para foto de perfil (máx 5 MB)"
                                 }
                             }
                         }
@@ -284,6 +287,49 @@ const usuariosRoutes = {
                     }
                 },
                 400: commonResponses[400](),
+                401: commonResponses[401](),
+                404: commonResponses[404](),
+                413: commonResponses[413](),
+                498: commonResponses[498](),
+                500: commonResponses[500]()
+            }
+        },
+        delete: {
+            tags: ["Usuários"],
+            summary: "Deleta a foto do usuário",
+            description: `
+            + Caso de uso: Remoção da foto de perfil do usuário.
+            
+            + Função de Negócio:
+                - Permitir ao usuário autenticado remover sua foto de perfil do sistema de armazenamento.
+                + Recebe como path parameter:
+                    - **id**: identificador do usuário (MongoDB ObjectId).
+
+            + Regras de Negócio:
+                - Usuário deve existir no sistema.
+                - Remove o arquivo de imagem do MinIO/S3.
+                - Usuário só pode deletar sua própria foto ou admin pode deletar qualquer foto.
+                - Operação é irreversível.
+
+            + Resultado Esperado:
+                - HTTP 200 OK - Foto deletada com sucesso.
+                - Em caso de usuário inexistente, retorna erro 404.
+                - Em caso de erro no serviço de armazenamento, retorna erro 500.
+            `,
+            security: [{ bearerAuth: [] }],
+            parameters: [
+                {
+                    name: "id",
+                    in: "path",
+                    required: true,
+                    schema: {
+                        type: "string",
+                    },
+                    description: "ID do usuário"
+                }
+            ],
+            responses: {
+                200: commonResponses[200](),
                 401: commonResponses[401](),
                 404: commonResponses[404](),
                 498: commonResponses[498](),

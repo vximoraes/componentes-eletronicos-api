@@ -332,6 +332,48 @@ const componentesRoutes = {
                 498: commonResponses[498](),
                 500: commonResponses[500]()
             }
+        },
+        delete: {
+            tags: ["Componentes"],
+            summary: "Deleta a foto do componente",
+            description: `
+            + Caso de uso: Remoção da foto do componente eletrônico.
+            
+            + Função de Negócio:
+                - Permitir ao usuário autenticado remover a foto de um componente do sistema de armazenamento.
+                + Recebe como path parameter:
+                    - **id**: identificador do componente (MongoDB ObjectId).
+
+            + Regras de Negócio:
+                - Componente deve existir no sistema.
+                - Remove o arquivo de imagem do MinIO/S3.
+                - Usuário deve ter permissão para alterar componentes.
+                - Operação é irreversível.
+
+            + Resultado Esperado:
+                - HTTP 200 OK - Foto deletada com sucesso.
+                - Em caso de componente inexistente, retorna erro 404.
+                - Em caso de erro no serviço de armazenamento, retorna erro 500.
+            `,
+            security: [{ bearerAuth: [] }],
+            parameters: [
+                {
+                    name: "id",
+                    in: "path",
+                    required: true,
+                    schema: {
+                        type: "string",
+                    },
+                    description: "ID do componente"
+                }
+            ],
+            responses: {
+                200: commonResponses[200](),
+                401: commonResponses[401](),
+                404: commonResponses[404](),
+                498: commonResponses[498](),
+                500: commonResponses[500]()
+            }
         }
     }
 };
