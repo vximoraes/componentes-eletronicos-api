@@ -6,8 +6,6 @@ class Categoria {
         const categoriaSchema = new mongoose.Schema({
             nome: {
                 type: String,
-                index: true,
-                unique: true,
                 required: true
             },
             usuario: {
@@ -16,6 +14,8 @@ class Categoria {
                 required: true
             }
         });
+
+        categoriaSchema.index({ nome: 1, usuario: 1 }, { unique: true });
 
         categoriaSchema.plugin(mongoosePaginate);
 

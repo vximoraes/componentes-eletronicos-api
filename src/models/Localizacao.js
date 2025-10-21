@@ -6,8 +6,6 @@ class Localizacao {
         const localizacaoSchema = new mongoose.Schema({
             nome: {
                 type: String,
-                index: true,
-                unique: true,
                 required: true
             },
             ativo: {
@@ -20,6 +18,8 @@ class Localizacao {
                 required: true
             }
         });
+
+        localizacaoSchema.index({ nome: 1, usuario: 1 }, { unique: true });
 
         localizacaoSchema.plugin(mongoosePaginate);
 

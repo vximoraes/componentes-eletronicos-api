@@ -6,8 +6,6 @@ class Componente {
         const componenteSchema = new mongoose.Schema({
             nome: {
                 type: String,
-                index: true,
-                unique: true,
                 required: true
             },
             quantidade: {
@@ -79,6 +77,8 @@ class Componente {
                 }
             }
         });
+
+        componenteSchema.index({ nome: 1, usuario: 1 }, { unique: true });
 
         componenteSchema.plugin(mongoosePaginate);
 
