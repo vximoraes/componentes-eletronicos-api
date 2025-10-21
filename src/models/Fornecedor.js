@@ -6,8 +6,6 @@ class Fornecedor {
         const fornecedorSchema = new mongoose.Schema({
             nome: {
                 type: String,
-                index: true,
-                unique: true,
                 required: true
             },
             usuario: {
@@ -28,6 +26,8 @@ class Fornecedor {
                 required: false
             }
         });
+
+        fornecedorSchema.index({ nome: 1, usuario: 1 }, { unique: true });
 
         fornecedorSchema.plugin(mongoosePaginate);
 
