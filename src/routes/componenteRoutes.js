@@ -17,5 +17,6 @@ router
     .patch("/componentes/:id/inativar", AuthMiddleware, AuthPermission, asyncWrapper(componenteController.inativar.bind(componenteController)))
     .put("/componentes/:id", AuthMiddleware, AuthPermission, asyncWrapper(componenteController.atualizar.bind(componenteController)))
     .post("/componentes/:id/foto", AuthMiddleware, AuthPermission, upload.single('file'), asyncWrapper(componenteController.uploadFoto.bind(componenteController)))
+    .delete("/componentes/id:foto", AuthMiddleware, AuthPermission, asyncWrapper(componenteController.de))
 
 export default router;

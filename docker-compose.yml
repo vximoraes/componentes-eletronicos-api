@@ -21,7 +21,7 @@ services:
             - mongodb
     minio:
         image: minio/minio:latest
-        container_name: name
+        container_name: minio
         ports:
             - "${MINIO_PORT}:${MINIO_PORT}"
             - "${MINIO_CONSOLE_PORT}:${MINIO_CONSOLE_PORT}"

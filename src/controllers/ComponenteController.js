@@ -60,6 +60,15 @@ class ComponenteController {
         const data = await this.service.uploadFoto(req, id);
         return CommonResponse.success(res, data, 201, 'Foto enviada com sucesso.');
     };
+
+    async deletarFoto(req, res) {
+        const { id } = req.params || {}
+        ComponenteIdSchema.parse(id)
+
+        await this.service.deletarFoto(req, id)
+
+        return CommonResponse.success(res, null, 200, 'Foto deletada com sucesso.')
+    }
 };
 
 export default ComponenteController;
