@@ -75,8 +75,8 @@ class UsuarioController {
         const { id } = req.params || {}
         UsuarioIdSchema.parse(id)
 
-        await this.service.deletarFoto(req, id)
-        return CommonResponse.success(res, null, 200, "Foto deletada com sucesso.")
+        const data = await this.service.deletarFoto(req, id)
+        return CommonResponse.success(res, data, 200, "Foto deletada com sucesso.")
 
     }
 };

@@ -65,9 +65,9 @@ class ComponenteController {
         const { id } = req.params || {}
         ComponenteIdSchema.parse(id)
 
-        await this.service.deletarFoto(req, id)
+        const data = await this.service.deletarFoto(req, id)
 
-        return CommonResponse.success(res, null, 200, 'Foto deletada com sucesso.')
+        return CommonResponse.success(res, data, 200, 'Foto deletada com sucesso.')
     }
 };
 

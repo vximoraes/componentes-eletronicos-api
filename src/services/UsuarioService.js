@@ -49,7 +49,7 @@ class UsuarioService {
 
     async atualizar(id, parsedData, req) {
         delete parsedData.senha;
-        delete parsedData.email; 
+        delete parsedData.email;
 
         await this.ensureUserExists(id, req.user_id);
 
@@ -98,7 +98,7 @@ class UsuarioService {
 
     async uploadFoto(req, id) {
         const file = req.file;
-        if(!file){
+        if (!file) {
             throw new CustomError({
                 statusCode: HttpStatusCodes.BAD_REQUEST.code,
                 errorType: "badRequest",
@@ -117,13 +117,16 @@ class UsuarioService {
             });
         }
         try {
+            const data = await this.repository.atualizar(id, {
+                fotoPerfil:
+                    `${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT}/${process.env.MINIO_BUCKET}/${id}.jpeg`
+            })
             const newFile = await compress(file.buffer);
             const objectName = `${id}.jpeg`;
-            const data = await minioClient.putObject(process.env.MINIO_BUCKET, objectName, newFile, {
+            await minioClient.putObject(process.env.MINIO_BUCKET, objectName, newFile, {
                 'Content-Type': file.mimetype,
             });
-
-            return data;
+            return {fotoPerfil: data.fotoPerfil};
         } catch (err) {
             throw new Error(err);
         };
@@ -132,7 +135,7 @@ class UsuarioService {
     async deletarFoto(req, id) {
         const objectName = `${id}.jpeg`
         await minioClient.removeObject(process.env.MINIO_BUCKET, objectName, (err) => {
-            if(err){
+            if (err) {
                 throw new CustomError({
                     statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR.code,
                     errorType: 'internalServerError',
@@ -142,6 +145,8 @@ class UsuarioService {
                 })
             }
         })
+        const data = await this.repository.atualizar(id, { fotoPerfil: "" })
+        return {fotoPerfil: data.fotoPerfil}
     }
 };
 

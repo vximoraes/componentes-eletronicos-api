@@ -110,13 +110,17 @@ class ComponenteService {
             });
         }
         try {
+            const data = await this.repository.atualizar(id, {
+                imagem:
+                    `${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT}/${process.env.MINIO_BUCKET_2}/${id}.jpeg`
+            }, req)
             const newFile = await compress(file.buffer);
             const objectName = `${id}.jpeg`;
-            const data = await minioClient.putObject(process.env.MINIO_BUCKET_2, objectName, newFile, {
+            await minioClient.putObject(process.env.MINIO_BUCKET_2, objectName, newFile, {
                 'Content-Type': file.mimetype,
             });
 
-            return data;
+            return {imagem: data.imagem};
         } catch (err) {
             throw new Error(err);
         };
@@ -134,6 +138,9 @@ class ComponenteService {
                 })
             }
         })
+        const data = await this.repository.atualizar(id, { imagem: "" }, req)
+
+        return { imagem: data.imagem}
     }
 };
 
