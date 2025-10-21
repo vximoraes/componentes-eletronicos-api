@@ -9,28 +9,28 @@ class FornecedorFilterBuilder {
     };
 
     comNome(nome) {
-        if (nome !== undefined && nome !== null) {
+        if (nome !== undefined && nome !== null && nome !== '') {
             this.filtros.nome = { $regex: nome, $options: 'i' };
         };
         return this;
     };
 
     comContato(contato) {
-        if (contato !== undefined && contato !== null) {
+        if (contato !== undefined && contato !== null && contato !== '') {
             this.filtros.contato = { $regex: contato, $options: 'i' };
         };
         return this;
     };
 
     comDescricao(descricao) {
-        if (descricao !== undefined && descricao !== null) {
+        if (descricao !== undefined && descricao !== null && descricao !== '') {
             this.filtros.descricao = { $regex: descricao, $options: 'i' };
         };
         return this;
     };
 
     comUrl(url) {
-        if (url !== undefined && url !== null) {
+        if (url !== undefined && url !== null && url !== '') {
             this.filtros.url = { $regex: url, $options: 'i' };
         };
         return this;
