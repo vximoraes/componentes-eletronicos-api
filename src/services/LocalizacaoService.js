@@ -51,7 +51,7 @@ class LocalizacaoService {
                 errorType: 'resourceInUse',
                 field: 'Localizacao',
                 details: [],
-                customMessage: 'Não é possível inativar: localização possui estoque de componentes ativos.'
+                customMessage: 'Não é possível excluir: localização possui estoque de componentes ativos.'
             });
         }
 
