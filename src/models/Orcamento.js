@@ -40,7 +40,8 @@ class Orcamento {
                     quantidade: {
                         type: Number,
                         required: true,
-                        min: 1
+                        min: 1,
+                        max: 999999999
                     },
                     valor_unitario: {
                         type: Number,

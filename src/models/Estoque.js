@@ -8,7 +8,8 @@ class Estoque {
                 type: Number,
                 required: true,
                 default: 0,
-                min: 0
+                min: 0,
+                max: 999999999
             },
             componente: {
                 type: mongoose.Schema.Types.ObjectId,

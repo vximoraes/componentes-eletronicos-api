@@ -19,7 +19,10 @@ const MovimentacaoSchema = z.object({
         .optional()
         .transform((val) => (val ? parseInt(val) : undefined))
         .refine((val) => val === undefined || Number.isInteger(val), {
-            message: "Quantidade deve ser um número inteiro",
+            message: "Quantidade deve ser inteira",
+        })
+        .refine((val) => val === undefined || (val >= 0 && val <= 999999999), {
+            message: "Quantidade: 0 a 999.999.999",
         }),
     componente:
         objectIdSchema,

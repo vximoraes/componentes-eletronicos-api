@@ -15,9 +15,10 @@ const ComponenteOrcamentoSchema = z.object({
     quantidade: z
         .number()
         .int()
-        .min(1, { message: "Quantidade deve ser um número inteiro maior que zero" })
-        .or(z.string().transform((val) => parseInt(val)).refine((val) => !isNaN(val) && val > 0, {
-            message: "Quantidade deve ser um número inteiro maior que zero",
+        .min(1, { message: "Quantidade mínima: 1" })
+        .max(999999999, { message: "Quantidade máxima: 999.999.999" })
+        .or(z.string().transform((val) => parseInt(val)).refine((val) => !isNaN(val) && val > 0 && val <= 999999999, {
+            message: "Quantidade: 1 a 999.999.999",
         })),
     valor_unitario: z
         .number()

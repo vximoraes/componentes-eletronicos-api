@@ -20,14 +20,14 @@ class MovimentacaoService {
             });
         };
 
+        const estoqueAtual = await Estoque.findOne({
+            componente: parsedData.componente,
+            localizacao: parsedData.localizacao
+        });
+        
+        const quantidadeDisponivel = estoqueAtual ? estoqueAtual.quantidade : 0;
+
         if (parsedData.tipo === 'saida') {
-            const estoqueAtual = await Estoque.findOne({
-                componente: parsedData.componente,
-                localizacao: parsedData.localizacao
-            });
-            
-            const quantidadeDisponivel = estoqueAtual ? estoqueAtual.quantidade : 0;
-            
             if (quantidadeDisponivel < parsedData.quantidade) {
                 throw new CustomError({
                     statusCode: 400,
@@ -35,6 +35,17 @@ class MovimentacaoService {
                     field: 'quantidade',
                     details: [{ path: 'quantidade', message: `Quantidade insuficiente em estoque. Disponível: ${quantidadeDisponivel}` }],
                     customMessage: `Quantidade insuficiente em estoque. Disponível: ${quantidadeDisponivel}`
+                });
+            }
+        } else if (parsedData.tipo === 'entrada') {
+            const quantidadeResultante = quantidadeDisponivel + parsedData.quantidade;
+            if (quantidadeResultante > 999999999) {
+                throw new CustomError({
+                    statusCode: 400,
+                    errorType: 'validationError',
+                    field: 'quantidade',
+                    details: [{ path: 'quantidade', message: `Limite de estoque excedido (máx: 999.999.999)` }],
+                    customMessage: `Limite de estoque excedido (máx: 999.999.999)`
                 });
             }
         }

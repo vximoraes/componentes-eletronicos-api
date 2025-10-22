@@ -11,11 +11,15 @@ class Componente {
             quantidade: {
                 type: Number,
                 required: false,
-                default: 0
+                default: 0,
+                min: 0,
+                max: 999999999
             },
             estoque_minimo: {
                 type: Number,
-                required: true
+                required: true,
+                min: 0,
+                max: 999999999
             },
             descricao: {
                 type: String,

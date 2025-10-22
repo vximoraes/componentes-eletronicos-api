@@ -17,7 +17,9 @@ class Movimentacao {
             },
             quantidade: {
                 type: Number,
-                required: true
+                required: true,
+                min: 0,
+                max: 999999999
             },
             componente: {
                 type: mongoose.Schema.Types.ObjectId,
