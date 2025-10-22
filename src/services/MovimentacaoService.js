@@ -33,8 +33,8 @@ class MovimentacaoService {
                     statusCode: 400,
                     errorType: 'validationError',
                     field: 'quantidade',
-                    details: [{ path: 'quantidade', message: `Quantidade insuficiente em estoque. Disponível: ${quantidadeDisponivel}` }],
-                    customMessage: `Quantidade insuficiente em estoque. Disponível: ${quantidadeDisponivel}`
+                    details: [{ path: 'quantidade', message: `Estoque insuficiente (disponível: ${quantidadeDisponivel})` }],
+                    customMessage: `Estoque insuficiente (disponível: ${quantidadeDisponivel})`
                 });
             }
         } else if (parsedData.tipo === 'entrada') {
