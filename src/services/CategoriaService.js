@@ -47,7 +47,7 @@ class CategoriaService {
                 errorType: 'resourceInUse',
                 field: 'Categoria',
                 details: [],
-                customMessage: 'Não é possível inativar: categoria está vinculada a componentes ativos.'
+                customMessage: 'Não é possível excluir: categoria está vinculada a componentes ativos.'
             });
         }
 
