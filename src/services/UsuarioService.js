@@ -119,7 +119,7 @@ class UsuarioService {
         try {
             const data = await this.repository.atualizar(id, {
                 fotoPerfil:
-                    `${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT}/${process.env.MINIO_BUCKET}/${id}.jpeg`
+                    `http://${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT}/${process.env.MINIO_BUCKET}/${id}.jpeg`
             })
             const newFile = await compress(file.buffer);
             const objectName = `${id}.jpeg`;
