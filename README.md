@@ -135,14 +135,20 @@ npm test
 
 ### Executando com Docker Compose
 ```bash
-# Subir o container
-docker-compose up -d
+# Subir a API com MongoDB e MinIO
+docker compose up --build
 
-# Parar o container
-docker-compose down
+# Ou em modo detached (background)
+docker compose up -d --build
 
-# Reconstruir e subir
-docker-compose up --build
+# Rodar API + Frontend (se estiver na mesma pasta pai)
+docker compose -f docker-compose.full.yml up --build
+
+# Parar os containers
+docker compose down
+
+# Remover volumes (apagar dados)
+docker compose down -v
 ```
 
 ## Estrutura do Projeto
