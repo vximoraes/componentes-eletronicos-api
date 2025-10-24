@@ -20,7 +20,7 @@ class EstoqueRepository {
         const { componente, localizacao, quantidade, page = 1 } = req.query;
         const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
 
-        const filtros = { usuario: req.user_id };
+        const filtros = {};
 
         if (componente) {
             filtros.componente = componente;
@@ -58,7 +58,6 @@ class EstoqueRepository {
         const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
 
         const filtros = { 
-            usuario: req.user_id,
             componente: componenteId 
         };
 
@@ -90,7 +89,7 @@ class EstoqueRepository {
 
     async atualizar(id, parsedData, req) {
         const estoque = await this.model.findOneAndUpdate(
-            { _id: id, usuario: req.user_id }, 
+            { _id: id }, 
             parsedData, 
             { new: true }
         )
@@ -112,7 +111,7 @@ class EstoqueRepository {
     };
 
     async deletar(id, req) {
-        const estoque = await this.model.findOne({ _id: id, usuario: req.user_id })
+        const estoque = await this.model.findOne({ _id: id })
             .populate('componente')
             .populate('localizacao');
 
@@ -126,14 +125,14 @@ class EstoqueRepository {
             });
         }
 
-        await this.model.findOneAndDelete({ _id: id, usuario: req.user_id });
+        await this.model.findOneAndDelete({ _id: id });
         return estoque;
     };
 
     // Métodos auxiliares
 
     async buscarPorId(id, req) {
-        const estoque = await this.model.findOne({ _id: id, usuario: req.user_id })
+        const estoque = await this.model.findOne({ _id: id })
             .populate('componente')
             .populate('localizacao');
 

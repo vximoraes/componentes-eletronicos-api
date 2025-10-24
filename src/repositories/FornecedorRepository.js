@@ -19,7 +19,7 @@ class FornecedorRepository {
 
         // Se um ID for fornecido, retorna o fornecedor enriquecido com estatísticas.
         if (id) {
-            const data = await this.model.findOne({ _id: id, usuario: req.user_id, ativo: true });
+            const data = await this.model.findOne({ _id: id, ativo: true });
 
             if (!data) {
                 throw new CustomError({
@@ -57,7 +57,7 @@ class FornecedorRepository {
             });
         };
 
-        const filtros = { ...filterBuilder.build(), usuario: req.user_id, ativo: true };
+        const filtros = { ...filterBuilder.build(), ativo: true };
 
         const options = {
             page: parseInt(page, 10),
@@ -80,7 +80,7 @@ class FornecedorRepository {
     };
 
     async atualizar(id, parsedData, req) {
-        const fornecedor = await this.model.findOneAndUpdate({ _id: id, usuario: req.user_id }, parsedData, { new: true }).lean();
+        const fornecedor = await this.model.findOneAndUpdate({ _id: id }, parsedData, { new: true }).lean();
         if (!fornecedor) {
             throw new CustomError({
                 statusCode: 404,
@@ -97,7 +97,7 @@ class FornecedorRepository {
     // Métodos auxiliares.
 
     async buscarPorNome(nome, idIgnorado, req) {
-        const filtro = { nome, usuario: req.user_id, ativo: true };
+        const filtro = { nome, ativo: true };
 
         if (idIgnorado) {
             filtro._id = { $ne: idIgnorado };
@@ -109,7 +109,7 @@ class FornecedorRepository {
     };
 
     async buscarPorId(id, includeTokens = false, req) {
-        let query = this.model.findOne({ _id: id, usuario: req.user_id, ativo: true });
+        let query = this.model.findOne({ _id: id, ativo: true });
 
         const fornecedor = await query;
 

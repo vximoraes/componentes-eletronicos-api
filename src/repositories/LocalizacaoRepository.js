@@ -21,7 +21,7 @@ class LocalizacaoRepository {
 
         // Se um ID for fornecido, retorna a localização enriquecida com estatísticas.
         if (id) {
-            const data = await this.model.findOne({ _id: id, usuario: req.user_id, ativo: true });
+            const data = await this.model.findOne({ _id: id, ativo: true });
 
             if (!data) {
                 throw new CustomError({
@@ -56,7 +56,7 @@ class LocalizacaoRepository {
             });
         };
 
-        const filtros = { ...filterBuilder.build(), usuario: req.user_id, ativo: true };
+        const filtros = { ...filterBuilder.build(), ativo: true };
 
         const options = {
             page: parseInt(page, 10),
@@ -79,7 +79,7 @@ class LocalizacaoRepository {
     };
 
     async atualizar(id, parsedData, req) {
-        const localizacao = await this.model.findOneAndUpdate({ _id: id, usuario: req.user_id }, parsedData, { new: true }).lean();
+        const localizacao = await this.model.findOneAndUpdate({ _id: id }, parsedData, { new: true }).lean();
         if (!localizacao) {
             throw new CustomError({
                 statusCode: 404,
@@ -96,7 +96,7 @@ class LocalizacaoRepository {
     // Métodos auxiliares.
 
     async buscarPorNome(nome, idIgnorado, req) {
-        const filtro = { nome, usuario: req.user_id, ativo: true };
+        const filtro = { nome, ativo: true };
 
         if (idIgnorado) {
             filtro._id = { $ne: idIgnorado };
@@ -108,7 +108,7 @@ class LocalizacaoRepository {
     };
 
     async buscarPorId(id, includeTokens = false, req) {
-        let query = this.model.findOne({ _id: id, usuario: req.user_id, ativo: true });
+        let query = this.model.findOne({ _id: id, ativo: true });
 
         const localizacao = await query;
 

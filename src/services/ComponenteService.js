@@ -77,7 +77,7 @@ class ComponenteService {
     };
 
     async validateCategoria(categoriaId, req) {
-        const categoria = await CategoriaModel.findOne({ _id: categoriaId, usuario: req.user_id });
+        const categoria = await CategoriaModel.findOne({ _id: categoriaId });
         if (!categoria) {
             throw new CustomError({
                 statusCode: HttpStatusCodes.BAD_REQUEST.code,

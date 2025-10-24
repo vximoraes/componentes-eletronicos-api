@@ -37,7 +37,6 @@ class CategoriaService {
         // Verificar se existem componentes ativos vinculados a esta categoria
         const existeComponenteAtivo = await ComponenteModel.exists({ 
             categoria: id, 
-            usuario: req.user_id,
             ativo: true 
         });
 

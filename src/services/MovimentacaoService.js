@@ -9,7 +9,7 @@ class MovimentacaoService {
     };
 
     async criar(parsedData, req) {
-        const componente = await Componente.findOne({ _id: parsedData.componente, usuario: req.user_id });
+        const componente = await Componente.findOne({ _id: parsedData.componente });
         if (!componente) {
             throw new CustomError({
                 statusCode: 404,

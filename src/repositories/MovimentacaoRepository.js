@@ -29,7 +29,7 @@ class MovimentacaoRepository {
 
         // Se um ID for fornecido, retorna a movimentação enriquecida com estatísticas.
         if (id) {
-            const data = await this.model.findOne({ _id: id, usuario: req.user_id })
+            const data = await this.model.findOne({ _id: id })
                 .populate('componente')
                 .populate('localizacao');
 
@@ -71,7 +71,7 @@ class MovimentacaoRepository {
             });
         };
 
-        const filtros = { ...filterBuilder.build(), usuario: req.user_id };
+        const filtros = { ...filterBuilder.build() };
 
         const options = {
             page: parseInt(page),
@@ -100,7 +100,7 @@ class MovimentacaoRepository {
     // Métodos auxiliares.
 
     async buscarPorId(id, includeTokens = false, req) {
-        let query = this.model.findOne({ _id: id, usuario: req.user_id });
+        let query = this.model.findOne({ _id: id });
 
         const movimentacao = await query;
 

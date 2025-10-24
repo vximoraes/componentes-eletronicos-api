@@ -22,7 +22,7 @@ class ComponenteRepository {
 
         // Se um ID for fornecido, retorna o componente enriquecido com estatísticas.
         if (id) {
-            const data = await this.model.findOne({ _id: id, usuario: req.user_id })
+            const data = await this.model.findOne({ _id: id })
                 .populate('categoria');
 
             if (!data) {
@@ -64,7 +64,7 @@ class ComponenteRepository {
             });
         };
 
-        const filtros = { ...filterBuilder.build(), usuario: req.user_id };
+        const filtros = { ...filterBuilder.build() };
 
         const options = {
             page: parseInt(page),
@@ -90,7 +90,7 @@ class ComponenteRepository {
     };
 
     async atualizar(id, parsedData, req) {
-        const componente = await this.model.findOneAndUpdate({ _id: id, usuario: req.user_id }, parsedData, { new: true })
+        const componente = await this.model.findOneAndUpdate({ _id: id }, parsedData, { new: true })
             .populate('categoria')
             .lean();
         if (!componente) {
@@ -107,7 +107,7 @@ class ComponenteRepository {
     };
 
     async deletar(id, req) {
-        const existeMovimentacao = await MovimentacaoModel.exists({ componente: id, usuario: req.user_id });
+        const existeMovimentacao = await MovimentacaoModel.exists({ componente: id });
         if (existeMovimentacao) {
             throw new CustomError({
                 statusCode: 400,
@@ -118,7 +118,7 @@ class ComponenteRepository {
             });
         };
 
-        const componente = await this.model.findOne({ _id: id, usuario: req.user_id })
+        const componente = await this.model.findOne({ _id: id })
             .populate('categoria');
 
         if (!componente) {
@@ -131,14 +131,14 @@ class ComponenteRepository {
             });
         }
 
-        await this.model.findOneAndDelete({ _id: id, usuario: req.user_id });
+        await this.model.findOneAndDelete({ _id: id });
         return componente;
     };
 
     // Métodos auxiliares.
 
     async buscarPorId(id, includeTokens = false, req) {
-        let query = this.model.findOne({ _id: id, usuario: req.user_id })
+        let query = this.model.findOne({ _id: id })
             .populate('categoria');
 
         const componente = await query;
@@ -157,7 +157,7 @@ class ComponenteRepository {
     };
 
     async buscarPorNome(nome, idIgnorado, req) {
-        const filtro = { nome, usuario: req.user_id };
+        const filtro = { nome };
 
         if (idIgnorado) {
             filtro._id = { $ne: idIgnorado }

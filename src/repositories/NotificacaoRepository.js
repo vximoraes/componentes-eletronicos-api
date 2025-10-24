@@ -11,7 +11,7 @@ class NotificacaoRepository {
     };
 
     async buscarPorId(id, userId) {
-        const notificacao = await this.model.findOne({ _id: id, usuario: userId });
+        const notificacao = await this.model.findOne({ _id: id });
 
         if (!notificacao) {
             throw new CustomError({
@@ -63,7 +63,7 @@ class NotificacaoRepository {
             filterBuilder.comVisualizada(visualizada);
         };
 
-        const filtros = { ...filterBuilder.build(), usuario: user_id || req.user_id };
+        const filtros = { ...filterBuilder.build() };
 
         const options = {
             page: parseInt(page, 10),
@@ -83,7 +83,7 @@ class NotificacaoRepository {
 
     async _atualizar(id, parsedData, userId) {
         const notificacao = await this.model.findOneAndUpdate(
-            { _id: id, usuario: userId },
+            { _id: id },
             parsedData,
             { new: true }
         );

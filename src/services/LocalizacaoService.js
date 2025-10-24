@@ -37,8 +37,7 @@ class LocalizacaoService {
 
         // Verificar se existem estoques nesta localização vinculados a componentes ativos
         const estoques = await EstoqueModel.find({ 
-            localizacao: id, 
-            usuario: req.user_id 
+            localizacao: id 
         }).populate('componente');
 
         const temComponenteAtivo = estoques.some(estoque => 
