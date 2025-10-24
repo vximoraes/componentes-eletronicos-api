@@ -32,9 +32,9 @@ export default async function usuarioSeed() {
     }
 
     const admin = {
-        nome: "Administrador",
-        email: "admin@admin.com",
-        senha: await bcrypt.hash('Senha@123', 10),
+        nome: process.env.ADMIN_NAME || "Administrador",
+        email: process.env.ADMIN_EMAIL || "admin@admin.com",
+        senha: await bcrypt.hash(process.env.ADMIN_PASSWORD || 'Senha@123', 10),
         ativo: true,
         permissoes: rotasCompletas.map(r => r.toObject()),
         grupos: grupos[0],
@@ -45,7 +45,7 @@ export default async function usuarioSeed() {
     const result = await Usuario.collection.insertMany(usuarios);
     
     // Buscar o admin criado para retornar seu ID
-    const adminCriado = await Usuario.findOne({ email: "admin@admin.com" });
+    const adminCriado = await Usuario.findOne({ email: process.env.ADMIN_EMAIL || "admin@admin.com" });
     
     return {
         adminId: adminCriado._id,
