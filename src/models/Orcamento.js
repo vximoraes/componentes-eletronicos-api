@@ -9,10 +9,6 @@ class Orcamento {
                 index: true,
                 required: true
             },
-            protocolo: {
-                type: String,
-                required: true
-            },
             descricao: {
                 type: String,
                 required: false
@@ -86,8 +82,6 @@ class Orcamento {
                 update.total = parseFloat(update.componentes.reduce((acc, comp) => acc + comp.subtotal, 0).toFixed(2));
             }
         });
-
-        orcamentoSchema.index({ protocolo: 1, usuario: 1 }, { unique: true });
 
         orcamentoSchema.plugin(mongoosePaginate);
 

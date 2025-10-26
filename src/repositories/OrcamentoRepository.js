@@ -39,12 +39,11 @@ class OrcamentoRepository {
             return dataWithStats;
         };
 
-        const { nome, protocolo, page = 1 } = req.query;
+        const { nome, page = 1 } = req.query;
         const limite = Math.min(parseInt(req.query.limite, 10) || 10, 100);
 
         const filterBuilder = new OrcamentoFilterBuilder()
             .comNome(nome || '')
-            .comProtocolo(protocolo || '')
 
         if (typeof filterBuilder.build !== 'function') {
             throw new CustomError({

@@ -13,13 +13,6 @@ export const OrcamentoQuerySchema = z.object({
             message: "Nome não pode ser vazio",
         })
         .transform((val) => val?.trim()),
-    protocolo: z
-        .string()
-        .optional()
-        .refine((val) => !val || val.trim().length > 0, {
-            message: "Protocolo não pode ser vazio",
-        })
-        .transform((val) => val?.trim()),
     page: z
         .string()
         .optional()

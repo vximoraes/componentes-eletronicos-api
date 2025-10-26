@@ -135,7 +135,6 @@ export const fakeMappings = {
         produtoNome: () => fakebr.commerce.productName(),
         adjetivoNome: () => fakebr.lorem.word(),
         nome: () => `Projeto ${fakeMappings.Orcamento.adjetivoNome()} - ${fakeMappings.Orcamento.produtoNome()}`,
-        protocolo: () => uuid(),
         descricao: () => fakebr.lorem.sentence(),
         total: () => 0, // Será calculado automaticamente pelo middleware
         componentes: () => [], // Será preenchido no seed

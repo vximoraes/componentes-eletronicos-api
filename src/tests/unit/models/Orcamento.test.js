@@ -23,7 +23,6 @@ describe('Model Orcamento', () => {
     it('deve cadastrar orçamento válido', async () => {
         const orcamento = await Orcamento.create({
             nome: 'Orçamento 1',
-            protocolo: 'PROTO-001',
             usuario: new mongoose.Types.ObjectId(),
             componentes: [{
                 componente: new mongoose.Types.ObjectId(),
@@ -34,48 +33,18 @@ describe('Model Orcamento', () => {
             }],
         });
         expect(orcamento._id).toBeDefined();
-        expect(orcamento.protocolo).toBe('PROTO-001');
         expect(orcamento.componentes.length).toBe(1);
         expect(orcamento.total).toBe(100);
     });
 
     it('não deve cadastrar orçamento sem campos obrigatórios', async () => {
-        await expect(Orcamento.create({ nome: 'Sem Protocolo', usuario: new mongoose.Types.ObjectId() }))
+        await expect(Orcamento.create({ usuario: new mongoose.Types.ObjectId() }))
             .rejects.toThrow();
-    });
-
-    it('não deve permitir protocolo duplicado', async () => {
-        const userId = new mongoose.Types.ObjectId();
-        await Orcamento.create({
-            nome: 'Orçamento 1',
-            protocolo: 'PROTO-002',
-            usuario: userId,
-            componentes: [{
-                componente: new mongoose.Types.ObjectId(),
-                nome: 'Capacitor',
-                fornecedor: new mongoose.Types.ObjectId(),
-                quantidade: 5,
-                valor_unitario: 10,
-            }],
-        });
-        await expect(Orcamento.create({
-            nome: 'Orçamento 2',
-            protocolo: 'PROTO-002',
-            usuario: userId,
-            componentes: [{
-                componente: new mongoose.Types.ObjectId(),
-                nome: 'Diodo',
-                fornecedor: new mongoose.Types.ObjectId(),
-                quantidade: 3,
-                valor_unitario: 10,
-            }],
-        })).rejects.toThrow();
     });
 
     it('deve calcular corretamente o valor total', async () => {
         const orcamento = await Orcamento.create({
             nome: 'Orçamento Soma',
-            protocolo: 'PROTO-003',
             usuario: new mongoose.Types.ObjectId(),
             componentes: [
                 { componente: new mongoose.Types.ObjectId(), nome: 'A', fornecedor: new mongoose.Types.ObjectId(), quantidade: 2, valor_unitario: 10 },
@@ -88,7 +57,6 @@ describe('Model Orcamento', () => {
     it('deve buscar orçamento por nome', async () => {
         await Orcamento.create({
             nome: 'BuscaNome',
-            protocolo: 'PROTO-004',
             usuario: new mongoose.Types.ObjectId(),
             componentes: [{ componente: new mongoose.Types.ObjectId(), nome: 'X', fornecedor: new mongoose.Types.ObjectId(), quantidade: 1, valor_unitario: 10 }],
         });
@@ -100,7 +68,6 @@ describe('Model Orcamento', () => {
     it('deve buscar orçamento por id', async () => {
         const orcamento = await Orcamento.create({
             nome: 'BuscaId',
-            protocolo: 'PROTO-005',
             usuario: new mongoose.Types.ObjectId(),
             componentes: [{ componente: new mongoose.Types.ObjectId(), nome: 'Y', fornecedor: new mongoose.Types.ObjectId(), quantidade: 2, valor_unitario: 10 }],
         });
@@ -112,7 +79,6 @@ describe('Model Orcamento', () => {
     it('deve atualizar orçamento', async () => {
         const orcamento = await Orcamento.create({
             nome: 'Atualiza',
-            protocolo: 'PROTO-006',
             usuario: new mongoose.Types.ObjectId(),
             componentes: [{ componente: new mongoose.Types.ObjectId(), nome: 'Z', fornecedor: new mongoose.Types.ObjectId(), quantidade: 1, valor_unitario: 10 }],
         });
@@ -125,7 +91,6 @@ describe('Model Orcamento', () => {
     it('deve remover orçamento', async () => {
         const orcamento = await Orcamento.create({
             nome: 'Remove',
-            protocolo: 'PROTO-007',
             usuario: new mongoose.Types.ObjectId(),
             componentes: [{ componente: new mongoose.Types.ObjectId(), nome: 'W', fornecedor: new mongoose.Types.ObjectId(), quantidade: 1, valor_unitario: 10 }],
         });
@@ -137,7 +102,6 @@ describe('Model Orcamento', () => {
     it('deve adicionar componente ao orçamento', async () => {
         const orcamento = await Orcamento.create({
             nome: 'AddComp',
-            protocolo: 'PROTO-008',
             usuario: new mongoose.Types.ObjectId(),
             componentes: [{ componente: new mongoose.Types.ObjectId(), nome: 'V', fornecedor: new mongoose.Types.ObjectId(), quantidade: 1, valor_unitario: 10 }],
         });
@@ -157,7 +121,6 @@ describe('Model Orcamento', () => {
     it('não deve permitir componente sem campos obrigatórios', async () => {
         await expect(Orcamento.create({
             nome: 'SemComp',
-            protocolo: 'PROTO-009',
             usuario: new mongoose.Types.ObjectId(),
             componentes: [{ nome: 'Invalido' }],
         })).rejects.toThrow();

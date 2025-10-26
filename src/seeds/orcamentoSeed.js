@@ -33,7 +33,6 @@ export default async function orcamentoSeed(adminId) {
         
         const orcamento = {
             nome: fakeMappings.Orcamento.nome.apply(),
-            protocolo: fakeMappings.Orcamento.protocolo.apply(),
             descricao: fakeMappings.Orcamento.descricao.apply(),
             componentes,
             usuario: adminId

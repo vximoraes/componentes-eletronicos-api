@@ -17,13 +17,6 @@ class OrcamentoFilterBuilder {
         return this;
     };
 
-    comProtocolo(protocolo) {
-        if (protocolo) {
-            this.filtros.protocolo = { $regex: protocolo, $options: 'i' };
-        };
-        return this;
-    };
-
     build() {
         return this.filtros;
     };

@@ -14,7 +14,6 @@ const orcamentosSchemas = {
         type: "object",
         properties: {
             nome: orcamentoJsonSchema.properties.nome,
-            protocolo: orcamentoJsonSchema.properties.protocolo,
             valor: orcamentoJsonSchema.properties.valor,
         }
     },
