@@ -8,8 +8,6 @@ class OrcamentoService {
     };
 
     async criar(parsedData, req) {
-        await this.validateProtocolo(parsedData.protocolo, null, req);
-
         parsedData.usuario = req.user_id;
         const data = await this.repository.criar(parsedData);
 
@@ -63,19 +61,6 @@ class OrcamentoService {
     };
 
     // Métodos auxiliares.
-
-    async validateProtocolo(protocolo, id = null, req) {
-        const orcamentoExistente = await this.repository.buscarPorProtocolo(protocolo, id, req);
-        if (orcamentoExistente) {
-            throw new CustomError({
-                statusCode: HttpStatusCodes.BAD_REQUEST.code,
-                errorType: 'validationError',
-                field: 'protocolo',
-                details: [{ path: 'protocolo', message: 'Protocolo já está em uso.' }],
-                customMessage: 'Nome já está em uso.',
-            });
-        };
-    };
 
     async ensureBudgetExists(id, req) {
         const orcamentoExistente = await this.repository.buscarPorId(id, false, req);

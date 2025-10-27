@@ -15,19 +15,12 @@ describe('OrcamentoService', () => {
 
     describe('criar', () => {
         it('deve cadastrar orçamento válido', async () => {
-            const parsedData = { nome: 'Orçamento', protocolo: 'P123', valor: 10 };
+            const parsedData = { nome: 'Orçamento', valor: 10 };
             const req = { user_id: 'user123' };
-            repository.buscarPorProtocolo.mockResolvedValue(null);
             repository.criar.mockResolvedValue({ _id: 'id', ...parsedData, usuario: 'user123' });
             const result = await service.criar(parsedData, req);
             expect(repository.criar).toHaveBeenCalledWith({ ...parsedData, usuario: 'user123' });
             expect(result).toEqual(expect.objectContaining({ _id: 'id', nome: 'Orçamento' }));
-        });
-        it('deve lançar erro se protocolo já existe', async () => {
-            const parsedData = { nome: 'Orçamento', protocolo: 'P123', valor: 10 };
-            const req = { user_id: 'user123' };
-            repository.buscarPorProtocolo.mockResolvedValue({ _id: 'id' });
-            await expect(service.criar(parsedData, req)).rejects.toThrow('Nome já está em uso.');
         });
     });
 
@@ -112,17 +105,6 @@ describe('OrcamentoService', () => {
             repository.buscarPorId.mockResolvedValue({ componentes: [{ _id: 'other' }] });
             const comp = await service.getComponenteById('id', 'cid');
             expect(comp).toBeNull();
-        });
-    });
-
-    describe('validateProtocolo', () => {
-        it('deve lançar erro se protocolo já existe', async () => {
-            repository.buscarPorProtocolo.mockResolvedValue({ _id: 'id' });
-            await expect(service.validateProtocolo('P123')).rejects.toThrow('Nome já está em uso.');
-        });
-        it('não lança erro se protocolo não existe', async () => {
-            repository.buscarPorProtocolo.mockResolvedValue(null);
-            await expect(service.validateProtocolo('P123')).resolves.toBeUndefined();
         });
     });
 

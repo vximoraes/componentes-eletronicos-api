@@ -143,19 +143,4 @@ describe('OrcamentoRepository', () => {
         const req = { user_id: 'user123' };
         await expect(repository.buscarPorId('id', false, req)).rejects.toThrow('não encontrado');
     });
-
-    it('deve buscar por protocolo', async () => {
-        const fake = { _id: 'id' };
-        MockModel.findOne.mockResolvedValue(fake);
-        const req = { user_id: 'user123' };
-        const result = await repository.buscarPorProtocolo('P123', null, req);
-        expect(result._id).toBe('id');
-    });
-
-    it('deve retornar null se protocolo não existe', async () => {
-        MockModel.findOne.mockResolvedValue(null);
-        const req = { user_id: 'user123' };
-        const result = await repository.buscarPorProtocolo('P123', null, req);
-        expect(result).toBeNull();
-    });
 });

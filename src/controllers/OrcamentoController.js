@@ -2,7 +2,6 @@ import OrcamentoService from '../services/OrcamentoService.js';
 import { OrcamentoQuerySchema, OrcamentoIdSchema } from '../utils/validators/schemas/zod/querys/OrcamentoQuerySchema.js';
 import { OrcamentoSchema, OrcamentoUpdateSchema, ComponenteOrcamentoSchema, ComponenteOrcamentoUpdateSchema } from '../utils/validators/schemas/zod/OrcamentoSchema.js';
 import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, StatusService, asyncWrapper } from '../utils/helpers/index.js';
-import { v4 as uuid } from 'uuid';
 import mongoose from 'mongoose';
 import Componente from '../models/Componente.js';
 import Fornecedor from '../models/Fornecedor.js';
@@ -14,8 +13,6 @@ class OrcamentoController {
 
     async criar(req, res) {
         const parsedData = OrcamentoSchema.parse(req.body);
-
-        const protocolo = uuid();
 
         const componentesProcessados = [];
         for (const comp of parsedData.componentes) {
@@ -52,7 +49,6 @@ class OrcamentoController {
 
         const orcamentoParaSalvar = {
             nome: parsedData.nome,
-            protocolo,
             descricao: parsedData.descricao,
             componentes: componentesProcessados
         };

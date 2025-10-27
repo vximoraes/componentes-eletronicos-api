@@ -1,6 +1,5 @@
 import OrcamentoController from '../../../controllers/OrcamentoController.js';
 import { CommonResponse } from '../../../utils/helpers/index.js';
-import { v4 as uuid } from 'uuid';
 import Componente from '../../../models/Componente.js';
 import Fornecedor from '../../../models/Fornecedor.js';
 
@@ -67,7 +66,7 @@ describe('OrcamentoController', () => {
                 }
             };
             const fakeOrcamento = {
-                toObject: () => ({ _id: '507f1f77bcf86cd799439011', protocolo: uuid(), valor: 5, ...req.body })
+                toObject: () => ({ _id: '507f1f77bcf86cd799439011', valor: 5, ...req.body })
             };
             service.criar.mockResolvedValue(fakeOrcamento);
             await controller.criar(req, res);
@@ -79,17 +78,6 @@ describe('OrcamentoController', () => {
         it('deve retornar erro 400 para dados inválidos', async () => {
             const req = { body: { nome: '', componentes: [] } };
             await expect(controller.criar(req, res)).rejects.toThrow();
-        });
-
-        it('deve retornar erro 400 para protocolo duplicado', async () => {
-            const req = {
-                body: {
-                    nome: 'Orçamento Teste',
-                    componentes: [{ componente: '507f1f77bcf86cd799439012', fornecedor: '507f1f77bcf86cd799439013', quantidade: '1', valor_unitario: '1' }]
-                }
-            };
-            service.criar.mockRejectedValue({ code: 11000 });
-            await expect(controller.criar(req, res)).rejects.toBeDefined();
         });
     });
 

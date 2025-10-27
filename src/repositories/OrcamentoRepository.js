@@ -190,18 +190,6 @@ class OrcamentoRepository {
 
         return orcamento;
     };
-
-    async buscarPorProtocolo(protocolo, idIgnorado, req) {
-        const filtro = { protocolo };
-
-        if (idIgnorado) {
-            filtro._id = { $ne: idIgnorado }
-        };
-
-        const documento = await this.model.findOne(filtro)
-
-        return documento;
-    };
 };
 
 export default OrcamentoRepository;
