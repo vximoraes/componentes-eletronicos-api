@@ -67,7 +67,7 @@ services:
             args:
                 - NEXT_PUBLIC_API_URL=http://localhost:${PORT}
         ports:
-            - "3001:3001"
+            - "${FRONTEND_PORT}:${FRONTEND_PORT}"
         env_file:
             - ../componentes-eletronicos-front/.env.local
         restart: always
