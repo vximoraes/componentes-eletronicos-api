@@ -20,7 +20,7 @@ class OrcamentoRepository {
 
         // Se um ID for fornecido, retorna o orçamento enriquecido com estatísticas.
         if (id) {
-            const data = await this.model.findOne({ _id: id })
+            const data = await this.model.findOne({ _id: id, ativo: true })
 
             if (!data) {
                 throw new CustomError({
@@ -55,7 +55,7 @@ class OrcamentoRepository {
             });
         };
 
-        const filtros = { ...filterBuilder.build() };
+        const filtros = { ...filterBuilder.build(), ativo: true };
 
         const options = {
             page: parseInt(page),
@@ -93,7 +93,7 @@ class OrcamentoRepository {
     };
 
     async deletar(id, req) {
-        const orcamento = await this.model.findOne({ _id: id })
+        const orcamento = await this.model.findOne({ _id: id, ativo: true })
         if (!orcamento) {
             throw new CustomError({
                 statusCode: 404,
@@ -111,7 +111,7 @@ class OrcamentoRepository {
     // Manipular componentes.
 
     async adicionarComponente(orcamentoId, novoComponente, req) {
-        const orcamento = await this.model.findOne({ _id: orcamentoId });
+        const orcamento = await this.model.findOne({ _id: orcamentoId, ativo: true });
         if (!orcamento) throw new CustomError({
             statusCode: 404,
             errorType: 'resourceNotFound',
@@ -128,7 +128,7 @@ class OrcamentoRepository {
     };
 
     async atualizarComponente(orcamentoId, componenteId, componenteAtualizado, req) {
-        const orcamento = await this.model.findOne({ _id: orcamentoId });
+        const orcamento = await this.model.findOne({ _id: orcamentoId, ativo: true });
         if (!orcamento) throw new CustomError({
             statusCode: 404,
             errorType: 'resourceNotFound',
@@ -156,7 +156,7 @@ class OrcamentoRepository {
     };
 
     async removerComponente(orcamentoId, componenteId, req) {
-        const orcamento = await this.model.findOne({ _id: orcamentoId });
+        const orcamento = await this.model.findOne({ _id: orcamentoId, ativo: true });
         if (!orcamento) throw new CustomError({
             statusCode: 404,
             errorType: 'resourceNotFound',
@@ -175,7 +175,7 @@ class OrcamentoRepository {
     // Métodos auxiliares.
 
     async buscarPorId(id, includeTokens = false, req) {
-        let query = this.model.findOne({ _id: id });
+        let query = this.model.findOne({ _id: id, ativo: true });
 
         const orcamento = await query;
         if (!orcamento) {

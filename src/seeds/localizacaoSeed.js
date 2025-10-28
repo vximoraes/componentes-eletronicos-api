@@ -8,7 +8,8 @@ export default async function localizacaoSeed(adminId) {
     for (let i = 0; i < 10; i++) {
         const localizacao = {
             nome: fakeMappings.Localizacao.nome.apply(),
-            usuario: adminId
+            usuario: adminId,
+            ativo: true
         };
 
         await Localizacao.create(localizacao);

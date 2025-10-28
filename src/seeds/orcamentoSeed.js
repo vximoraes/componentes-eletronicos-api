@@ -35,7 +35,8 @@ export default async function orcamentoSeed(adminId) {
             nome: fakeMappings.Orcamento.nome.apply(),
             descricao: fakeMappings.Orcamento.descricao.apply(),
             componentes,
-            usuario: adminId
+            usuario: adminId,
+            ativo: true
         };
         
         await Orcamento.create(orcamento);

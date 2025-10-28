@@ -8,7 +8,8 @@ export default async function categoriaSeed(adminId) {
     for (let i = 0; i < fakeMappings.Categoria.categorias.length; i++) {
         const categoria = {
             nome: fakeMappings.Categoria.nome(i),
-            usuario: adminId
+            usuario: adminId,
+            ativo: true
         };
 
         await Categoria.create(categoria);

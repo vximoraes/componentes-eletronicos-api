@@ -36,6 +36,14 @@ class OrcamentoService {
         return data;
     };
 
+    async inativar(id, req) {
+        await this.ensureBudgetExists(id, req);
+
+        const data = await this.repository.atualizar(id, { ativo: false }, req);
+
+        return data;
+    };
+
     // Manipular componentes.
 
     async adicionarComponente(orcamentoId, novoComponente, req) {

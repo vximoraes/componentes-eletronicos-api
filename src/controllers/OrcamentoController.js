@@ -91,6 +91,15 @@ class OrcamentoController {
         return CommonResponse.success(res, data, 200, 'Orçamento excluído com sucesso.');
     };
 
+    async inativar(req, res) {
+        const { id } = req.params || {};
+        OrcamentoIdSchema.parse(id);
+
+        const data = await this.service.inativar(id, req);
+
+        return CommonResponse.success(res, data, 200, 'Orçamento inativado com sucesso.');
+    };
+
     // Manipular componentes.
 
     async adicionarComponente(req, res) {

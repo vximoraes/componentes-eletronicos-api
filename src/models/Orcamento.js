@@ -55,6 +55,10 @@ class Orcamento {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'usuarios',
                 required: true
+            },
+            ativo: {
+                type: Boolean,
+                default: true
             }
         });
 

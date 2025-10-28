@@ -11,7 +11,8 @@ export default async function fornecedorSeed(adminId) {
             usuario: adminId,
             url: fakeMappings.Fornecedor.url.apply(),
             contato: fakeMappings.Fornecedor.contato.apply(),
-            descricao: fakeMappings.Fornecedor.descricao.apply()
+            descricao: fakeMappings.Fornecedor.descricao.apply(),
+            ativo: true
         };
 
         await Fornecedor.create(fornecedor);
