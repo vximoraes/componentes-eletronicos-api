@@ -59,6 +59,21 @@ services:
                 condition: service_healthy
         restart: always
 
+    frontend:
+        container_name: componentes-eletronicos-front
+        build:
+            context: ../componentes-eletronicos-front
+            dockerfile: Dockerfile
+            args:
+                - NEXT_PUBLIC_API_URL=http://localhost:${PORT}
+        ports:
+            - "3001:3001"
+        env_file:
+            - ../componentes-eletronicos-front/.env.local
+        restart: always
+        depends_on:
+            - api
+
 volumes:
     vol-mongodb:
     vol-minio:
