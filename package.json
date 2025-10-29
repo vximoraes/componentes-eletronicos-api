@@ -98,7 +98,7 @@
             "/src/models/Grupo.js",
             "/src/models/Rota.js",
             "/src/config/MinIO.js",
-            "/src/config/MuterConfig.js",
+            "/src/config/MulterConfig.js",
             "/src/config/SharpConfig.js"
         ]
     }
