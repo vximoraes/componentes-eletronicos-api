@@ -95,21 +95,6 @@ describe('CategoriaRepository', () => {
         });
     });
 
-    describe('deletar', () => {
-        it('deve deletar categoria se não houver componente vinculado', async () => {
-            const req = { user_id: 'user1' };
-            ComponenteModel.exists.mockResolvedValueOnce(false);
-            CategoriaModel.findOneAndDelete = jest.fn().mockResolvedValueOnce({ nome: 'Cat1', _id: 'id1' });
-            const result = await repository.deletar('id1', req);
-            expect(result).toEqual({ nome: 'Cat1', _id: 'id1' });
-        });
-        it('deve lançar erro se houver componente vinculado', async () => {
-            const req = { user_id: 'user1' };
-            ComponenteModel.exists.mockResolvedValueOnce(true);
-            await expect(repository.deletar('id1', req)).rejects.toThrow(CustomError);
-        });
-    });
-
     describe('buscarPorNome', () => {
         it('deve retornar categoria por nome', async () => {
             const req = { user_id: 'user1' };

@@ -7,11 +7,11 @@ describe('OrcamentoQuerySchema', () => {
         expect(result.data).toEqual({ page: 1, limite: 10 });
     });
 
-    it('valida query com nome, protocolo', () => {
-        const query = { nome: 'Teste', protocolo: 'P123' };
+    it('valida query com nome', () => {
+        const query = { nome: 'Teste' };
         const result = OrcamentoQuerySchema.safeParse(query);
         expect(result.success).toBe(true);
-        expect(result.data).toMatchObject({ nome: 'Teste', protocolo: 'P123' });
+        expect(result.data).toMatchObject({ nome: 'Teste' });
     });
 
     it('valida paginação e limites', () => {

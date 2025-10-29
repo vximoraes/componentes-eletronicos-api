@@ -45,7 +45,7 @@ describe('OrcamentoSchema', () => {
         };
         const result = OrcamentoSchema.safeParse(data);
         expect(result.success).toBe(false);
-        expect(result.error.issues[0].message).toMatch(/maior que zero/i);
+        expect(result.error.issues[0].message).toMatch(/Quantidade: 1 a 999.999.999/i);
     });
 
     it('falha se valor_unitario não for número', () => {

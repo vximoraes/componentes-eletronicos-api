@@ -107,24 +107,24 @@ describe('CategoriaController', () => {
         });
     });
 
-    describe('deletar', () => {
-        it('deve deletar categoria existente', async () => {
+    describe('inativar', () => {
+        it('deve inativar categoria existente', async () => {
             req.params = { id: '1' };
             CategoriaIdSchema.parse.mockReturnValue('1');
-            serviceMock.deletar.mockResolvedValue({ nome: 'Removida' });
+            serviceMock.inativar.mockResolvedValue({ nome: 'Inativada' });
 
-            await controller.deletar(req, res);
+            await controller.inativar(req, res);
 
             expect(CategoriaIdSchema.parse).toHaveBeenCalledWith('1');
-            expect(serviceMock.deletar).toHaveBeenCalledWith('1', req);
-            expect(CommonResponse.success).toHaveBeenCalledWith(res, { nome: 'Removida' }, 200, 'Categoria excluída com sucesso.');
+            expect(serviceMock.inativar).toHaveBeenCalledWith('1', req);
+            expect(CommonResponse.success).toHaveBeenCalledWith(res, { nome: 'Inativada' }, 200, 'Categoria inativada com sucesso.');
         });
 
-        it('deve retornar erro 404 ao tentar deletar categoria inexistente', async () => {
+        it('deve retornar erro 404 ao tentar inativar categoria inexistente', async () => {
             req.params = { id: '1' };
             CategoriaIdSchema.parse.mockReturnValue('1');
-            serviceMock.deletar.mockRejectedValue({ status: 404 });
-            await expect(controller.deletar(req, res)).rejects.toEqual(expect.objectContaining({ status: 404 }));
+            serviceMock.inativar.mockRejectedValue({ status: 404 });
+            await expect(controller.inativar(req, res)).rejects.toEqual(expect.objectContaining({ status: 404 }));
         });
     });
 
@@ -148,11 +148,11 @@ describe('CategoriaController', () => {
             await expect(controller.atualizar(req, res)).rejects.toEqual(expect.objectContaining({ status: 500 }));
         });
 
-        it('deve retornar erro 500 para falha inesperada em deletar', async () => {
+        it('deve retornar erro 500 para falha inesperada em inativar', async () => {
             req.params = { id: '1' };
             CategoriaIdSchema.parse.mockReturnValue('1');
-            serviceMock.deletar.mockRejectedValue({ status: 500 });
-            await expect(controller.deletar(req, res)).rejects.toEqual(expect.objectContaining({ status: 500 }));
+            serviceMock.inativar.mockRejectedValue({ status: 500 });
+            await expect(controller.inativar(req, res)).rejects.toEqual(expect.objectContaining({ status: 500 }));
         });
     });
 });

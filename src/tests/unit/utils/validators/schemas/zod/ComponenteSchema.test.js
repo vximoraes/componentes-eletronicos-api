@@ -55,12 +55,8 @@ describe('ComponenteSchema', () => {
             estoque_minimo: 'dez',
             categoria: objectId,
         };
-        expect(() => ComponenteSchema.parse(dadosInvalidos)).toThrow('Estoque mínimo deve ser um número inteiro');
+        expect(() => ComponenteSchema.parse(dadosInvalidos)).toThrow('Estoque mínimo deve ser inteiro');
     });
-
-
-
-
 
     it('deve lançar erro quando "categoria" não é ObjectId', () => {
         const dadosInvalidos = {
@@ -128,7 +124,7 @@ describe('ComponenteUpdateSchema', () => {
 
     it('deve lançar erro quando "estoque_minimo" não é número', () => {
         const dadosInvalidos = { estoque_minimo: 'dez' };
-        expect(() => ComponenteUpdateSchema.parse(dadosInvalidos)).toThrow('Estoque mínimo deve ser um número inteiro');
+        expect(() => ComponenteUpdateSchema.parse(dadosInvalidos)).toThrow('Estoque mínimo deve ser inteiro');
     });
 
 

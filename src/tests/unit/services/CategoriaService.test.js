@@ -14,7 +14,6 @@ describe('CategoriaService', () => {
             criar: jest.fn(),
             listar: jest.fn(),
             atualizar: jest.fn(),
-            deletar: jest.fn(),
             buscarPorNome: jest.fn(),
             buscarPorId: jest.fn()
         };
@@ -79,32 +78,34 @@ describe('CategoriaService', () => {
         });
     });
 
-    describe('deletar', () => {
-        it('deve remover categoria existente', async () => {
+    describe('inativar', () => {
+        it('deve inativar categoria existente sem componentes ativos', async () => {
+            const ComponenteModel = require('../../../models/Componente.js').default;
+            ComponenteModel.exists = jest.fn().mockResolvedValue(false);
+            
             repositoryMock.buscarPorId.mockResolvedValue(makeCategoria());
-            repositoryMock.deletar.mockResolvedValue({ acknowledged: true, deletedCount: 1 });
-            const result = await service.deletar('cat1');
-            expect(result).toHaveProperty('acknowledged', true);
+            repositoryMock.atualizar.mockResolvedValue(makeCategoria({ ativo: false }));
+            const result = await service.inativar('cat1', {});
+            expect(result).toHaveProperty('ativo', false);
         });
         it('deve lançar erro se categoria não existir', async () => {
             repositoryMock.buscarPorId.mockResolvedValue(null);
-            await expect(service.deletar('catX')).rejects.toThrow(CustomError);
+            await expect(service.inativar('catX', {})).rejects.toThrow(CustomError);
         });
-        it('deve lançar erro se categoria estiver vinculada a componentes', async () => {
+        it('deve lançar erro se categoria estiver vinculada a componentes ativos', async () => {
+            const ComponenteModel = require('../../../models/Componente.js').default;
+            ComponenteModel.exists = jest.fn().mockResolvedValue(true);
+            
             repositoryMock.buscarPorId.mockResolvedValue(makeCategoria());
-            repositoryMock.deletar.mockRejectedValue(new CustomError({
-                statusCode: 400,
-                errorType: 'resourceInUse',
-                field: 'Categoria',
-                details: [],
-                customMessage: 'Categoria vinculada a componentes.'
-            }));
-            await expect(service.deletar('cat1')).rejects.toThrow('Categoria vinculada a componentes');
+            await expect(service.inativar('cat1', {})).rejects.toThrow('Categoria vinculada a componentes ativos');
         });
         it('deve lançar erro inesperado do repository', async () => {
+            const ComponenteModel = require('../../../models/Componente.js').default;
+            ComponenteModel.exists = jest.fn().mockResolvedValue(false);
+            
             repositoryMock.buscarPorId.mockResolvedValue(makeCategoria());
-            repositoryMock.deletar.mockRejectedValue(new Error('DB error'));
-            await expect(service.deletar('cat1')).rejects.toThrow('DB error');
+            repositoryMock.atualizar.mockRejectedValue(new Error('DB error'));
+            await expect(service.inativar('cat1', {})).rejects.toThrow('DB error');
         });
     });
 

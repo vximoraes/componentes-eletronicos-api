@@ -140,38 +140,31 @@ describe('FornecedorController', () => {
         });
     });
 
-    describe('deletar', () => {
-        it('deve deletar fornecedor existente', async () => {
+    describe('inativar', () => {
+        it('deve inativar fornecedor existente', async () => {
             req.params = { id: '1' };
             FornecedorIdSchema.parse.mockReturnValue('1');
-            serviceMock.deletar.mockResolvedValue({ nome: 'Removido' });
+            serviceMock.inativar.mockResolvedValue({ nome: 'Inativado' });
 
-            await controller.deletar(req, res);
+            await controller.inativar(req, res);
 
             expect(FornecedorIdSchema.parse).toHaveBeenCalledWith('1');
-            expect(serviceMock.deletar).toHaveBeenCalledWith('1', req);
-            expect(CommonResponse.success).toHaveBeenCalledWith(res, { nome: 'Removido' }, 200, 'Fornecedor excluído com sucesso.');
+            expect(serviceMock.inativar).toHaveBeenCalledWith('1', req);
+            expect(CommonResponse.success).toHaveBeenCalledWith(res, { nome: 'Inativado' }, 200, 'Fornecedor inativado com sucesso.');
         });
 
-        it('deve retornar erro 404 ao tentar deletar fornecedor inexistente', async () => {
+        it('deve retornar erro 404 ao tentar inativar fornecedor inexistente', async () => {
             req.params = { id: '1' };
             FornecedorIdSchema.parse.mockReturnValue('1');
-            serviceMock.deletar.mockRejectedValue({ status: 404 });
-            await expect(controller.deletar(req, res)).rejects.toEqual(expect.objectContaining({ status: 404 }));
-        });
-
-        it('deve retornar erro 409 ao tentar deletar fornecedor com vínculo', async () => {
-            req.params = { id: '1' };
-            FornecedorIdSchema.parse.mockReturnValue('1');
-            serviceMock.deletar.mockRejectedValue({ status: 409 });
-            await expect(controller.deletar(req, res)).rejects.toEqual(expect.objectContaining({ status: 409 }));
+            serviceMock.inativar.mockRejectedValue({ status: 404 });
+            await expect(controller.inativar(req, res)).rejects.toEqual(expect.objectContaining({ status: 404 }));
         });
 
         it('deve retornar erro 500 para falha inesperada', async () => {
             req.params = { id: '1' };
             FornecedorIdSchema.parse.mockReturnValue('1');
-            serviceMock.deletar.mockRejectedValue({ status: 500 });
-            await expect(controller.deletar(req, res)).rejects.toEqual(expect.objectContaining({ status: 500 }));
+            serviceMock.inativar.mockRejectedValue({ status: 500 });
+            await expect(controller.inativar(req, res)).rejects.toEqual(expect.objectContaining({ status: 500 }));
         });
     });
 });

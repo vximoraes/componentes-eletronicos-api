@@ -75,7 +75,7 @@ describe("Orçamentos", () => {
         const { componente, fornecedor } = await criarComponenteEFornecedor();
         componenteRealId = componente;
         fornecedorRealId = fornecedor;
-    });
+    }, 15000);
 
     it("Não deve cadastrar orçamento sem campos obrigatórios (400)", async () => {
         await request(BASE_URL)

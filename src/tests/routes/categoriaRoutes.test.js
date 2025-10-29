@@ -119,17 +119,17 @@ describe('Rotas de Categoria', () => {
         });
     });
 
-    describe('DELETE /categorias/:id', () => {
-        it('deve remover categoria existente', async () => {
+    describe('PATCH /categorias/:id/inativar', () => {
+        it('deve inativar categoria existente', async () => {
             const dados = await criarCategoriaValida();
             const catRes = await request(BASE_URL).post('/categorias').set('Authorization', `Bearer ${token}`).send(dados);
             const id = catRes.body.data._id;
-            const res = await request(BASE_URL).delete(`/categorias/${id}`).set('Authorization', `Bearer ${token}`);
+            const res = await request(BASE_URL).patch(`/categorias/${id}/inativar`).set('Authorization', `Bearer ${token}`);
             expect([200, 201, 204]).toContain(res.status);
         });
-        it('deve retornar 404 ao remover categoria inexistente', async () => {
+        it('deve retornar 404 ao inativar categoria inexistente', async () => {
             const id = new mongoose.Types.ObjectId();
-            const res = await request(BASE_URL).delete(`/categorias/${id}`).set('Authorization', `Bearer ${token}`);
+            const res = await request(BASE_URL).patch(`/categorias/${id}/inativar`).set('Authorization', `Bearer ${token}`);
             expect(res.status).toBe(404);
         });
     });

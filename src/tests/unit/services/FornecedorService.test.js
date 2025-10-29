@@ -14,7 +14,6 @@ describe('FornecedorService', () => {
             criar: jest.fn(),
             listar: jest.fn(),
             atualizar: jest.fn(),
-            deletar: jest.fn(),
             buscarPorNome: jest.fn(),
             buscarPorId: jest.fn()
         };
@@ -80,32 +79,21 @@ describe('FornecedorService', () => {
         });
     });
 
-    describe('deletar', () => {
-        it('deve remover fornecedor existente', async () => {
+    describe('inativar', () => {
+        it('deve inativar fornecedor existente', async () => {
             repositoryMock.buscarPorId.mockResolvedValue(makeFornecedor());
-            repositoryMock.deletar.mockResolvedValue({ acknowledged: true, deletedCount: 1 });
-            const result = await service.deletar('forn1');
-            expect(result).toHaveProperty('acknowledged', true);
+            repositoryMock.atualizar.mockResolvedValue(makeFornecedor({ ativo: false }));
+            const result = await service.inativar('forn1', {});
+            expect(result).toHaveProperty('ativo', false);
         });
         it('deve lançar erro se fornecedor não existir', async () => {
             repositoryMock.buscarPorId.mockResolvedValue(null);
-            await expect(service.deletar('fornX')).rejects.toThrow(CustomError);
-        });
-        it('deve lançar erro se fornecedor estiver vinculado a componentes/orçamentos', async () => {
-            repositoryMock.buscarPorId.mockResolvedValue(makeFornecedor());
-            repositoryMock.deletar.mockRejectedValue(new CustomError({
-                statusCode: 400,
-                errorType: 'resourceInUse',
-                field: 'Fornecedor',
-                details: [],
-                customMessage: 'Fornecedor vinculado a componentes/orçamentos.'
-            }));
-            await expect(service.deletar('forn1')).rejects.toThrow('Fornecedor vinculado a componentes/orçamentos');
+            await expect(service.inativar('fornX', {})).rejects.toThrow(CustomError);
         });
         it('deve lançar erro inesperado do repository', async () => {
             repositoryMock.buscarPorId.mockResolvedValue(makeFornecedor());
-            repositoryMock.deletar.mockRejectedValue(new Error('DB error'));
-            await expect(service.deletar('forn1')).rejects.toThrow('DB error');
+            repositoryMock.atualizar.mockRejectedValue(new Error('DB error'));
+            await expect(service.inativar('forn1', {})).rejects.toThrow('DB error');
         });
     });
 

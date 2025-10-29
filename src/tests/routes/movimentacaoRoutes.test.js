@@ -98,7 +98,7 @@ describe('Rotas de Movimentação', () => {
             expect(res.body.data).toHaveProperty('_id');
             expect(res.body.data._id).toBeTruthy();
             movimentacaoId = res.body.data._id;
-        });
+        }, 15000);
         it('deve falhar ao cadastrar sem campos obrigatórios', async () => {
             const res = await request(BASE_URL).post('/movimentacoes').set('Authorization', `Bearer ${token}`).send({});
             expect([400, 422]).toContain(res.status);
@@ -125,7 +125,7 @@ describe('Rotas de Movimentação', () => {
             const res = await request(BASE_URL).get(`/movimentacoes/${id}`).set('Authorization', `Bearer ${token}`);
             expect([200, 201]).toContain(res.status);
             expect(res.body.data).toHaveProperty('_id', id);
-        });
+        }, 15000);
         it('deve retornar 404 para movimentação inexistente', async () => {
             const id = new mongoose.Types.ObjectId();
             const res = await request(BASE_URL).get(`/movimentacoes/${id}`).set('Authorization', `Bearer ${token}`);

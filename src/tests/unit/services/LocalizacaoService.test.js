@@ -1,10 +1,13 @@
 import LocalizacaoService from '../../../services/LocalizacaoService.js';
 import LocalizacaoRepository from '../../../repositories/LocalizacaoRepository.js';
+import EstoqueModel from '../../../models/Estoque.js';
 import { CustomError } from '../../../utils/helpers/index.js';
+import mongoose from 'mongoose';
 
 jest.mock('../../../repositories/LocalizacaoRepository.js');
+jest.mock('../../../models/Estoque.js');
 
-const makeLocalizacao = (props = {}) => ({ _id: 'loc1', nome: 'Estoque', ...props });
+const makeLocalizacao = (props = {}) => ({ _id: new mongoose.Types.ObjectId(), nome: 'Estoque', ...props });
 
 describe('LocalizacaoService', () => {
     let service, repositoryMock;
@@ -82,20 +85,51 @@ describe('LocalizacaoService', () => {
     });
 
     describe('inativar', () => {
-        it('deve inativar localização existente', async () => {
-            repositoryMock.buscarPorId.mockResolvedValue(makeLocalizacao());
+        it('deve inativar localização existente sem componentes ativos', async () => {
+            const locId = new mongoose.Types.ObjectId();
+            const localizacao = makeLocalizacao();
+            localizacao._id = locId;
+            
+            repositoryMock.buscarPorId.mockResolvedValue(localizacao);
+            EstoqueModel.find = jest.fn().mockReturnValue({
+                populate: jest.fn().mockResolvedValue([])
+            });
             repositoryMock.atualizar.mockResolvedValue({ nome: 'Prateleira A', ativo: false });
-            const result = await service.inativar('loc1', {});
+            
+            const result = await service.inativar(locId.toString(), {});
             expect(result).toHaveProperty('ativo', false);
         });
         it('deve lançar erro se localização não existir', async () => {
+            const locId = new mongoose.Types.ObjectId();
             repositoryMock.buscarPorId.mockResolvedValue(null);
-            await expect(service.inativar('locX', {})).rejects.toThrow(CustomError);
+            await expect(service.inativar(locId.toString(), {})).rejects.toThrow(CustomError);
+        });
+        it('deve lançar erro se localização tiver componentes ativos', async () => {
+            const locId = new mongoose.Types.ObjectId();
+            const localizacao = makeLocalizacao();
+            localizacao._id = locId;
+            
+            repositoryMock.buscarPorId.mockResolvedValue(localizacao);
+            EstoqueModel.find = jest.fn().mockReturnValue({
+                populate: jest.fn().mockResolvedValue([
+                    { componente: { ativo: true } }
+                ])
+            });
+            
+            await expect(service.inativar(locId.toString(), {})).rejects.toThrow('Localização possui estoque de componentes ativos');
         });
         it('deve lançar erro inesperado do repository', async () => {
-            repositoryMock.buscarPorId.mockResolvedValue(makeLocalizacao());
+            const locId = new mongoose.Types.ObjectId();
+            const localizacao = makeLocalizacao();
+            localizacao._id = locId;
+            
+            repositoryMock.buscarPorId.mockResolvedValue(localizacao);
+            EstoqueModel.find = jest.fn().mockReturnValue({
+                populate: jest.fn().mockResolvedValue([])
+            });
             repositoryMock.atualizar.mockRejectedValue(new Error('DB error'));
-            await expect(service.inativar('loc1', {})).rejects.toThrow('DB error');
+            
+            await expect(service.inativar(locId.toString(), {})).rejects.toThrow('DB error');
         });
     });
 
@@ -113,8 +147,11 @@ describe('LocalizacaoService', () => {
             await expect(service.ensureLocationExists('locX')).rejects.toThrow(CustomError);
         });
         it('ensureLocationExists retorna localização se existir', async () => {
-            repositoryMock.buscarPorId.mockResolvedValue(makeLocalizacao());
-            await expect(service.ensureLocationExists('loc1')).resolves.toHaveProperty('_id', 'loc1');
+            const localizacao = makeLocalizacao();
+            repositoryMock.buscarPorId.mockResolvedValue(localizacao);
+            const result = await service.ensureLocationExists(localizacao._id.toString());
+            expect(result).toHaveProperty('_id');
+            expect(result._id).toBe(localizacao._id);
         });
     });
 });

@@ -48,9 +48,9 @@ describe('FornecedorFilterBuilder', () => {
             });
         });
 
-        test('deve tratar string vazia como filtro válido', () => {
+        test('deve ignorar string vazia', () => {
             const resultado = fornecedorFilterBuilder.comNome('');
-            expect(fornecedorFilterBuilder.filtros.nome).toEqual({ $regex: '', $options: 'i' });
+            expect(fornecedorFilterBuilder.filtros.nome).toBeUndefined();
             expect(resultado).toBe(fornecedorFilterBuilder);
         });
     });
