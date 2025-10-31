@@ -207,6 +207,26 @@ class UsuarioService {
             });
         }
 
+        if (usuario.ativo && usuario.ativadoEm) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.BAD_REQUEST.code,
+                errorType: 'accountAlreadyActivated',
+                field: 'Token',
+                details: [],
+                customMessage: 'Esta conta já foi ativada. Faça login para acessar o sistema.'
+            });
+        }
+
+        if (!usuario.convidadoEm) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.BAD_REQUEST.code,
+                errorType: 'invalidInvitation',
+                field: 'Token',
+                details: [],
+                customMessage: 'Convite inválido. Solicite um novo convite ao administrador.'
+            });
+        }
+
         const minutosDesdeConvite = (new Date() - new Date(usuario.convidadoEm)) / (1000 * 60);
         if (minutosDesdeConvite > 5) {
             throw new CustomError({
@@ -236,6 +256,7 @@ class UsuarioService {
             ativo: true,
             ativadoEm: new Date(),
             tokenConvite: null,
+            convidadoEm: null,
             permissoes
         });
 
