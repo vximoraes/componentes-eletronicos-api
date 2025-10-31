@@ -5,7 +5,8 @@ import { CommonResponse, CustomError, HttpStatusCodes, errorHandler, messages, S
 import minioClient from '../config/MinIO.js';
 import path from 'path';
 import compress from '../config/SharpConfig.js';
-// import AuthHelper from '../utils/AuthHelper.js';
+import EmailService from './EmailService.js';
+import tokenUtil from '../utils/TokenUtil.js';
 
 class UsuarioService {
     constructor() {
@@ -22,7 +23,6 @@ class UsuarioService {
             parsedData.senha = await bcrypt.hash(parsedData.senha, saltRounds);
         };
 
-        // Buscar grupo "Usuario" padrão se não foram fornecidas permissões
         if (!parsedData.permissoes || parsedData.permissoes.length === 0) {
             try {
                 const grupoUsuario = await this.grupoRepository.buscarPorNome("Usuario", null, userId);
@@ -30,7 +30,6 @@ class UsuarioService {
                     parsedData.permissoes = grupoUsuario.permissoes || [];
                 }
             } catch (error) {
-                // Se não conseguir buscar o grupo, continua sem definir permissões padrão
                 console.warn('Não foi possível buscar o grupo "Usuario" padrão:', error.message);
             }
         }
@@ -147,6 +146,145 @@ class UsuarioService {
         })
         const data = await this.repository.atualizar(id, { fotoPerfil: "" })
         return {fotoPerfil: data.fotoPerfil}
+    }
+
+    async convidarUsuario(nome, email) {
+        await this.validateEmail(email, null, null);
+
+        const tokenConvite = await tokenUtil.generateInviteToken(email);
+        const convidadoEm = new Date();
+
+        const novoUsuario = await this.repository.criar({
+            nome,
+            email,
+            tokenConvite,
+            convidadoEm,
+            ativo: false,
+        });
+
+        try {
+            await EmailService.enviarEmailConvite(nome, email, tokenConvite);
+        } catch (error) {
+            await this.repository.deletar(novoUsuario._id);
+            throw error;
+        }
+
+        return {
+            message: 'Convite enviado com sucesso!',
+            usuario: {
+                id: novoUsuario._id,
+                nome: novoUsuario.nome,
+                email: novoUsuario.email,
+                convidadoEm: novoUsuario.convidadoEm
+            }
+        };
+    }
+
+    async ativarConta(token, senha) {
+        let emailDoToken;
+        try {
+            const decoded = await tokenUtil.decodeInviteToken(token);
+            emailDoToken = decoded.email;
+        } catch (error) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.UNAUTHORIZED.code,
+                errorType: 'invalidToken',
+                field: 'Token',
+                details: [],
+                customMessage: 'Token de convite inválido ou expirado.'
+            });
+        }
+
+        const usuario = await this.repository.buscarPorTokenConvite(token);
+        
+        if (!usuario) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.NOT_FOUND.code,
+                errorType: 'resourceNotFound',
+                field: 'Token',
+                details: [],
+                customMessage: 'Token de convite inválido ou já utilizado.'
+            });
+        }
+
+        const minutosDesdeConvite = (new Date() - new Date(usuario.convidadoEm)) / (1000 * 60);
+        if (minutosDesdeConvite > 5) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.UNAUTHORIZED.code,
+                errorType: 'tokenExpired',
+                field: 'Token',
+                details: [],
+                customMessage: 'Token de convite expirado. Solicite um novo convite ao administrador.'
+            });
+        }
+
+        const saltRounds = 10;
+        const senhaHash = await bcrypt.hash(senha, saltRounds);
+
+        let permissoes = [];
+        try {
+            const grupoUsuario = await this.grupoRepository.buscarPorNome("Usuario", null, null);
+            if (grupoUsuario) {
+                permissoes = grupoUsuario.permissoes || [];
+            }
+        } catch (error) {
+            console.warn('Não foi possível buscar o grupo "Usuario" padrão:', error.message);
+        }
+
+        const usuarioAtualizado = await this.repository.atualizar(usuario._id, {
+            senha: senhaHash,
+            ativo: true,
+            ativadoEm: new Date(),
+            tokenConvite: null,
+            permissoes
+        });
+
+        return {
+            message: 'Conta ativada com sucesso! Você já pode fazer login.',
+            usuario: {
+                id: usuarioAtualizado._id,
+                nome: usuarioAtualizado.nome,
+                email: usuarioAtualizado.email
+            }
+        };
+    }
+
+    async reenviarConvite(id) {
+        const usuario = await this.repository.buscarPorId(id);
+
+        if (!usuario) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.NOT_FOUND.code,
+                errorType: 'resourceNotFound',
+                field: 'Usuário',
+                details: [],
+                customMessage: messages.error.resourceNotFound('Usuário')
+            });
+        }
+
+        if (usuario.ativo && usuario.ativadoEm) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.BAD_REQUEST.code,
+                errorType: 'validationError',
+                field: 'Usuário',
+                details: [],
+                customMessage: 'Este usuário já ativou sua conta.'
+            });
+        }
+
+        const tokenConvite = await tokenUtil.generateInviteToken(usuario.email);
+        const convidadoEm = new Date();
+
+        await this.repository.atualizar(usuario._id, {
+            tokenConvite,
+            convidadoEm
+        });
+
+        await EmailService.enviarEmailConvite(usuario.nome, usuario.email, tokenConvite);
+
+        return {
+            message: 'Convite reenviado com sucesso!'
+        };
     }
 };
 

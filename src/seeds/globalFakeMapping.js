@@ -45,7 +45,10 @@ export const fakeMappings = {
         tokenUnico: () => TokenUtil.generateAccessToken(new mongoose.Types.ObjectId().toString()),
         refreshtoken: () => TokenUtil.generateRefreshToken(new mongoose.Types.ObjectId().toString()),
         accesstoken: () => TokenUtil.generateAccessToken(new mongoose.Types.ObjectId().toString()),
-        fotoPerfil:() =>""
+        fotoPerfil:() => "",
+        tokenConvite: () => uuid(),
+        convidadoEm: () => null,
+        ativadoEm: () => null
     },
 
     Notificacao: {

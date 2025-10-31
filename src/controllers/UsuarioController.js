@@ -79,6 +79,64 @@ class UsuarioController {
         return CommonResponse.success(res, data, 200, "Foto deletada com sucesso.")
 
     }
+
+    async convidarUsuario(req, res) {
+        const { nome, email } = req.body;
+
+        if (!nome || !email) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.BAD_REQUEST.code,
+                errorType: 'validationError',
+                field: 'nome, email',
+                details: [
+                    { path: 'nome', message: 'Nome é obrigatório' },
+                    { path: 'email', message: 'E-mail é obrigatório' }
+                ],
+                customMessage: 'Nome e e-mail são obrigatórios.'
+            });
+        }
+
+        const data = await this.service.convidarUsuario(nome, email);
+        return CommonResponse.created(res, data);
+    }
+
+    async ativarConta(req, res) {
+        const { token } = req.query;
+        const { senha } = req.body;
+
+        if (!token) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.BAD_REQUEST.code,
+                errorType: 'validationError',
+                field: 'token',
+                details: [{ path: 'token', message: 'Token é obrigatório' }],
+                customMessage: 'Token de convite é obrigatório.'
+            });
+        }
+
+        if (!senha) {
+            throw new CustomError({
+                statusCode: HttpStatusCodes.BAD_REQUEST.code,
+                errorType: 'validationError',
+                field: 'senha',
+                details: [{ path: 'senha', message: 'Senha é obrigatória' }],
+                customMessage: 'Senha é obrigatória.'
+            });
+        }
+
+        const senhaValidada = UsuarioUpdateSchema.parse({ senha });
+
+        const data = await this.service.ativarConta(token, senhaValidada.senha);
+        return CommonResponse.success(res, data, 200, data.message);
+    }
+
+    async reenviarConvite(req, res) {
+        const { id } = req.params;
+        UsuarioIdSchema.parse(id);
+
+        const data = await this.service.reenviarConvite(id);
+        return CommonResponse.success(res, data, 200, data.message);
+    }
 };
 
 export default UsuarioController;

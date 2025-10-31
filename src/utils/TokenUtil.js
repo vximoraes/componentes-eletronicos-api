@@ -98,6 +98,38 @@ class TokenUtil {
         });
     }
 
+    generateInviteToken(email) {
+        return new Promise((resolve, reject) => {
+            jwt.sign(
+                { email },
+                process.env.JWT_SECRET_INVITE || process.env.JWT_SECRET_PASSWORD_RECOVERY,
+                { expiresIn: '5m' }, 
+                (err, token) => {
+                    if (err) {
+                        return reject(err);
+                    }
+                    resolve(token);
+                }
+            );
+        });
+    }
+
+    decodeInviteToken(token) {
+        return new Promise((resolve, reject) => {
+            jwt.verify(
+                token,
+                process.env.JWT_SECRET_INVITE || process.env.JWT_SECRET_PASSWORD_RECOVERY,
+                (err, decoded) => {
+                    if (err) {
+                        return reject(err);
+                    }
+                    
+                    resolve(decoded);
+                }
+            );
+        });
+    }
+
 }
 
 export default new TokenUtil();

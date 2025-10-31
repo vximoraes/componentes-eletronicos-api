@@ -13,6 +13,8 @@ router
     .get("/usuarios", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.listar.bind(usuarioController)))
     .get("/usuarios/:id", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.listar.bind(usuarioController)))
     .post("/usuarios", asyncWrapper(usuarioController.criar.bind(usuarioController)))
+    .post("/usuarios/convidar", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.convidarUsuario.bind(usuarioController)))
+    .post("/usuarios/:id/reenviar-convite", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.reenviarConvite.bind(usuarioController)))
     .put("/usuarios/:id/foto", AuthMiddleware, AuthPermission, upload.single('file'), asyncWrapper(usuarioController.uploadFoto.bind(usuarioController)))
     .patch("/usuarios/:id", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.atualizar.bind(usuarioController)))
     .put("/usuarios/:id", AuthMiddleware, AuthPermission, asyncWrapper(usuarioController.atualizar.bind(usuarioController)))

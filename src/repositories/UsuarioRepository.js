@@ -169,6 +169,39 @@ class UsuarioRepository {
         return await this.model.findOne({ codigo_recupera_senha: codigo });
     }
 
+    async buscarPorTokenConvite(token) {
+        return await this.model.findOne({ tokenConvite: token }).select('+tokenConvite +convidadoEm');
+    }
+
+    async atualizarSenha(id, senhaHash) {
+        const usuario = await this.model.findByIdAndUpdate(
+            id,
+            { 
+                senha: senhaHash,
+                tokenUnico: null,
+                codigo_recupera_senha: null,
+                exp_codigo_recupera_senha: null
+            },
+            { new: true }
+        );
+
+        if (!usuario) {
+            throw new CustomError({
+                statusCode: 404,
+                errorType: 'resourceNotFound',
+                field: 'Usuário',
+                details: [],
+                customMessage: messages.error.resourceNotFound('Usuário')
+            });
+        }
+
+        return usuario;
+    }
+
+    async buscarPorTokenUnico(token) {
+        return await this.model.findOne({ tokenUnico: token }).select('+tokenUnico');
+    }
+
     async removeToken(id) {
         const usuarioExistente = await this.model.findById(id);
         if (!usuarioExistente) {

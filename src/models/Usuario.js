@@ -18,22 +18,34 @@ class Usuario {
             senha: {
                 type: String,
                 select: false,
-                required: true
+                required: false
             },
             ativo: {
                 type: Boolean,
                 default:
                     false
             },
-            tokenUnico: { // Token único para recuperação de senha.
+            tokenUnico: { 
                 type: String,
                 select: false
             },
-            refreshtoken: { // Refresh token para geração de access token de autenticação longa duração 7 dias para invalidação.
+            tokenConvite: { 
                 type: String,
                 select: false
             },
-            accesstoken: { // Refresh token para  autenticação curta longa 15 minutos para invalidação.
+            convidadoEm: { 
+                type: Date,
+                select: false
+            },
+            ativadoEm: { 
+                type: Date,
+                select: false
+            },
+            refreshtoken: {
+                type: String,
+                select: false
+            },
+            accesstoken: { 
                 type: String,
                 select: false
             },
@@ -45,12 +57,12 @@ class Usuario {
                 {
                     rota: { type: String, index: true, required: true }, // usuários / grupos / unidades / rotas
                     dominio: { type: String }, // http://localhost:3000
-                    ativo: { type: Boolean, default: false },  // false
-                    buscar: { type: Boolean, default: false },    // false
-                    enviar: { type: Boolean, default: false },   // false
-                    substituir: { type: Boolean, default: false },    // false
-                    modificar: { type: Boolean, default: false },  // false
-                    excluir: { type: Boolean, default: false }, // false
+                    ativo: { type: Boolean, default: false }, 
+                    buscar: { type: Boolean, default: false },    
+                    enviar: { type: Boolean, default: false },  
+                    substituir: { type: Boolean, default: false },   
+                    modificar: { type: Boolean, default: false },  
+                    excluir: { type: Boolean, default: false }, 
                 }
             ],
             fotoPerfil:{type:String, required:false}
