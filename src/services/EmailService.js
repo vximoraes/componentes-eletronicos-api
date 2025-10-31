@@ -89,7 +89,7 @@ Equipe Estoque Inteligente
             <p style="margin: 0 0 15px 0; font-size: 18px;">Olá, <strong>${nome}</strong>!</p>
             <p style="margin: 0 0 20px 0; font-size: 18px;">Sua conta foi criada. Para começar, clique no botão abaixo e defina sua senha.</p>
             <div style="text-align: center; margin: 30px 0;">
-                <a href="${activationUrl}" style="display: inline-block; padding: 14px 32px; background-color: #306FCC; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">Ativar Minha Conta</a>
+                <a href="${activationUrl}" style="display: inline-block; padding: 14px 32px; background-color: #306FCC; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">Ativar minha conta</a>
             </div>
             <div style="margin-top: 25px; border-radius: 4px;">
                 <p style="margin: 0; font-size: 18px;"><strong>Importante:</strong> Este link expira em 5 minutos por segurança.</p>
