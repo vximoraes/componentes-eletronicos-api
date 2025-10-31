@@ -12,6 +12,7 @@ const usuarioController = new UsuarioController();
 router
     .post("/login", asyncWrapper(authController.login.bind(authController)))
     .post("/recover", asyncWrapper(authController.recuperaSenha.bind(authController)))
+    .post("/redefinir-senha", asyncWrapper(authController.atualizarSenhaToken.bind(authController)))
     .post("/ativar-conta", asyncWrapper(usuarioController.ativarConta.bind(usuarioController)))
     .post("/logout", asyncWrapper(authController.logout.bind(authController)))
     .post("/revoke", asyncWrapper(authController.revoke.bind(authController)))

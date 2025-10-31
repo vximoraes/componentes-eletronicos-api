@@ -7,6 +7,7 @@ import AuthHelper from '../utils/AuthHelper.js';
 import fetch from 'node-fetch'
 
 import UsuarioRepository from '../repositories/UsuarioRepository.js';
+import EmailService from './EmailService.js';
 
 class AuthService {
     constructor({ tokenUtil: injectedTokenUtil } = {}) {
@@ -161,29 +162,38 @@ class AuthService {
         }
 
         // ───────────────────────────────────────────────
-        // Passo 2 – Gerar código de verificação (4 carac.)
+        // Passo 2 – Gerar código de verificação (6 carac.)
         // ───────────────────────────────────────────────
         const generateCode = () => Math.random()
-            .toString(36)              // ex: “0.f5g9hk3j”
+            .toString(36)              // ex: "0.f5g9hk3j"
             .replace(/[^a-z0-9]/gi, '') // mantém só letras/números
-            .slice(0, 4)               // pega os 4 primeiros
+            .slice(0, 6)               // pega os 6 primeiros (aumentado para reduzir colisões)
             .toUpperCase();            // converte p/ maiúsculas
 
         let codigoRecuperaSenha = generateCode();
 
         // ───────────────────────────────────────────────
-        // Passo 3 – Garantir unicidade do código gerado 
+        // Passo 3 – Garantir unicidade do código gerado (com limite de tentativas)
         // ───────────────────────────────────────────────
+        let tentativas = 0;
+        const MAX_TENTATIVAS = 10;
         let codigoExistente =
             await this.repository.buscarPorCodigoRecuperacao(codigoRecuperaSenha);
-        console.log('Código existente:', codigoExistente);
 
-        while (codigoExistente) {
-            console.log('Código já existe, gerando um novo código');
+        while (codigoExistente && tentativas < MAX_TENTATIVAS) {
+            tentativas++;
+            console.log(`Código já existe, gerando um novo código (tentativa ${tentativas}/${MAX_TENTATIVAS})`);
             codigoRecuperaSenha = generateCode();
             codigoExistente =
                 await this.repository.buscarPorCodigoRecuperacao(codigoRecuperaSenha);
         }
+
+        // Se após 10 tentativas ainda não conseguiu, usa timestamp + random
+        if (codigoExistente) {
+            console.warn('Não foi possível gerar código único após 10 tentativas, usando timestamp');
+            codigoRecuperaSenha = Date.now().toString(36).slice(-6).toUpperCase();
+        }
+        
         console.log('Código gerado:', codigoRecuperaSenha);
 
         // ───────────────────────────────────────────────
@@ -213,79 +223,31 @@ class AuthService {
             });
         }
 
-        /**
-         * Passo 6 – Enviar e-mail com código + link
-         * 
-         * Usar CHAVE MAIL_API_KEI no .env para requisitar o envio de e-mail em https://edurondon.tplinkdns.com/mail/emails/send
-         * Exemplo de corpo do e-mail:
-         * Corpo do e-mail:
-         * {
-            "to": "falecomgilberto@gmail.com",
-            "subject": "Redefinir senha",
-            "template": "password-reset",
-            "data": {
-                "name": "Gilberto",
-                "resetUrl": "https://edurondon.tplinkdns.com?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.yJpZCI6IjY4NDFmNWVhMmQ5YWYxOWVlN2Y1YmY3OCIsImlhdCI6MTc0OTU2OTI1MiwiZXhwIjoxNzQ5NTcyODUyfQ.D_bW22QyKqZ2YL6lv7kRo-_zY54v3esNHsxK7DKeOq0",
-                "expirationMinutes": 30,
-                "year": 2025,
-                "company": "Exemplo Ltda"
-                }
-            }
-         * 
-         */
-
-        const resetUrl = `https://edurondon.tplinkdns.com/auth/?token=${tokenUnico}`;
-        console.log('URL de redefinição de senha:', resetUrl);
-        const emailData = {
-            to: userEncontrado.email,
-            subject: 'Redefinir senha',
-            template: 'password-reset',
-            data: {
-                name: userEncontrado.nome,
-                resetUrl: resetUrl,
-                expirationMinutes: 60, // Expiração em minutos
-                year: new Date().getFullYear(),
-                company: process.env.COMPANY_NAME || 'Auth'
-            }
-        };
-        console.log('Dados do e-mail:', emailData);
-
-
-        // Criar função para fazer a chamada para enviar o e-mail
-        // Usa a URL base do serviço de e-mail do .env
-        const sendMail = async (emailData) => {
-            const mailApiUrl = process.env.MAIL_API_URL || 'http://localhost:3001';
-            const url = `${mailApiUrl}/emails/send?apiKey=${process.env.MAIL_API_KEY}`;
-            console.log('Enviando e-mail de recuperação de senha para:', emailData.to);
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(emailData)
-                });
-                if (!response.ok) {
-                    throw new Error(`Erro ao enviar e-mail: ${response.status} ${response.statusText}`);
-                }
-                const responseData = await response.json();
-                console.log('E-mail enviado com sucesso:', responseData);
-            } catch (error) {
-                console.error('Erro ao enviar e-mail:', error);
-                throw new CustomError({
-                    statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR.code,
-                    field: 'E-mail',
-                    details: [],
-                    customMessage: 'Erro ao enviar e-mail de recuperação de senha.'
-                });
-            }
-        };
-
-        console.log('Antes de sendMail');
-        await sendMail(emailData);
-        console.log('Depois de sendMail');;
-
-        console.log('Enviando e-mail de recuperação de senha');
+        // ───────────────────────────────────────────────
+        // Passo 6 – Enviar e-mail de recuperação de senha
+        // ───────────────────────────────────────────────
+        try {
+            await EmailService.enviarEmailRecuperacaoSenha(
+                userEncontrado.nome, 
+                userEncontrado.email, 
+                tokenUnico
+            );
+            console.log('E-mail de recuperação enviado com sucesso para:', userEncontrado.email);
+        } catch (error) {
+            console.error('Erro ao enviar e-mail de recuperação:', error);
+            // Se falhar ao enviar o e-mail, reverte a atualização do usuário
+            await this.repository.atualizar(userEncontrado._id, {
+                tokenUnico: null,
+                codigo_recupera_senha: null,
+                exp_codigo_recupera_senha: null
+            });
+            throw new CustomError({
+                statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR.code,
+                field: 'E-mail',
+                details: [],
+                customMessage: 'Erro ao enviar e-mail de recuperação de senha. Tente novamente mais tarde.'
+            });
+        }
 
         // ───────────────────────────────────────────────
         // Passo 7 – Retornar resposta ao cliente
