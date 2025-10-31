@@ -19,18 +19,7 @@ export default async function seedGrupos(rotas) {
         descricao: "Grupo com acesso aos visualização de pontos históricos",
         ativo: true,
         permissoes: rotas.map((r) => {
-            if (r.rota === "usuarios" || r.rota === "usuarios:id") {
-                return {
-                    ...r.toObject(),
-                    _id: r._id,
-                    buscar: true,
-                    enviar: true,
-                    modificar: true,
-                    substituir: true,
-                    excluir: false,
-                };
-            }
-            else if(r.rota ==="grupos" || r.rota ==="grupos:id" || r.rota === "rotas" || r.rota ==="rotas:id"){
+            if (r.rota === "usuarios" || r.rota === "usuarios:id" || r.rota ==="grupos" || r.rota ==="grupos:id" || r.rota === "rotas" || r.rota ==="rotas:id") {
                 return {
                     ...r.toObject(),
                     _id: r._id,
@@ -40,7 +29,7 @@ export default async function seedGrupos(rotas) {
                     modificar: false,
                     substituir: false,
                     excluir: false
-                }
+                };
             }
             return {
                 ...r.toObject(),
