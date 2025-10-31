@@ -253,8 +253,8 @@ class AuthService {
         // Passo 7 – Retornar resposta ao cliente
         // ───────────────────────────────────────────────
         return {
-            message:
-                'Solicitação de recuperação de senha recebida. Um e-mail foi enviado com instruções.'
+            message: 'E-mail de recuperação enviado com sucesso! Verifique sua caixa de entrada.',
+            email: userEncontrado.email
         };
     }
 
