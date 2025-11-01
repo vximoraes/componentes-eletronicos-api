@@ -17,6 +17,11 @@ class Orcamento {
                 type: Number,
                 default: 0
             },
+            createdAt:{
+                type:Date,
+                required: true,
+                default: Date.now
+            },
             componentes: [
                 {
                     componente: {
