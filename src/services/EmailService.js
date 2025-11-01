@@ -66,7 +66,7 @@ class EmailService {
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
         const activationUrl = `${frontendUrl}/ativar-conta?token=${token}`;
         
-        const subject = 'Ative sua conta no Estoque Inteligente';
+        const subject = 'Ative sua conta - Estoque Inteligente';
         
         const text = `
 Olá, ${nome}!
@@ -111,7 +111,7 @@ Equipe Estoque Inteligente
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
         const resetUrl = `${frontendUrl}/redefinir-senha?token=${token}`;
         
-        const subject = 'Recuperação de Senha - Estoque Inteligente';
+        const subject = 'Recuperação de senha - Estoque Inteligente';
         
         const text = `
 Olá, ${nome}!
@@ -136,17 +136,16 @@ Equipe Estoque Inteligente
         <div style="background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             <h1 style="color: #306FCC; font-size: 24px; margin-bottom: 20px; margin-top: 0;">Recuperação de Senha</h1>
             <p style="margin: 0 0 15px 0; font-size: 18px;">Olá, <strong>${nome}</strong>!</p>
-            <p style="margin: 0 0 20px 0; font-size: 18px;">Você solicitou a recuperação de senha da sua conta no Estoque Inteligente.</p>
-            <p style="margin: 0 0 20px 0; font-size: 18px;">Clique no botão abaixo para redefinir sua senha:</p>
+            <p style="margin: 0 0 20px 0; font-size: 18px;">Você solicitou a recuperação de senha da sua conta. Para redefinir, clique no botão abaixo.</p>
             <div style="text-align: center; margin: 30px 0;">
-                <a href="${resetUrl}" style="display: inline-block; padding: 14px 32px; background-color: #306FCC; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">Redefinir Senha</a>
+                <a href="${resetUrl}" style="display: inline-block; padding: 14px 32px; background-color: #306FCC; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">Redefinir minha senha</a>
             </div>
-            <div style="margin-top: 25px; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #306FCC; border-radius: 4px;">
+            <div style="margin-top: 25px; border-radius: 4px;">
                 <p style="margin: 0; font-size: 18px;"><strong>Importante:</strong> Este link expira em 5 minutos por segurança.</p>
             </div>
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666;">
-                <p style="margin: 0 0 8px 0; font-size: 14px;">Se você não solicitou esta recuperação, ignore este e-mail. Sua senha permanecerá segura.</p>
-                <p style="margin: 0; font-size: 14px; color: #999;">Equipe Estoque Inteligente</p>
+                <p style="margin: 0 0 8px 0; font-size: 16px;">Não solicitou esta recuperação? Ignore este e-mail.</p>
+                <p style="margin: 0; font-size: 16px; color: #999;">Equipe Estoque Inteligente</p>
             </div>
         </div>
     </div>
