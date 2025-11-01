@@ -66,7 +66,7 @@ class EmailService {
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
         const activationUrl = `${frontendUrl}/ativar-conta?token=${token}`;
         
-        const subject = 'Ative sua conta - Estoque Inteligente';
+        const subject = 'Ative sua conta';
         
         const text = `
 Olá, ${nome}!
@@ -111,7 +111,7 @@ Equipe Estoque Inteligente
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
         const resetUrl = `${frontendUrl}/redefinir-senha?token=${token}`;
         
-        const subject = 'Recuperação de senha - Estoque Inteligente';
+        const subject = 'Recuperação de senha';
         
         const text = `
 Olá, ${nome}!
