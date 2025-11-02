@@ -17,11 +17,6 @@ class Orcamento {
                 type: Number,
                 default: 0
             },
-            createdAt:{
-                type:Date,
-                required: true,
-                default: Date.now
-            },
             componentes: [
                 {
                     componente: {
@@ -65,6 +60,8 @@ class Orcamento {
                 type: Boolean,
                 default: true
             }
+        }, {
+            timestamps: true // Adiciona createdAt e updatedAt automaticamente
         });
 
         // Middleware para calcular subtotal e total antes de salvar
