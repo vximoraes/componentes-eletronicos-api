@@ -7,13 +7,7 @@ const UsuarioSchema = z.object({
   nome: z
     .string()
     .min(1, 'Campo nome é obrigatório.')
-    .refine((nome)=>{
-      return nomeRegex.test(nome)
-    },{
-      message:
-        `O nome não pode ter caracteres especiais, nem numeros e somente ter letras maiúsculas no começo de cada nome/sobrenome, possuindo ao menos 2 letras.`
-    }
-  ),
+    .max(100, 'O nome deve ter no máximo 100 caracteres.'),
   email: z
     .string()
     .email('Formato de email inválido.')
