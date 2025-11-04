@@ -13,7 +13,7 @@ class PermissionService {
         this.messages = messages;        
     }
 
-    async hasPermission(userId, rota, dominio, metodo) {
+    async hasPermission(userId, rota, dominio, metodo, params = {}, httpMethod = '') {
         try {
             const usuario = await this.repository.buscarPorId(userId, { grupos: true });
             if (!usuario) {
@@ -26,9 +26,15 @@ class PermissionService {
                 });
             }
 
+            if (rota === 'usuarios' && params.id && params.id === userId) {
+                const metodosPermitidos = ['GET', 'PATCH', 'PUT', 'DELETE'];
+                if (metodosPermitidos.includes(httpMethod)) {
+                    return true;
+                }
+            }
+
             let permissoes = usuario.permissoes || [];
 
-            // Verifica se usuario.grupos é um array antes de iterar
             if (Array.isArray(usuario.grupos)) {
                 for (const grupo of usuario.grupos) {
                     permissoes = permissoes.concat(grupo.permissoes || []);

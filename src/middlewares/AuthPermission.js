@@ -108,7 +108,9 @@ class AuthPermission {
                 userId,
                 rotaReq.toLowerCase(),
                 rotaDB.dominio,
-                metodo
+                metodo,
+                req.params,
+                req.method
             );
 
             if (!hasPermission) {
