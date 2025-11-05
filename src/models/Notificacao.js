@@ -19,6 +19,11 @@ class Notificacao {
                 required: false,
                 default: false
             },
+            ativo: {
+                type: Boolean,
+                required: false,
+                default: true
+            },
             usuario: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "usuarios", 

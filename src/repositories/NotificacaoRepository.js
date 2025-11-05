@@ -63,7 +63,7 @@ class NotificacaoRepository {
             filterBuilder.comVisualizada(visualizada);
         };
 
-        const filtros = { ...filterBuilder.build() };
+        const filtros = { ...filterBuilder.build(), ativo: true };
 
         const options = {
             page: parseInt(page, 10),
@@ -78,6 +78,12 @@ class NotificacaoRepository {
         return this._atualizar(id, {
             visualizada: true,
             dataLeitura: new Date()
+        }, userId);
+    };
+
+    async inativar(id, userId) {
+        return this._atualizar(id, {
+            ativo: false
         }, userId);
     };
 

@@ -40,6 +40,17 @@ class NotificacaoController {
         const atualizada = await this.service.marcarComoVisualizada(id, req);
         return CommonResponse.success(res, atualizada);
     };
+
+    async inativar(req, res) {
+        const { id } = req.params;
+        const notificacao = await this.service.buscarPorId(id, req);
+        if (!notificacao) {
+            return CommonResponse.error(res, { message: "Notificação não encontrada" }, HttpStatusCodes.NOT_FOUND);
+        }
+
+        const inativada = await this.service.inativar(id, req);
+        return CommonResponse.success(res, inativada);
+    };
 };
 
 export default NotificacaoController;

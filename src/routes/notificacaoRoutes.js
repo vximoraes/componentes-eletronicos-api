@@ -13,6 +13,7 @@ router
     .get("/notificacoes/:id", AuthMiddleware, AuthPermission, asyncWrapper(notificacaoController.buscarPorId.bind(notificacaoController)))
     .post("/notificacoes", AuthMiddleware, AuthPermission, asyncWrapper(notificacaoController.criar.bind(notificacaoController)))
     .patch("/notificacoes/:id/visualizar", AuthMiddleware, AuthPermission, asyncWrapper(notificacaoController.marcarComoVisualizada.bind(notificacaoController)))
+    .patch("/notificacoes/:id/inativar", AuthMiddleware, AuthPermission, asyncWrapper(notificacaoController.inativar.bind(notificacaoController)))
     .put("/notificacoes/:id/visualizar", AuthMiddleware, AuthPermission, asyncWrapper(notificacaoController.marcarComoVisualizada.bind(notificacaoController)));
 
 export default router;
