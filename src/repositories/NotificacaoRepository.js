@@ -65,6 +65,16 @@ class NotificacaoRepository {
 
         const filtros = { ...filterBuilder.build(), ativo: true };
 
+        // Adicionar filtro para excluir notificações visualizadas há mais de 1 dia
+        const umDiaAtras = new Date();
+        umDiaAtras.setDate(umDiaAtras.getDate() - 1);
+        
+        filtros.$or = [
+            { visualizada: false },
+            { visualizada: true, dataLeitura: { $gte: umDiaAtras } },
+            { visualizada: true, dataLeitura: null }
+        ];
+
         const options = {
             page: parseInt(page, 10),
             limit: Math.min(parseInt(limite, 10), 100),

@@ -59,6 +59,8 @@ export const fakeMappings = {
         },
         data_hora: () => new Date().toISOString(),
         visualizada: () => fakebr.random.boolean(),
+        dataLeitura: () => fakebr.random.boolean() ? new Date(Date.now() - fakebr.random.number({ min: 0, max: 86400000 })).toISOString() : null,
+        ativo: () => true,
         usuario: () => new mongoose.Types.ObjectId().toString(),
     },
 

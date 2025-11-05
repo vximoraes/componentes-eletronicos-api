@@ -19,6 +19,10 @@ class Notificacao {
                 required: false,
                 default: false
             },
+            dataLeitura: {
+                type: Date,
+                required: false
+            },
             ativo: {
                 type: Boolean,
                 required: false,
