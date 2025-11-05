@@ -78,7 +78,7 @@ class NotificacaoRepository {
         const options = {
             page: parseInt(page, 10),
             limit: Math.min(parseInt(limite, 10), 100),
-            sort: { createdAt: -1 }
+            sort: { data_hora: -1 }
         };
 
         return await this.model.paginate(filtros, options);

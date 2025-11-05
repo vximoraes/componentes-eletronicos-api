@@ -57,6 +57,7 @@ class Estoque {
         // Método estático para atualizar quantidade total do componente
         estoqueSchema.statics.atualizarQuantidadeComponente = async function(componenteId) {
             const Componente = mongoose.model('componentes');
+            const Notificacao = mongoose.model('notificacoes');
             
             // Soma todas as quantidades do componente em todas as localizações
             const resultado = await this.aggregate([
@@ -66,8 +67,41 @@ class Estoque {
 
             const quantidadeTotal = resultado.length > 0 ? resultado[0].quantidadeTotal : 0;
 
-            // Atualiza a quantidade total no componente
-            await Componente.findByIdAndUpdate(componenteId, { quantidade: quantidadeTotal });
+            // Buscar componente para verificar estoque mínimo e criar notificação
+            const componente = await Componente.findById(componenteId);
+            
+            if (componente) {
+                const quantidadeAnterior = componente.quantidade || 0;
+                const estoqueMinimo = componente.estoque_minimo || 0;
+
+                // Atualiza a quantidade total no componente
+                await Componente.findByIdAndUpdate(componenteId, { quantidade: quantidadeTotal });
+
+                // Criar notificações baseadas no status do estoque
+                let mensagem = null;
+                
+                if (quantidadeTotal === 0 && quantidadeAnterior > 0) {
+                    // Componente ficou indisponível
+                    mensagem = `${componente.nome} está indisponível (0 unidades)`;
+                } else if (quantidadeTotal > 0 && quantidadeAnterior === 0) {
+                    // Componente voltou a ter estoque
+                    mensagem = `${componente.nome} está em estoque (${quantidadeTotal} unidades)`;
+                } else if (quantidadeTotal > 0 && quantidadeTotal <= estoqueMinimo && quantidadeAnterior > estoqueMinimo) {
+                    // Componente ficou com estoque baixo
+                    mensagem = `${componente.nome} está com estoque baixo (${quantidadeTotal} unidades)`;
+                }
+
+                // Criar notificação se houver mensagem
+                if (mensagem && componente.usuario) {
+                    await Notificacao.create({
+                        mensagem,
+                        data_hora: new Date(),
+                        visualizada: false,
+                        ativo: true,
+                        usuario: componente.usuario
+                    });
+                }
+            }
         };
 
         estoqueSchema.plugin(mongoosePaginate);
