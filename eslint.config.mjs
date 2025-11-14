@@ -1,11 +1,16 @@
 import js from '@eslint/js';
 
 export default [
-    js.configs.recommended, // Inclui diretamente a configuração recomendada para JavaScript
+    js.configs.recommended,
     {
-        plugins: {}, // Flat Config requer que "plugins" seja um objeto
+        languageOptions: {
+            globals: {
+                process: 'readonly',
+                console: 'readonly'
+            },
+        },
         rules: {
-            semi: ['error', 'always'], // Exige ponto e vírgula no final das linhas
+            semi: ['off'],
         },
     },
 ];
