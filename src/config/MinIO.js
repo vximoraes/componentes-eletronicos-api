@@ -1,43 +1,26 @@
-import * as Minio from 'minio'
-import dotenv from 'dotenv'
+import * as Minio from 'minio';
+import 'dotenv/config';
 
-dotenv.config()
+const requiredMinioVars = [
+    'MINIO_ENDPOINT',
+    'MINIO_PORT',
+    'MINIO_ACCESS_KEY',
+    'MINIO_SECRET_KEY',
+    'MINIO_BUCKET'
+];
+
+for (const varName of requiredMinioVars) {
+    if(!process.env[varName]) {
+        throw new Error(`Variável de ambiente do MinIO não está definida: ${varName}`);
+    }
+};
 
 const minioClient = new Minio.Client({
     endPoint: process.env.MINIO_ENDPOINT,
-    port: parseInt(process.env.MINIO_PORT),
-    useSSL: false,
+    port: parseInt(process.env.MINIO_PORT, 10),
+    useSSL: process.env.MINIO_USE_SSL === "true",
     accessKey: process.env.MINIO_ACCESS_KEY,
     secretKey: process.env.MINIO_SECRET_KEY
-})
-
-// Função para inicializar os buckets
-const initializeBuckets = async () => {
-    const buckets = [process.env.MINIO_BUCKET, process.env.MINIO_BUCKET_2]
-    for (const bucket of buckets) {
-        const policy = {
-            Version: "2012-10-17",
-            Statement: [
-                {
-                    Effect: "Allow",
-                    Principal: { AWS: ["*"] },
-                    Action: ["s3:GetObject"],
-                    Resource: [`arn:aws:s3:::${bucket}/*`]
-                }
-            ]
-        };
-
-        if (!(await minioClient.bucketExists(bucket))) {
-            await minioClient.makeBucket(bucket, 'us-east-1');
-            await minioClient.setBucketPolicy(bucket, JSON.stringify(policy));
-            console.log('Bucket criado:', bucket)
-        }
-    }
-}
-
-// Inicializar buckets apenas se não estivermos em ambiente de teste
-if (process.env.NODE_ENV !== 'test') {
-    initializeBuckets().catch(console.error);
-}
+});
 
 export default minioClient;

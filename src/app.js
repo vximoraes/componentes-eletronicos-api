@@ -2,6 +2,7 @@ import express from "express";
 import routes from "./routes/index.js";
 import cors from "cors";
 import helmet from "helmet";
+import setupMinio from "./config/setupMinio.js";
 import compression from "compression";
 import errorHandler from './utils/helpers/errorHandler.js';
 import logger from './utils/logger.js';
@@ -11,6 +12,7 @@ import DbConnect from "./config/DbConnect.js";
 const app = express();
 
 await DbConnect.conectar();
+await setupMinio();
 
 app.use(helmet());
 app.use(cors());
