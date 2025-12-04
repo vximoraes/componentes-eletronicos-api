@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
+import SSEService from "../services/SSEService.js";
 
 class Estoque {
     constructor() {
@@ -74,6 +75,8 @@ class Estoque {
                 const quantidadeAnterior = componente.quantidade || 0;
                 const estoqueMinimo = componente.estoque_minimo || 0;
 
+                console.log('[DEBUG Notificação] quantidadeAnterior:', quantidadeAnterior, 'quantidadeTotal:', quantidadeTotal, 'estoqueMinimo:', estoqueMinimo);
+
                 // Atualiza a quantidade total no componente
                 await Componente.findByIdAndUpdate(componenteId, { quantidade: quantidadeTotal });
 
@@ -83,22 +86,37 @@ class Estoque {
                 if (quantidadeTotal === 0 && quantidadeAnterior > 0) {
                     // Componente ficou indisponível
                     mensagem = `${componente.nome} está indisponível (0 unidades)`;
-                } else if (quantidadeTotal > 0 && quantidadeAnterior === 0) {
-                    // Componente voltou a ter estoque
+                } else if (quantidadeTotal >= estoqueMinimo && quantidadeAnterior < estoqueMinimo) {
+                    // Componente voltou ao estoque normal (estava indisponível ou baixo estoque)
                     mensagem = `${componente.nome} está em estoque (${quantidadeTotal} unidades)`;
-                } else if (quantidadeTotal > 0 && quantidadeTotal <= estoqueMinimo && quantidadeAnterior > estoqueMinimo) {
-                    // Componente ficou com estoque baixo
+                } else if (quantidadeTotal > 0 && quantidadeTotal < estoqueMinimo && quantidadeAnterior === 0) {
+                    // Componente saiu de indisponível para baixo estoque
+                    mensagem = `${componente.nome} está com estoque baixo (${quantidadeTotal} unidades)`;
+                } else if (quantidadeTotal > 0 && quantidadeTotal < estoqueMinimo && quantidadeAnterior >= estoqueMinimo) {
+                    // Componente ficou com estoque baixo (estava em estoque normal)
                     mensagem = `${componente.nome} está com estoque baixo (${quantidadeTotal} unidades)`;
                 }
 
+                console.log('[DEBUG Notificação] mensagem a criar:', mensagem);
+
                 // Criar notificação se houver mensagem
                 if (mensagem && componente.usuario) {
-                    await Notificacao.create({
+                    const novaNotificacao = await Notificacao.create({
                         mensagem,
                         data_hora: new Date(),
                         visualizada: false,
                         ativo: true,
                         usuario: componente.usuario
+                    });
+
+                    console.log('[DEBUG SSE] Enviando notificação para usuário:', componente.usuario.toString());
+
+                    // Envia notificação via SSE para o usuário
+                    SSEService.sendNotification(componente.usuario, {
+                        _id: novaNotificacao._id,
+                        mensagem: novaNotificacao.mensagem,
+                        data_hora: novaNotificacao.data_hora,
+                        visualizada: novaNotificacao.visualizada
                     });
                 }
             }
