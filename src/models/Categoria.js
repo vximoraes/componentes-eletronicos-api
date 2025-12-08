@@ -19,8 +19,6 @@ class Categoria {
             }
         });
 
-        categoriaSchema.index({ nome: 1, usuario: 1 }, { unique: true });
-
         categoriaSchema.plugin(mongoosePaginate);
 
         this.model = mongoose.model("categorias", categoriaSchema);

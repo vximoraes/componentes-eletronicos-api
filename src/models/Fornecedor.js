@@ -31,8 +31,6 @@ class Fornecedor {
             }
         });
 
-        fornecedorSchema.index({ nome: 1, usuario: 1 }, { unique: true });
-
         fornecedorSchema.plugin(mongoosePaginate);
 
         this.model = mongoose.model("fornecedores", fornecedorSchema);

@@ -157,7 +157,7 @@ class ComponenteRepository {
     };
 
     async buscarPorNome(nome, idIgnorado, req) {
-        const filtro = { nome };
+        const filtro = { nome, ativo: true };
 
         if (idIgnorado) {
             filtro._id = { $ne: idIgnorado }

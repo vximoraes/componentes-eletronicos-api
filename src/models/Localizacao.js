@@ -19,8 +19,6 @@ class Localizacao {
             }
         });
 
-        localizacaoSchema.index({ nome: 1, usuario: 1 }, { unique: true });
-
         localizacaoSchema.plugin(mongoosePaginate);
 
         this.model = mongoose.model("localizacoes", localizacaoSchema);

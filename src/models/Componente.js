@@ -82,8 +82,6 @@ class Componente {
             }
         });
 
-        componenteSchema.index({ nome: 1, usuario: 1 }, { unique: true });
-
         componenteSchema.plugin(mongoosePaginate);
 
         this.model = mongoose.model("componentes", componenteSchema);
